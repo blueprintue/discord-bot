@@ -1,0 +1,28 @@
+{
+  "discord": {
+    "name": "",
+    "token": ""
+  },
+  "twitch": {
+    "userID": "",
+    "clientID": ""
+  },
+  "log": {
+    "filename": "",
+    "level": "info"
+  },
+  "modules": {
+    "welcome": {
+      "channel": "",
+      "messages": [
+        {
+          "title": "",
+          "description": "",
+          "color": 0,
+          "role": "",
+          "emoji": ""
+        }
+      ]
+    }
+  }
+}

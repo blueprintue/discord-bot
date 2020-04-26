@@ -35,8 +35,7 @@ func MessageReactionsAll(session *discordgo.Session, channelID, messageID, emoji
 		}
 
 		for k := range listUsers {
-			var ptr discordgo.User
-			ptr = *listUsers[k]
+			ptr := *listUsers[k]
 			st = append(st, &ptr)
 		}
 
