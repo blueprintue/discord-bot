@@ -1,0 +1,11 @@
+{
+  "discord": {
+    "token": "",
+    "channel": "",
+    "roles": ""
+  },
+  "twitch": {
+    "clientID": "",
+    "userID": ""
+  }
+}

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"github.com/rancoud/blueprintue-discord/configuration"
 	"github.com/rancoud/blueprintue-discord/handlers"
 	"github.com/rancoud/blueprintue-discord/welcome"
 	"log"
@@ -13,16 +13,15 @@ import (
 	"time"
 )
 
-var token string
 var waitStateFilled = 10 * time.Millisecond
 
-func init() {
-	flag.StringVar(&token, "t", "", "Bot token")
-	flag.Parse()
-}
-
 func main() {
-	session, err := discordgo.New("Bot " + token)
+	config, err := configuration.ReadConfiguration("config.json")
+	if err != nil {
+		log.Fatalf("could not read configuration: %s", err)
+	}
+
+	session, err := discordgo.New("Bot " + config.Discord.Token)
 	if err != nil {
 		log.Fatalf("could not create session: %s", err)
 	}
