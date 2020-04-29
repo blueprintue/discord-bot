@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/rancoud/blueprintue-discord/configuration"
-	"github.com/rancoud/blueprintue-discord/handlers"
 	"github.com/rancoud/blueprintue-discord/welcome"
 	"log"
 	"os"
@@ -38,9 +38,13 @@ func main() {
 		}
 	}
 
-	session.AddHandler(handlers.Debug)
+	spew.Dump(session.State)
 
-	welcomeManager := welcome.NewWelcomeManager("671032699879686171", session)
+	err = session.Close()
+
+	//session.AddHandler(handlers.Debug)
+
+	welcomeManager := welcome.NewWelcomeManager(session, config.Modules.WelcomeConfiguration)
 	welcomeManager.Run()
 
 	fmt.Println("Bot is now running. Press CTRL+C to stop")

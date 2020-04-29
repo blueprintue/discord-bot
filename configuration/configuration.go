@@ -3,6 +3,7 @@ package configuration
 import (
 	"encoding/json"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/rancoud/blueprintue-discord/welcome"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -15,14 +16,16 @@ import (
 
 type Configuration struct {
 	Discord struct {
-		Channel string   `json:"channel" env:"BUE_BOT_DISCORD_CHANNELS"`
-		Roles   string   `json:"roles"   env:"BUE_BOT_DISCORD_ROLES"`
-		Token   string   `json:"token"   env:"BUE_BOT_DISCORD_TOKEN"`
+		Name string `json:"name" env:"BUE_BOT_DISCORD_NAME"`
+		Token string `json:"token" env:"BUE_BOT_DISCORD_TOKEN"`
 	} `json:"discord"`
 	Twitch struct {
 		ClientID string `json:"clientID" env:"BUE_BOT_TWITCH_CLIENT_ID"`
 		UserID string `json:"userID" env:"BUE_BOT_TWITCH_USER_ID"`
 	} `json:"twitch"`
+	Modules struct {
+		WelcomeConfiguration welcome.Configuration `json:"welcome"`
+	} `json:"modules"`
 }
 
 func ReadConfiguration(filename string) (*Configuration, error) {
