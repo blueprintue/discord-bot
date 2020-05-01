@@ -26,6 +26,8 @@ func init() {
 }
 
 func main() {
+	var err error
+
 	logrus.Infof("[MAIN]\tRead configuration from file: %s", configurationFilename)
 	config, err := configuration.ReadConfiguration(configurationFilename)
 	if err != nil {
@@ -58,7 +60,12 @@ func main() {
 	welcomeManager := welcome.NewWelcomeManager(session, config.Discord.Name, config.Modules.WelcomeConfiguration)
 
 	logrus.Info("[MAIN]\t[WELCOME]\tRun Welcome Manager")
-	welcomeManager.Run()
+	err = welcomeManager.Run()
+	if err != nil {
+		logrus.Errorf("[MAIN]\t[WELCOME]\tRun Welcome Manager: %s", err)
+		closeSessionDiscord(session)
+		return
+	}
 
 	logrus.Info("[MAIN]\t--- Modules loaded ---")
 
@@ -67,13 +74,17 @@ func main() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
 
-	logrus.Info("[MAIN]\tClose discord session")
-	err = session.Close()
-	if err != nil {
-		logrus.Fatalf("[MAIN]\tCould not close discord session %s", err)
-	}
+	closeSessionDiscord(session)
 }
 
 func hasRequiredStateFieldsFilled(session *discordgo.Session) bool {
 	return session.State.Guilds[0].Channels != nil && session.State.User != nil
+}
+
+func closeSessionDiscord(session *discordgo.Session) {
+	logrus.Info("[MAIN]\tClose discord session")
+	err := session.Close()
+	if err != nil {
+		logrus.Fatalf("[MAIN]\tCould not close discord session %s", err)
+	}
 }
