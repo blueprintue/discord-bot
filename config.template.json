@@ -1,11 +1,24 @@
 {
   "discord": {
-    "token": "",
-    "channel": "",
-    "roles": ""
+    "name": "",
+    "token": ""
   },
   "twitch": {
-    "clientID": "",
-    "userID": ""
+    "userID": "",
+    "clientID": ""
+  },
+  "modules": {
+    "welcome": {
+      "channel": "",
+      "messages": [
+        {
+          "title": "",
+          "description": "",
+          "color": 0,
+          "role": "",
+          "emoji": ""
+        }
+      ]
+    }
   }
 }

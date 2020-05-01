@@ -2,7 +2,6 @@ package configuration
 
 import (
 	"encoding/json"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/rancoud/blueprintue-discord/welcome"
 	"io/ioutil"
 	"os"
@@ -68,19 +67,16 @@ func eraseConfigurationValuesWithEnv(obj interface{}) interface{} {
 		switch val.Field(idxNumField).Kind() {
 		case reflect.String:
 			val.Field(idxNumField).SetString(envValue)
-			break
 		case reflect.Int:
 			intEnvValue, err := strconv.Atoi(envValue)
 			if err == nil {
 				val.Field(idxNumField).SetInt(int64(intEnvValue))
 			}
-			break
 		case reflect.Bool:
 			boolEnvValue, err := strconv.ParseBool(envValue)
 			if err == nil {
 				val.Field(idxNumField).SetBool(boolEnvValue)
 			}
-			break
 		case reflect.Slice:
 			splitter := ":"
 			if runtime.GOOS == "windows" {
@@ -89,10 +85,8 @@ func eraseConfigurationValuesWithEnv(obj interface{}) interface{} {
 			stringEnvValues := strings.Split(envValue, splitter)
 			val.Field(idxNumField).Set(reflect.MakeSlice(val.Field(idxNumField).Type(), len(stringEnvValues), len(stringEnvValues)))
 			for idxSlice := 0; idxSlice < len(stringEnvValues); idxSlice++ {
-				spew.Dump(val.Field(idxNumField).Index(idxSlice))
 				val.Field(idxNumField).Index(idxSlice).SetString(stringEnvValues[idxSlice])
 			}
-			break
 		}
 	}
 
