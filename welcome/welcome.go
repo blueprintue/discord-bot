@@ -203,19 +203,6 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 			continue
 		}
 
-		if !w.userHasRequirements(user.ID) {
-			logrus.Info("[WELCOME]\t[updateRoleBelongMessage]\tSKIP - User has not requirements")
-
-			logrus.Infof("[WELCOME]\t[updateRoleBelongMessage]\tRemove Reaction (%s) in MessageID %s", message.Emoji + ":" + message.EmojiID, message.ID)
-			err := w.session.MessageReactionRemove(w.config.ChannelID, message.ID, message.Emoji + ":" + message.EmojiID, user.ID)
-			if err != nil {
-				logrus.Errorf("[WELCOME]\t[updateRoleBelongMessage]\tCould not remove Reaction (%s) in MessageID %s: %s", message.Emoji + ":" + message.EmojiID, message.ID, err)
-				return err
-			}
-
-			continue
-		}
-
 		logrus.Infof("[WELCOME]\t[updateRoleBelongMessage]\tAdd RoleID %s (%s) to UserID %s (%s)", message.RoleID, message.Role, user.ID, user.Username)
 		err = w.session.GuildMemberRoleAdd(w.config.GuildID, user.ID, message.RoleID)
 		if err != nil {
@@ -282,24 +269,6 @@ func (w *Manager) onMessageReactionAdd(session *discordgo.Session, reaction *dis
 		return
 	}
 
-	if !w.userHasRequirements(reaction.UserID) {
-		logrus.Info("[WELCOME]\t[onMessageReactionAdd]\tSKIP - User has not requirements")
-
-		logrus.Infof("[WELCOME]\t[onMessageReactionAdd]\tRemove Reaction (%s) in MessageID %s", reaction.Emoji.Name, reaction.MessageID)
-		err := w.session.MessageReactionRemove(w.config.ChannelID, reaction.MessageID, w.config.Messages[idxMessageFound].Emoji + ":" + w.config.Messages[idxMessageFound].EmojiID, reaction.UserID)
-		if err != nil {
-			logrus.Errorf("[WELCOME]\t[onMessageReactionAdd]\tCould not remove Reaction (%s) in MessageID %s: %s", reaction.Emoji.Name, reaction.MessageID, err)
-			return
-		}
-
-		err = w.sendMessageToUser(reaction.UserID)
-		if err != nil {
-			logrus.Errorf("[WELCOME]\t[onMessageReactionAdd]\tCould not send Message to userID %s: %s", reaction.UserID, err)
-			return
-		}
-		return
-	}
-
 	logrus.Infof("[WELCOME]\t[onMessageReactionAdd]\tAdd RoleID %s (%s) to UserID %s", w.config.Messages[idxMessageFound].RoleID, w.config.Messages[idxMessageFound].Role, reaction.UserID)
 	err := w.session.GuildMemberRoleAdd(w.config.GuildID, reaction.UserID, w.config.Messages[idxMessageFound].RoleID)
 	if err != nil {
@@ -346,16 +315,6 @@ func (w *Manager) onMessageReactionRemove(session *discordgo.Session, reaction *
 
 func (w *Manager) isUserBot(userID string) bool {
 	return w.session.State.User.ID == userID
-}
-
-func (w *Manager) userHasRequirements(userID string) bool {
-	member, err := w.session.State.Member(w.config.GuildID, userID)
-	if err != nil {
-		logrus.Errorf("[WELCOME]\tcould not find Member userID %s in GuildID %s: %s", userID, w.config.GuildID, err)
-		return false
-	}
-
-	return member.User.MFAEnabled || member.User.Verified
 }
 
 func (w *Manager) sendMessageToUser(userID string) error {
