@@ -14,6 +14,7 @@ import (
 
 const waitStateFilled = 10 * time.Millisecond
 const configurationFilename = "config.json"
+const logFile = "/var/log/blueprintue-discord.log"
 
 func init() {
 	logrus.SetLevel(logrus.InfoLevel)
@@ -23,6 +24,11 @@ func init() {
 		TimestampFormat: "2006-01-02 15:04:05",
 	})
 	logrus.SetOutput(colorable.NewColorableStdout())
+	file, err := os.OpenFile(logFile, os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0755)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	logrus.SetOutput(file)
 }
 
 func main() {

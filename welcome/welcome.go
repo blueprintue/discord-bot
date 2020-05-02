@@ -3,21 +3,10 @@ package welcome
 import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
-	"github.com/mattn/go-colorable"
 	"github.com/rancoud/blueprintue-discord/helpers"
 	"github.com/sirupsen/logrus"
 	"strings"
 )
-
-func init() {
-	logrus.SetLevel(logrus.InfoLevel)
-	logrus.SetFormatter(&logrus.TextFormatter{
-		ForceColors: true,
-		FullTimestamp: true,
-		TimestampFormat: "2006-01-02 15:04:05",
-	})
-	logrus.SetOutput(colorable.NewColorableStdout())
-}
 
 type Configuration struct {
 	Channel string `json:"channel"`
