@@ -2,20 +2,23 @@ package welcome
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/rancoud/blueprintue-discord/helpers"
 	"github.com/sirupsen/logrus"
-	"strings"
 )
 
+// Configuration is a struct
 type Configuration struct {
-	Channel string `json:"channel"`
+	Channel   string `json:"channel"`
 	ChannelID string
-	Guild string
-	GuildID string
-	Messages []Message `json:"messages"`
+	Guild     string
+	GuildID   string
+	Messages  []Message `json:"messages"`
 }
 
+// Message is a struct
 type Message struct {
 	ID          string
 	Title       string `json:"title"`
@@ -27,11 +30,13 @@ type Message struct {
 	EmojiID     string
 }
 
+// Manager is a struct
 type Manager struct {
 	session *discordgo.Session
-	config Configuration
+	config  Configuration
 }
 
+// NewWelcomeManager return a Manager
 func NewWelcomeManager(
 	session *discordgo.Session,
 	guildName string,
@@ -41,7 +46,7 @@ func NewWelcomeManager(
 
 	manager := &Manager{
 		session: session,
-		config: config,
+		config:  config,
 	}
 
 	logrus.Info("[WELCOME]\t[NewWelcomeManager]\tComplete configuration with session.State")
@@ -91,6 +96,7 @@ func (w *Manager) completeConfiguration() {
 	}
 }
 
+// Run do the main task of Welcome
 func (w *Manager) Run() error {
 	logrus.Info("[WELCOME]\t[Run]\tAdd Handler on Message Reaction Add")
 	w.session.AddHandler(w.onMessageReactionAdd)
@@ -172,9 +178,9 @@ func (w *Manager) addMessagesToChannel() error {
 
 func (w *Manager) updateRoleBelongMessage(message Message) error {
 	logrus.Infof("[WELCOME]\t[updateRoleBelongMessage]\tGet all reactions from Message %s", message.Title)
-	users, err := helpers.MessageReactionsAll(w.session, w.config.ChannelID, message.ID, message.Emoji + ":" + message.EmojiID)
+	users, err := helpers.MessageReactionsAll(w.session, w.config.ChannelID, message.ID, message.Emoji+":"+message.EmojiID)
 	if err != nil {
-		logrus.Errorf("[WELCOME]\t[updateRoleBelongMessage]\tCould not get all reactions from MessageID %s ChannelID %s (%s) Emoji %s: %s", message.ID, w.config.ChannelID, w.config.Channel, message.Emoji + ":" + message.EmojiID, err)
+		logrus.Errorf("[WELCOME]\t[updateRoleBelongMessage]\tCould not get all reactions from MessageID %s ChannelID %s (%s) Emoji %s: %s", message.ID, w.config.ChannelID, w.config.Channel, message.Emoji+":"+message.EmojiID, err)
 		return err
 	}
 
@@ -187,7 +193,7 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 		member, err := w.session.State.Member(w.config.GuildID, user.ID)
 		if err != nil {
 			logrus.Errorf("[WELCOME]\t[updateRoleBelongMessage]\tCould not find Member userID %s in GuildID %s: %s", user.ID, w.config.GuildID, err)
-			return err
+			continue
 		}
 
 		skipUser := false
@@ -217,9 +223,9 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 func (w *Manager) addMessage(message *Message) error {
 	logrus.Infof("[WELCOME]\t[addMessage]\tSent Message %s to ChannelID %s (%s)", message.Title, w.config.ChannelID, w.config.Channel)
 	messageSent, err := w.session.ChannelMessageSendEmbed(w.config.ChannelID, &discordgo.MessageEmbed{
-		Title: message.Title,
+		Title:       message.Title,
 		Description: message.Description,
-		Color: message.Color,
+		Color:       message.Color,
 	})
 	if err != nil {
 		logrus.Errorf("[WELCOME]\t[addMessage]\tCould not send Message to ChannelID %s: %s", w.config.ChannelID, err)
@@ -230,7 +236,7 @@ func (w *Manager) addMessage(message *Message) error {
 	message.ID = messageSent.ID
 
 	logrus.Infof("[WELCOME]\t[addMessage]\tAdd Reaction to Message %s", message.Title)
-	err = w.session.MessageReactionAdd(w.config.ChannelID, message.ID, message.Emoji + ":" + message.EmojiID)
+	err = w.session.MessageReactionAdd(w.config.ChannelID, message.ID, message.Emoji+":"+message.EmojiID)
 	if err != nil {
 		logrus.Errorf("[WELCOME]\t[addMessage]\tCould not add Reaction to MessageID %s: %s", message.ID, err)
 		return err
