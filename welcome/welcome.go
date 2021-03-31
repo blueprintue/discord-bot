@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/rancoud/blueprintue-discord/helpers"
-	"github.com/sirupsen/logrus"
 )
 
 // Configuration is a struct
@@ -49,7 +50,7 @@ func NewWelcomeManager(
 		config:  config,
 	}
 
-	logrus.Info("[WELCOME]\t[NewWelcomeManager]\tComplete configuration with session.State")
+	log.Info().Msg("Complete configuration with session.State")
 	manager.completeConfiguration()
 
 	return manager
@@ -58,12 +59,12 @@ func NewWelcomeManager(
 func (w *Manager) completeConfiguration() {
 	for _, guild := range w.session.State.Guilds {
 		if guild.Name == w.config.Guild {
-			logrus.Infof("[WELCOME]\t[completeConfiguration]\tSet GuildID %s for Guild '%s'", guild.ID, w.config.Guild)
+			log.Info().Msgf("Set GuildID %s for Guild '%s'", guild.ID, w.config.Guild)
 			w.config.GuildID = guild.ID
 
 			for _, channel := range guild.Channels {
 				if channel.Name == w.config.Channel {
-					logrus.Infof("[WELCOME]\t[completeConfiguration]\tSet ChannelID %s for Channel '%s'", channel.ID, w.config.Channel)
+					log.Info().Msgf("Set ChannelID %s for Channel '%s'", channel.ID, w.config.Channel)
 					w.config.ChannelID = channel.ID
 					break
 				}
@@ -72,7 +73,7 @@ func (w *Manager) completeConfiguration() {
 			for _, role := range guild.Roles {
 				for idx := range w.config.Messages {
 					if w.config.Messages[idx].Role == role.Name {
-						logrus.Infof("[WELCOME]\t[completeConfiguration]\tSet RoleID %s for Role '%s'", role.ID, w.config.Messages[idx].Role)
+						log.Info().Msgf("Set RoleID %s for Role '%s'", role.ID, w.config.Messages[idx].Role)
 						w.config.Messages[idx].RoleID = role.ID
 					}
 				}
@@ -85,7 +86,7 @@ func (w *Manager) completeConfiguration() {
 					w.config.Messages[idx].Title = strings.ReplaceAll(w.config.Messages[idx].Title, emojiInText, emojiRichEmbed)
 					w.config.Messages[idx].Description = strings.ReplaceAll(w.config.Messages[idx].Description, emojiInText, emojiRichEmbed)
 					if w.config.Messages[idx].Emoji == emoji.Name {
-						logrus.Infof("[WELCOME]\t[completeConfiguration]\tSet EmojiID %s for Emoji '%s'", emoji.ID, w.config.Messages[idx].Emoji)
+						log.Info().Msgf("Set EmojiID %s for Emoji '%s'", emoji.ID, w.config.Messages[idx].Emoji)
 						w.config.Messages[idx].EmojiID = emoji.ID
 					}
 				}
@@ -98,16 +99,16 @@ func (w *Manager) completeConfiguration() {
 
 // Run do the main task of Welcome
 func (w *Manager) Run() error {
-	logrus.Info("[WELCOME]\t[Run]\tAdd Handler on Message Reaction Add")
+	log.Info().Msg("Add Handler on Message Reaction Add")
 	w.session.AddHandler(w.onMessageReactionAdd)
 
-	logrus.Info("[WELCOME]\t[Run]\tAdd Handler on Message Reaction Remove")
+	log.Info().Msg("Add Handler on Message Reaction Remove")
 	w.session.AddHandler(w.onMessageReactionRemove)
 
-	logrus.Info("[WELCOME]\t[Run]\tAdd messages to channel")
+	log.Info().Msg("Add messages to channel")
 	err := w.addMessagesToChannel()
 	if err != nil {
-		logrus.Errorf("[WELCOME]\t[Run]\tCould not add messages to channel: %s", err)
+		log.Error().Err(err).Msg("Could not add messages to channel")
 		return err
 	}
 
@@ -115,22 +116,22 @@ func (w *Manager) Run() error {
 }
 
 func (w *Manager) addMessagesToChannel() error {
-	logrus.Infof("[WELCOME]\t[addMessagesToChannel]\tGet messages from channelID %s (%s)", w.config.ChannelID, w.config.Channel)
+	log.Info().Msgf("Get messages from channelID %s (%s)", w.config.ChannelID, w.config.Channel)
 	messages, err := w.session.ChannelMessages(w.config.ChannelID, 100, "", "", "")
 	if err != nil {
-		logrus.Errorf("[WELCOME]\t[addMessagesToChannel]\tCould not read messages from channelID %s (%s): %s", w.config.ChannelID, w.config.Channel, err)
+		log.Error().Err(err).Msgf("Could not read messages from channelID %s (%s)", w.config.ChannelID, w.config.Channel)
 		return err
 	}
 
 	var idxsMessageTreated []int
 	for _, message := range messages {
 		if message.Author.ID != w.session.State.User.ID {
-			logrus.Infof("[WELCOME]\t[addMessagesToChannel]\tSKIP - Message in Channel %s is not from bot", w.config.Channel)
+			log.Info().Msgf("SKIP - Message in Channel %s is not from bot", w.config.Channel)
 			continue
 		}
 
 		if len(message.Embeds) == 0 {
-			logrus.Infof("[WELCOME]\t[addMessagesToChannel]\tSKIP - Message in Channel %s is not an embed", w.config.Channel)
+			log.Info().Msgf("SKIP - Message in Channel %s is not an embed", w.config.Channel)
 			continue
 		}
 
@@ -138,10 +139,10 @@ func (w *Manager) addMessagesToChannel() error {
 			if message.Embeds[0].Title == w.config.Messages[idxMessages].Title {
 				w.config.Messages[idxMessages].ID = message.ID
 
-				logrus.Infof("[WELCOME]\t[addMessagesToChannel]\tMessage '%s' already sent -> update roles", w.config.Messages[idxMessages].Title)
+				log.Info().Msgf("Message '%s' already sent -> update roles", w.config.Messages[idxMessages].Title)
 				err := w.updateRoleBelongMessage(w.config.Messages[idxMessages])
 				if err != nil {
-					logrus.Errorf("[WELCOME]\t[addMessagesToChannel]\tCould not update role belong to Message '%s': %s", w.config.Messages[idxMessages].Title, err)
+					log.Error().Err(err).Msgf("Could not update role belong to Message '%s'", w.config.Messages[idxMessages].Title)
 					return err
 				}
 
@@ -162,10 +163,10 @@ func (w *Manager) addMessagesToChannel() error {
 		}
 
 		if !messageTreated {
-			logrus.Infof("[WELCOME]\t[addMessagesToChannel]\tMessage %s missing - add message", w.config.Messages[idxMessages].Title)
+			log.Info().Msgf("Message %s missing - add message", w.config.Messages[idxMessages].Title)
 			err := w.addMessage(&w.config.Messages[idxMessages])
 			if err != nil {
-				logrus.Errorf("[WELCOME]\t[addMessagesToChannel]\tCould not add Message %s: %s", w.config.Messages[idxMessages].Title, err)
+				log.Error().Err(err).Msgf("Could not add Message %s", w.config.Messages[idxMessages].Title)
 				return err
 			}
 
@@ -177,22 +178,22 @@ func (w *Manager) addMessagesToChannel() error {
 }
 
 func (w *Manager) updateRoleBelongMessage(message Message) error {
-	logrus.Infof("[WELCOME]\t[updateRoleBelongMessage]\tGet all reactions from Message %s", message.Title)
+	log.Info().Msgf("Get all reactions from Message %s", message.Title)
 	users, err := helpers.MessageReactionsAll(w.session, w.config.ChannelID, message.ID, message.Emoji+":"+message.EmojiID)
 	if err != nil {
-		logrus.Errorf("[WELCOME]\t[updateRoleBelongMessage]\tCould not get all reactions from MessageID %s ChannelID %s (%s) Emoji %s: %s", message.ID, w.config.ChannelID, w.config.Channel, message.Emoji+":"+message.EmojiID, err)
+		log.Error().Err(err).Msgf("Could not get all reactions from MessageID %s ChannelID %s (%s) Emoji %s", message.ID, w.config.ChannelID, w.config.Channel, message.Emoji+":"+message.EmojiID)
 		return err
 	}
 
 	for _, user := range users {
 		if w.isUserBot(user.ID) {
-			logrus.Info("[WELCOME]\t[updateRoleBelongMessage]\tSKIP - User is the bot")
+			log.Info().Msg("SKIP - User is the bot")
 			continue
 		}
 
 		member, err := w.session.State.Member(w.config.GuildID, user.ID)
 		if err != nil {
-			logrus.Errorf("[WELCOME]\t[updateRoleBelongMessage]\tCould not find Member userID %s in GuildID %s: %s", user.ID, w.config.GuildID, err)
+			log.Error().Err(err).Msgf("Could not find Member userID %s in GuildID %s", user.ID, w.config.GuildID)
 			continue
 		}
 
@@ -205,14 +206,14 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 		}
 
 		if skipUser {
-			logrus.Info("[WELCOME]\t[updateRoleBelongMessage]\tSKIP - User has already role")
+			log.Info().Msg("SKIP - User has already role")
 			continue
 		}
 
-		logrus.Infof("[WELCOME]\t[updateRoleBelongMessage]\tAdd RoleID %s (%s) to UserID %s (%s)", message.RoleID, message.Role, user.ID, user.Username)
+		log.Info().Msgf("Add RoleID %s (%s) to UserID %s (%s)", message.RoleID, message.Role, user.ID, user.Username)
 		err = w.session.GuildMemberRoleAdd(w.config.GuildID, user.ID, message.RoleID)
 		if err != nil {
-			logrus.Errorf("[WELCOME]\t[updateRoleBelongMessage]\tCould not add roleID %s to userID %s: %s", message.RoleID, user.ID, err)
+			log.Error().Err(err).Msgf("Could not add roleID %s to userID %s", message.RoleID, user.ID)
 			return err
 		}
 	}
@@ -221,24 +222,24 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 }
 
 func (w *Manager) addMessage(message *Message) error {
-	logrus.Infof("[WELCOME]\t[addMessage]\tSent Message %s to ChannelID %s (%s)", message.Title, w.config.ChannelID, w.config.Channel)
+	log.Info().Msgf("Sent Message %s to ChannelID %s (%s)", message.Title, w.config.ChannelID, w.config.Channel)
 	messageSent, err := w.session.ChannelMessageSendEmbed(w.config.ChannelID, &discordgo.MessageEmbed{
 		Title:       message.Title,
 		Description: message.Description,
 		Color:       message.Color,
 	})
 	if err != nil {
-		logrus.Errorf("[WELCOME]\t[addMessage]\tCould not send Message to ChannelID %s: %s", w.config.ChannelID, err)
+		log.Error().Err(err).Msgf("Could not send Message to ChannelID %s: %s", w.config.ChannelID)
 		return err
 	}
 
-	logrus.Infof("[WELCOME]\t[addMessage]\tMessage Sent with ID %s", messageSent.ID)
+	log.Info().Msgf("Message Sent with ID %s", messageSent.ID)
 	message.ID = messageSent.ID
 
-	logrus.Infof("[WELCOME]\t[addMessage]\tAdd Reaction to Message %s", message.Title)
+	log.Info().Msgf("Add Reaction to Message %s", message.Title)
 	err = w.session.MessageReactionAdd(w.config.ChannelID, message.ID, message.Emoji+":"+message.EmojiID)
 	if err != nil {
-		logrus.Errorf("[WELCOME]\t[addMessage]\tCould not add Reaction to MessageID %s: %s", message.ID, err)
+		log.Error().Err(err).Msgf("Could not add Reaction to MessageID %s: %s", message.ID)
 		return err
 	}
 
@@ -246,14 +247,14 @@ func (w *Manager) addMessage(message *Message) error {
 }
 
 func (w *Manager) onMessageReactionAdd(session *discordgo.Session, reaction *discordgo.MessageReactionAdd) {
-	logrus.Info("[WELCOME]\t[onMessageReactionAdd]\tIncoming Message Reaction Add")
+	log.Info().Msg("Incoming Message Reaction Add")
 	if reaction.ChannelID != w.config.ChannelID {
-		logrus.Info("[WELCOME]\t[onMessageReactionAdd]\tSKIP - Channel is not matching")
+		log.Info().Msg("SKIP - Channel is not matching")
 		return
 	}
 
 	if w.isUserBot(reaction.UserID) {
-		logrus.Info("[WELCOME]\t[onMessageReactionAdd]\tSKIP - User is the bot")
+		log.Info().Msg("SKIP - User is the bot")
 		return
 	}
 
@@ -266,31 +267,31 @@ func (w *Manager) onMessageReactionAdd(session *discordgo.Session, reaction *dis
 	}
 
 	if idxMessageFound == -1 {
-		logrus.Info("[WELCOME]\t[onMessageReactionAdd]\tSKIP - Message is not matching")
+		log.Info().Msg("SKIP - Message is not matching")
 		return
 	}
 
 	if reaction.Emoji.Name != w.config.Messages[idxMessageFound].Emoji {
-		logrus.Info("[WELCOME]\t[onMessageReactionAdd]\tSKIP - Emoji is not matching")
+		log.Info().Msg("SKIP - Emoji is not matching")
 		return
 	}
 
-	logrus.Infof("[WELCOME]\t[onMessageReactionAdd]\tAdd RoleID %s (%s) to UserID %s", w.config.Messages[idxMessageFound].RoleID, w.config.Messages[idxMessageFound].Role, reaction.UserID)
+	log.Info().Msgf("Add RoleID %s (%s) to UserID %s", w.config.Messages[idxMessageFound].RoleID, w.config.Messages[idxMessageFound].Role, reaction.UserID)
 	err := w.session.GuildMemberRoleAdd(w.config.GuildID, reaction.UserID, w.config.Messages[idxMessageFound].RoleID)
 	if err != nil {
-		logrus.Errorf("[WELCOME]\t[onMessageReactionAdd]\tCould not add roleID %s to userID %s: %s", w.config.Messages[idxMessageFound].RoleID, reaction.UserID, err)
+		log.Error().Err(err).Msgf("Could not add roleID %s to userID %s", w.config.Messages[idxMessageFound].RoleID, reaction.UserID)
 	}
 }
 
 func (w *Manager) onMessageReactionRemove(session *discordgo.Session, reaction *discordgo.MessageReactionRemove) {
-	logrus.Info("[WELCOME]\t[onMessageReactionRemove]\tIncoming Message Reaction Remove")
+	log.Info().Msg("Incoming Message Reaction Remove")
 	if reaction.ChannelID != w.config.ChannelID {
-		logrus.Infof("[WELCOME]\t[onMessageReactionRemove]\tSKIP - Channel is not matching")
+		log.Info().Msgf("SKIP - Channel is not matching")
 		return
 	}
 
 	if w.isUserBot(reaction.UserID) {
-		logrus.Info("[WELCOME]\t[onMessageReactionRemove]\tSKIP - User is the bot")
+		log.Info().Msg("SKIP - User is the bot")
 		return
 	}
 
@@ -303,19 +304,19 @@ func (w *Manager) onMessageReactionRemove(session *discordgo.Session, reaction *
 	}
 
 	if idxMessageFound == -1 {
-		logrus.Info("[WELCOME]\t[onMessageReactionRemove]\tSKIP - Message is not matching")
+		log.Info().Msg("SKIP - Message is not matching")
 		return
 	}
 
 	if reaction.Emoji.Name != w.config.Messages[idxMessageFound].Emoji {
-		logrus.Info("[WELCOME]\t[onMessageReactionRemove]\tSKIP - Emoji is not matching")
+		log.Info().Msg("SKIP - Emoji is not matching")
 		return
 	}
 
-	logrus.Infof("[WELCOME]\t[onMessageReactionRemove]\tRemove RoleID %s (%s) to UserID %s", w.config.Messages[idxMessageFound].RoleID, w.config.Messages[idxMessageFound].Role, reaction.UserID)
+	log.Info().Msgf("Remove RoleID %s (%s) to UserID %s", w.config.Messages[idxMessageFound].RoleID, w.config.Messages[idxMessageFound].Role, reaction.UserID)
 	err := w.session.GuildMemberRoleRemove(w.config.GuildID, reaction.UserID, w.config.Messages[idxMessageFound].RoleID)
 	if err != nil {
-		logrus.Errorf("[WELCOME]\t[onMessageReactionRemove]\tCould not remove roleID %s to userID %s: %s", w.config.Messages[idxMessageFound].RoleID, reaction.UserID, err)
+		log.Error().Err(err).Msgf("Could not remove roleID %s to userID %s: %s", w.config.Messages[idxMessageFound].RoleID, reaction.UserID)
 	}
 }
 
@@ -326,13 +327,13 @@ func (w *Manager) isUserBot(userID string) bool {
 func (w *Manager) sendMessageToUser(userID string) error {
 	st, err := w.session.UserChannelCreate(userID)
 	if err != nil {
-		logrus.Errorf("[WELCOME]\t[sendMessageToUser]\tCould not create Channel with UserID %s: %s", userID, err)
+		log.Error().Err(err).Str("user_id", userID).Msg("Could not create Channel")
 		return err
 	}
 
 	_, err = w.session.ChannelMessageSend(st.ID, "Sorry it's not possible to add role because your account is not verified and you don't have multi-factor authentication enabled")
 	if err != nil {
-		logrus.Errorf("[WELCOME]\t[sendMessageToUser]\tCould not send Message to UserID %s: %s", userID, err)
+		log.Error().Err(err).Str("user_id", userID).Msgf("Could not send Message")
 		return err
 	}
 

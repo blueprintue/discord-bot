@@ -7,6 +7,10 @@
     "userID": "",
     "clientID": ""
   },
+  "log": {
+    "filename": "",
+    "level": "info"
+  },
   "modules": {
     "welcome": {
       "channel": "",

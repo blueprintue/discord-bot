@@ -1,81 +1,66 @@
 package main
 
 import (
-	"github.com/bwmarrin/discordgo"
-	"github.com/mattn/go-colorable"
-	"github.com/rancoud/blueprintue-discord/configuration"
-	"github.com/rancoud/blueprintue-discord/welcome"
-	"github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+	_ "time/tzdata"
+
+	"github.com/rancoud/blueprintue-discord/logger"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/rancoud/blueprintue-discord/configuration"
+	"github.com/rancoud/blueprintue-discord/welcome"
+	"github.com/rs/zerolog/log"
 )
 
 const waitStateFilled = 10 * time.Millisecond
 const configurationFilename = "config.json"
-const logFile = "/var/log/blueprintue-discord.log"
-
-func init() {
-	logrus.SetLevel(logrus.InfoLevel)
-	logrus.SetFormatter(&logrus.TextFormatter{
-		ForceColors: true,
-		FullTimestamp: true,
-		TimestampFormat: "2006-01-02 15:04:05",
-	})
-	logrus.SetOutput(colorable.NewColorableStdout())
-	file, err := os.OpenFile(logFile, os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0755)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	logrus.SetOutput(file)
-}
 
 func main() {
 	var err error
 
-	logrus.Infof("[MAIN]\tRead configuration from file: %s", configurationFilename)
+	log.Info().Msgf("Read configuration from file: %s", configurationFilename)
 	config, err := configuration.ReadConfiguration(configurationFilename)
 	if err != nil {
-		logrus.Fatalf("[MAIN]\tCould not read configuration: %s", err)
+		log.Fatal().Err(err).Msg("Could not read configuration")
 	}
 
-	logrus.Info("[MAIN]\tCreate discord session")
+	logger.Configure(config)
+
+	log.Info().Msg("Create discord session")
 	session, err := discordgo.New("Bot " + config.Discord.Token)
 	if err != nil {
-		logrus.Fatalf("[MAIN]\tCould not create discord session: %s", err)
+		log.Fatal().Err(err).Msg("Could not create discord session")
 	}
 
-	logrus.Info("[MAIN]\tOpen discord session")
+	log.Info().Msg("Open discord session")
 	err = session.Open()
 	if err != nil {
-		logrus.Fatalf("[MAIN]\tCould not open discord session: %s", err)
+		log.Fatal().Err(err).Msg("Could not open discord session")
 	}
 
 	for {
-		logrus.Info("[MAIN]\tPending session to be ready...")
+		log.Info().Msg("Pending session to be ready...")
 		time.Sleep(waitStateFilled)
 		if hasRequiredStateFieldsFilled(session) {
 			break
 		}
 	}
 
-	logrus.Info("[MAIN]\t--- Modules loading ---")
-
-	logrus.Info("[MAIN]\t[WELCOME]\tCreate Welcome Manager")
+	log.Info().Msg("Create Welcome Manager")
 	welcomeManager := welcome.NewWelcomeManager(session, config.Discord.Name, config.Modules.WelcomeConfiguration)
 
-	logrus.Info("[MAIN]\t[WELCOME]\tRun Welcome Manager")
+	log.Info().Msg("Run Welcome Manager")
 	err = welcomeManager.Run()
 	if err != nil {
-		logrus.Errorf("[MAIN]\t[WELCOME]\tRun Welcome Manager: %s", err)
+		log.Error().Err(err).Msg("could not run Welcome Manager")
 		closeSessionDiscord(session)
 		return
 	}
 
-	logrus.Info("[MAIN]\t--- Modules loaded ---")
-
-	logrus.Info("[MAIN]\tBot is now running. Press CTRL+C to stop")
+	log.Info().Msg("Bot is now running. Press CTRL+C to stop")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
@@ -88,9 +73,9 @@ func hasRequiredStateFieldsFilled(session *discordgo.Session) bool {
 }
 
 func closeSessionDiscord(session *discordgo.Session) {
-	logrus.Info("[MAIN]\tClose discord session")
+	log.Info().Msg("Close discord session")
 	err := session.Close()
 	if err != nil {
-		logrus.Fatalf("[MAIN]\tCould not close discord session %s", err)
+		log.Fatal().Err(err).Msg("Could not close discord session")
 	}
 }
