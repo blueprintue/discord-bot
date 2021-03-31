@@ -9,23 +9,23 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rancoud/blueprintue-discord/welcome"
+	"github.com/blueprintue/discord-bot/welcome"
 )
 
 // Support only field's type string, int, bool, []string
 
 type Configuration struct {
 	Discord struct {
-		Name  string `json:"name" env:"BUE_BOT_DISCORD_NAME"`
-		Token string `json:"token" env:"BUE_BOT_DISCORD_TOKEN"`
+		Name  string `json:"name" env:"DBOT_DISCORD_NAME"`
+		Token string `json:"token" env:"DBOT_DISCORD_TOKEN"`
 	} `json:"discord"`
 	Twitch struct {
-		ClientID string `json:"clientID" env:"BUE_BOT_TWITCH_CLIENT_ID"`
-		UserID   string `json:"userID" env:"BUE_BOT_TWITCH_USER_ID"`
+		ClientID string `json:"clientID" env:"DBOT_TWITCH_CLIENT_ID"`
+		UserID   string `json:"userID" env:"DBOT_TWITCH_USER_ID"`
 	} `json:"twitch"`
 	Log struct {
-		Filename string `json:"filename" env:"BUE_BOT_LOG_FILENAME"`
-		Level    string `json:"level" env:"BUE_BOT_LOG_LEVEL"`
+		Filename string `json:"filename" env:"DBOT_LOG_FILENAME"`
+		Level    string `json:"level" env:"DBOT_LOG_LEVEL"`
 	}
 	Modules struct {
 		WelcomeConfiguration welcome.Configuration `json:"welcome"`

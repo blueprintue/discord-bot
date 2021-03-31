@@ -7,11 +7,10 @@ import (
 	"time"
 	_ "time/tzdata"
 
-	"github.com/rancoud/blueprintue-discord/logger"
-
+	"github.com/blueprintue/discord-bot/configuration"
+	"github.com/blueprintue/discord-bot/logger"
+	"github.com/blueprintue/discord-bot/welcome"
 	"github.com/bwmarrin/discordgo"
-	"github.com/rancoud/blueprintue-discord/configuration"
-	"github.com/rancoud/blueprintue-discord/welcome"
 	"github.com/rs/zerolog/log"
 )
 
@@ -23,7 +22,7 @@ var version = "edge"
 func main() {
 	var err error
 
-	log.Info().Str("version", version).Msg("Starting blueprintUE discord")
+	log.Info().Str("version", version).Msg("Starting discord-bot")
 
 	log.Info().Msgf("Read configuration from file: %s", configurationFilename)
 	config, err := configuration.ReadConfiguration(configurationFilename)

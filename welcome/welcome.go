@@ -6,8 +6,8 @@ import (
 
 	"github.com/rs/zerolog/log"
 
+	"github.com/blueprintue/discord-bot/helpers"
 	"github.com/bwmarrin/discordgo"
-	"github.com/rancoud/blueprintue-discord/helpers"
 )
 
 // Configuration is a struct

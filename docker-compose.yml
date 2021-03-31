@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   app:
-    image: blueprintue-discord
+    image: discord-bot
     volumes:
       - "./config.json:/config.json"
     restart: "no"

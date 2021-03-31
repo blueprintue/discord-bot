@@ -11,7 +11,11 @@ target "git-ref" {
 
 // Special target: https://github.com/crazy-max/ghaction-docker-meta#bake-definition
 target "ghaction-docker-meta" {
-  tags = ["blueprintue-discord"]
+  tags = ["discord-bot"]
+}
+
+group "default" {
+  targets = ["image-local"]
 }
 
 target "artifact" {

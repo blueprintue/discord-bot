@@ -1,4 +1,4 @@
-module github.com/rancoud/blueprintue-discord
+module github.com/blueprintue/discord-bot
 
 go 1.14
 

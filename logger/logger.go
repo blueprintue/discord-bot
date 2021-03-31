@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/rancoud/blueprintue-discord/configuration"
+	"github.com/blueprintue/discord-bot/configuration"
 
 	"github.com/ilya1st/rotatewriter"
 	"github.com/rs/zerolog"

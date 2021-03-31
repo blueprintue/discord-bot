@@ -1,3 +1,1 @@
-golangci-lint run
-
-sudo nohup ./blueprintue-discord &
+## Discord-bot

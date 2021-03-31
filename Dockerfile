@@ -10,7 +10,7 @@ FROM base AS build
 ARG TARGETPLATFORM
 RUN --mount=type=bind,source=.,target=/src,rw \
   goreleaser-xx --debug \
-    --name="blueprintue-discord" \
+    --name="discord-bot" \
     --dist="/out" \
     --hooks="go mod tidy" \
     --hooks="go mod download" \
@@ -24,10 +24,10 @@ COPY --from=build /out/*.zip /
 
 FROM alpine:3.13 AS image
 RUN apk --update --no-cache add ca-certificates libressl shadow \
-  && addgroup -g 1000 blueprintue-discord \
-  && adduser -u 1000 -G blueprintue-discord -s /sbin/nologin -D blueprintue-discord \
-  && mkdir -p /var/log/blueprintue-discord \
-  && chown blueprintue-discord. /var/log/blueprintue-discord
-COPY --from=build /usr/local/bin/blueprintue-discord /usr/local/bin/blueprintue-discord
-USER blueprintue-discord
-ENTRYPOINT [ "blueprintue-discord" ]
+  && addgroup -g 1000 discord-bot \
+  && adduser -u 1000 -G discord-bot -s /sbin/nologin -D discord-bot \
+  && mkdir -p /var/log/discord-bot \
+  && chown discord-bot. /var/log/discord-bot
+COPY --from=build /usr/local/bin/discord-bot /usr/local/bin/discord-bot
+USER discord-bot
+ENTRYPOINT [ "discord-bot" ]

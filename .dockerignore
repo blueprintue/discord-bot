@@ -1,5 +1,12 @@
+# IntelliJ
 .idea
-blueprintue-discord.exe
-blueprintue-discord
-config.json
+*.iml
+
+# Images
 dist
+
+# Config
+config.json
+
+# Build
+discord-bot*
