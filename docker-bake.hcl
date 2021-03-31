@@ -9,8 +9,13 @@ target "git-ref" {
   }
 }
 
+// Special target: https://github.com/crazy-max/ghaction-docker-meta#bake-definition
+target "ghaction-docker-meta" {
+  tags = ["blueprintue-discord"]
+}
+
 target "artifact" {
-  inherits = ["git-ref"]
+  inherits = ["git-ref", "ghaction-docker-meta"]
   target = "artifact"
   output = ["./dist"]
 }
@@ -26,12 +31,11 @@ target "artifact-all" {
 }
 
 target "image" {
-  inherits = ["git-ref"]
+  inherits = ["git-ref", "ghaction-docker-meta"]
 }
 
 target "image-local" {
   inherits = ["image"]
-  tags = ["blueprint-discord"]
   output = ["type=docker"]
 }
 
