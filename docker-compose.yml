@@ -1,0 +1,8 @@
+version: "3.8"
+
+services:
+  app:
+    image: blueprint-discord
+    volumes:
+      - "./config.json:/config.json"
+    restart: "no"

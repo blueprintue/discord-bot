@@ -18,8 +18,12 @@ import (
 const waitStateFilled = 10 * time.Millisecond
 const configurationFilename = "config.json"
 
+var version = "edge"
+
 func main() {
 	var err error
+
+	log.Info().Str("version", version).Msg("Starting blueprintUE discord")
 
 	log.Info().Msgf("Read configuration from file: %s", configurationFilename)
 	config, err := configuration.ReadConfiguration(configurationFilename)
