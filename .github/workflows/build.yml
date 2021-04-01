@@ -16,6 +16,7 @@ on:
 
 env:
   DOCKERHUB_SLUG: blueprintue/discord-bot
+  GHCR_SLUG: ghcr.io/blueprintue/discord-bot
 
 jobs:
   build:
@@ -33,6 +34,7 @@ jobs:
         with:
           images: |
             ${{ env.DOCKERHUB_SLUG }}
+            ${{ env.GHCR_SLUG }}
           tag-semver: |
             {{version}}
           tag-edge: true
@@ -49,6 +51,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
+      -
+        name: Login to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build artifacts
         uses: docker/bake-action@v1
