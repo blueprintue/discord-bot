@@ -19,7 +19,7 @@ group "default" {
 }
 
 target "artifact" {
-  inherits = ["git-ref", "ghaction-docker-meta"]
+  inherits = ["git-ref"]
   target = "artifact"
   output = ["./dist"]
 }

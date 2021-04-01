@@ -7,6 +7,3 @@ dist
 
 # Config
 config.json
-
-# Build
-discord-bot*
