@@ -8,6 +8,7 @@ WORKDIR /src
 
 FROM base AS build
 ARG TARGETPLATFORM
+ARG GIT_REF
 RUN --mount=type=bind,source=.,target=/src,rw \
   goreleaser-xx --debug \
     --name="discord-bot" \
