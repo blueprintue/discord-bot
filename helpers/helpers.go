@@ -2,12 +2,14 @@ package helpers
 
 import (
 	"encoding/json"
-	"github.com/bwmarrin/discordgo"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/bwmarrin/discordgo"
 )
 
+// MessageReactionsAll retreive all Reactions from Message taking into account pagination
 func MessageReactionsAll(session *discordgo.Session, channelID, messageID, emojiID string) (st []*discordgo.User, err error) {
 	var body []byte
 	var listUsers []*discordgo.User

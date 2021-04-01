@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/blueprintue/discord-bot/configuration"
-
 	"github.com/ilya1st/rotatewriter"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"

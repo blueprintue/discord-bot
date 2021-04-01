@@ -14,6 +14,7 @@ import (
 
 // Support only field's type string, int, bool, []string
 
+// Configuration contains Discord, Twitch, Log and Modules parameters
 type Configuration struct {
 	Discord struct {
 		Name  string `json:"name" env:"DBOT_DISCORD_NAME"`
@@ -32,6 +33,7 @@ type Configuration struct {
 	} `json:"modules"`
 }
 
+// ReadConfiguration read config.json file and update some values with env if found
 func ReadConfiguration(filename string) (*Configuration, error) {
 	filedata, err := ioutil.ReadFile(filename)
 	if err != nil {

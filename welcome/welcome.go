@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rs/zerolog/log"
-
 	"github.com/blueprintue/discord-bot/helpers"
 	"github.com/bwmarrin/discordgo"
+	"github.com/rs/zerolog/log"
 )
 
 // Configuration is a struct
