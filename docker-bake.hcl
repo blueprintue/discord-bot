@@ -30,7 +30,9 @@ target "artifact-all" {
     "linux/amd64",
     "linux/arm/v7",
     "linux/arm64",
-    "windows/amd64"
+    "windows/amd64",
+    "darwin/arm64",
+    "darwin/amd64"
   ]
 }
 
