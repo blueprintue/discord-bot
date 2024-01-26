@@ -1,10 +1,10 @@
 ## Discord-bot
 
-[![GitHub release](https://img.shields.io/github/release/blueprintue/discord-bot.svg)](https://github.com/blueprintue/discord-bot/releases/latest)
-[![Total downloads](https://img.shields.io/github/downloads/blueprintue/discord-bot/total.svg)](https://github.com/blueprintue/discord-bot/releases/latest)
-[![Build Status](https://img.shields.io/github/workflow/status/blueprintue/discord-bot/build?label=build&logo=github)](https://github.com/blueprintue/discord-bot/actions?query=workflow%3Abuild)
-[![Docker Stars](https://img.shields.io/docker/stars/blueprintue/discord-bot.svg&logo=docker)](https://hub.docker.com/r/blueprintue/discord-bot/)
-[![Docker Pulls](https://img.shields.io/docker/pulls/blueprintue/discord-bot.svg&logo=docker)](https://hub.docker.com/r/blueprintue/discord-bot/)
+[![GitHub release](https://img.shields.io/github/release/blueprintue/discord-bot.svg?logo=github)](https://github.com/blueprintue/discord-bot/releases/latest)
+[![Total downloads](https://img.shields.io/github/downloads/blueprintue/discord-bot/total.svg?logo=github)](https://github.com/blueprintue/discord-bot/releases/latest)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/blueprintue/discord-bot/build?label=build&logo=github)](https://github.com/blueprintue/discord-bot/actions?query=workflow%3Abuild)
+[![Docker Stars](https://img.shields.io/docker/stars/blueprintue/discord-bot?logo=docker)](https://hub.docker.com/r/blueprintue/discord-bot/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/blueprintue/discord-bot?logo=docker)](https://hub.docker.com/r/blueprintue/discord-bot/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/blueprintue/discord-bot)](https://goreportcard.com/report/github.com/blueprintue/discord-bot)
 
 ## Usage
