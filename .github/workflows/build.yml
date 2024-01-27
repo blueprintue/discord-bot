@@ -30,14 +30,14 @@ jobs:
       -
         name: Docker meta
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v5
+        uses: docker/metadata-action@v5
         with:
           images: |
             ${{ env.DOCKERHUB_SLUG }}
             ${{ env.GHCR_SLUG }}
-          tag-semver: |
-            {{version}}
-          tag-edge: true
+          tags: |
+            type=semver,pattern={{version}}
+            type=edge
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3

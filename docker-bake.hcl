@@ -1,4 +1,4 @@
-// GitHub reference as defined in GitHub Actions (eg. refs/head/master))
+// GitHub reference as defined in GitHub Actions (eg. refs/head/master)
 variable "GITHUB_REF" {
   default = ""
 }
@@ -9,8 +9,7 @@ target "git-ref" {
   }
 }
 
-// Special target: https://github.com/crazy-max/ghaction-docker-meta#bake-definition
-target "ghaction-docker-meta" {
+target "docker-metadata-action" {
   tags = ["discord-bot"]
 }
 
@@ -37,7 +36,7 @@ target "artifact-all" {
 }
 
 target "image" {
-  inherits = ["git-ref", "ghaction-docker-meta"]
+  inherits = ["git-ref", "docker-metadata-action"]
 }
 
 target "image-local" {
