@@ -20,10 +20,6 @@ type Configuration struct {
 		Name  string `json:"name" env:"DBOT_DISCORD_NAME"`
 		Token string `json:"token" env:"DBOT_DISCORD_TOKEN"`
 	} `json:"discord"`
-	Twitch struct {
-		ClientID string `json:"clientID" env:"DBOT_TWITCH_CLIENT_ID"`
-		UserID   string `json:"userID" env:"DBOT_TWITCH_USER_ID"`
-	} `json:"twitch"`
 	Log struct {
 		Filename string `json:"filename" env:"DBOT_LOG_FILENAME"`
 		Level    string `json:"level" env:"DBOT_LOG_LEVEL"`

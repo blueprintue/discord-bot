@@ -13,12 +13,6 @@
 
 `discord-bot` binaries are available on [releases page](https://github.com/blueprintue/discord-bot/releases/latest).
 
-Choose the archive matching the destination platform:
-
-```shell
-wget -qO- https://github.com/blueprintue/discord-bot/releases/download/v0.1.0/discord-bot_0.1.0_linux_arm64.tar.gz | tar -zxvf - discord-bot
-```
-
 ### From Dockerfile
 
 | Registry                                                                                                  | Image                             |
@@ -26,29 +20,7 @@ wget -qO- https://github.com/blueprintue/discord-bot/releases/download/v0.1.0/di
 | [Docker Hub](https://hub.docker.com/r/blueprintue/discord-bot/)                                           | `blueprintue/discord-bot`         |
 | [GitHub Container Registry](https://github.com/users/blueprintue/packages/container/package/discord-bot)  | `ghcr.io/blueprintue/discord-bot` |
 
-Following platforms for this image are available:
-
-```
-$ docker buildx imagetools inspect blueprintue/discord-bot:latest
-Name:      docker.io/blueprintue/discord-bot:edge
-MediaType: application/vnd.docker.distribution.manifest.list.v2+json
-Digest:    sha256:8d4501ea22b8914315a26acbf3da17c1009d15e480a80a75f1d2166db48ac998
-
-Manifests:
-  Name:      docker.io/blueprintue/discord-bot:edge@sha256:7194ed60cdcd51c57389c666d7e325464486e6fb7f593c3db57230ff0f05c40b
-  MediaType: application/vnd.docker.distribution.manifest.v2+json
-  Platform:  linux/amd64
-
-  Name:      docker.io/blueprintue/discord-bot:edge@sha256:7c984e4b0a0f9e106d201e15633e17319e4a312d283a16fa7b2782b6ddc9bb57
-  MediaType: application/vnd.docker.distribution.manifest.v2+json
-  Platform:  linux/arm/v7
-
-  Name:      docker.io/blueprintue/discord-bot:edge@sha256:329c01304b303d64016ceffdfa1b1c50731212d72db5e070f04923f0375f4df4
-  MediaType: application/vnd.docker.distribution.manifest.v2+json
-  Platform:  linux/arm64
-```
-
-## Build
+## Build from source
 
 ```shell
 git clone https://github.com/blueprintue/discord-bot.git discord-bot
@@ -63,3 +35,35 @@ docker buildx bake image-all
 # create artifacts in ./dist
 docker buildx bake artifact-all
 ```
+
+## Configuration explanations
+### General
+Mandatory parameters to run discord-bot without modules.
+
+#### Discord
+| JSON Parameter | ENV Parameter      | Mandatory | Type   | Default value | Specific values | Description                                                |
+| -------------- | ------------------ | --------- | ------ | ------------- | --------------- | ---------------------------------------------------------- |
+| name           | DBOT_DISCORD_NAME  | YES       | string |               |                 | discord server name (also called guild name)               |
+| token          | DBOT_DISCORD_TOKEN | YES       | string |               |                 | token for a bot                                            |
+
+##### How to get discord name?
+When you are on a discord server, you will see a list of channels on the left, at the top you will see the discord server name.
+
+##### How to generate token?
+You need to create a bot, you can start by looking at tutorial from Discord: [https://discord.com/developers/docs/getting-started](https://discord.com/developers/docs/getting-started).
+
+#### Log
+| JSON Parameter | ENV Parameter      | Mandatory | Type   | Default value | Specific values                                           | Description                                                                     |
+| -------------- | ------------------ | --------- | ------ | ------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| filename       | DBOT_LOG_FILENAME  | YES       | string |               |                                                           | relative or absolute path to log file (it will create directories if not exist) |
+| level          | DBOT_LOG_LEVEL     | NO        | string |               | trace \| debug \| info \| warn \| error \| fatal \| panic | level of log (if empty then no log)                                             |
+
+##### What is level?
+It uses zerolog levels (from highest to lowest):
+* panic (zerolog.PanicLevel, 5)
+* fatal (zerolog.FatalLevel, 4)
+* error (zerolog.ErrorLevel, 3)
+* warn (zerolog.WarnLevel, 2)
+* info (zerolog.InfoLevel, 1)
+* debug (zerolog.DebugLevel, 0)
+* trace (zerolog.TraceLevel, -1)

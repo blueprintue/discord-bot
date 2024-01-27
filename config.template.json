@@ -3,10 +3,6 @@
     "name": "",
     "token": ""
   },
-  "twitch": {
-    "userID": "",
-    "clientID": ""
-  },
   "log": {
     "filename": "",
     "level": "info"
