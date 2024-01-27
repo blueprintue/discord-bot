@@ -7,3 +7,9 @@ dist
 
 # Config
 config.json
+
+# bin
+discord-bot
+
+#logs
+discord-bot.log
