@@ -1,3 +1,7 @@
+variable "DEFAULT_TAG" {
+  default = "discord-bot:local"
+}
+
 // GitHub reference as defined in GitHub Actions (eg. refs/head/master)
 variable "GITHUB_REF" {
   default = ""
@@ -10,7 +14,7 @@ target "git-ref" {
 }
 
 target "docker-metadata-action" {
-  tags = ["discord-bot"]
+  tags = ["${DEFAULT_TAG}"]
 }
 
 group "default" {
