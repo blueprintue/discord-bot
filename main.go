@@ -14,7 +14,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const waitStateFilled = 10 * time.Millisecond
+const waitStateFilled = 250 * time.Millisecond
 const configurationFilename = "config.json"
 
 var version = "edge"
