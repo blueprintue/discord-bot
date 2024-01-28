@@ -103,13 +103,13 @@ You can define only one channel.
 ##### Message
 You can defines multiple messages.  
 
-| JSON Parameter | Mandatory | Type   | Default value | Description                                       |
-| -------------- | --------- | ------ | ------------- | ------------------------------------------------- |
-| title          | YES       | string |               | title's message                                   |
-| description    | YES       | string |               | description's message                             |
-| color          | NO        | int    | 0             | color on the left of the message                  |
-| role           | YES       | string |               | role's name to assign when user use correct emoji |
-| emoji          | YES       | string |               | emoji to use (format is my_emoji without :)       |
+| JSON Parameter | Mandatory | Type   | Default value | Description                                                                                   |
+| -------------- | --------- | ------ | ------------- | --------------------------------------------------------------------------------------------- |
+| title          | YES       | string |               | title's message                                                                               |
+| description    | YES       | string |               | description's message                                                                         |
+| color          | NO        | int    | 0             | color on the left of the message (format is	integer representation of hexadecimal color code) |
+| role           | YES       | string |               | role's name to assign when user use correct emoji                                             |
+| emoji          | YES       | string |               | emoji to use (format is my_emoji without `:`)                                                 |
 
 ##### How it works?
 Each time you start `discord-bot`, welcome module will check the configuration in the `config.json`.  
@@ -120,4 +120,4 @@ Secondly it will listen two events on `onMessageReactionAdd` and `onMessageReact
 
 After it will search the message in the channel.  
 If the message is not found then it will publish it and add a reaction to show user which emoji to use.  
-If the message is found then it will fetch all reactions by the users and apply role.  
+If the message is found then it will fetch all reactions by the users and apply role.

@@ -324,7 +324,6 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 				Str("user_id", user.ID).
 				Str("guild_id", w.config.GuildID).
 				Msg("Could not find Member in Guild")
-
 			continue
 		}
 
