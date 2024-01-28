@@ -107,7 +107,7 @@ You can defines multiple messages.
 | -------------- | --------- | ------ | ------------- | --------------------------------------------------------------------------------------------- |
 | title          | YES       | string |               | title's message                                                                               |
 | description    | YES       | string |               | description's message                                                                         |
-| color          | NO        | int    | 0             | color on the left of the message (format is	integer representation of hexadecimal color code) |
+| color          | NO        | int    | 0             | color on the left of the message (format is integer representation of hexadecimal color code) |
 | role           | YES       | string |               | role's name to assign when user use correct emoji                                             |
 | emoji          | YES       | string |               | emoji to use (format is my_emoji without `:`)                                                 |
 
