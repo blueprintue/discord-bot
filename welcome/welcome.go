@@ -49,10 +49,59 @@ func NewWelcomeManager(
 		config:  config,
 	}
 
+	log.Info().Msg("Check configuration 1/2")
+	if !manager.hasValidConfigurationInFile() {
+		return nil
+	}
+
 	log.Info().Msg("Complete configuration with session.State")
 	manager.completeConfiguration()
 
+	log.Info().Msg("Check configuration 2/2")
+	if !manager.hasValidConfigurationAgainstDiscordServer() {
+		return nil
+	}
+
 	return manager
+}
+
+func (w *Manager) hasValidConfigurationInFile() bool {
+	if w.config.Channel == "" {
+		log.Error().
+			Msg("Channel is empty")
+
+		return false
+	}
+
+	for idx, message := range w.config.Messages {
+		if message.Title == "" && message.Description == "" {
+			log.Error().
+				Int("message #", idx).
+				Str("title", message.Title).
+				Str("description", message.Description).
+				Msg("Title and Description is empty")
+
+			return false
+		}
+
+		if message.Emoji == "" {
+			log.Error().
+				Int("message #", idx).
+				Msg("Emoji is empty")
+
+			return false
+		}
+
+		if message.Role == "" {
+			log.Error().
+				Int("message #", idx).
+				Msg("Role is empty")
+
+			return false
+		}
+	}
+
+	return true
 }
 
 func (w *Manager) completeConfiguration() {
@@ -106,6 +155,38 @@ func (w *Manager) completeConfiguration() {
 			break
 		}
 	}
+}
+
+func (w *Manager) hasValidConfigurationAgainstDiscordServer() bool {
+	if w.config.ChannelID == "" {
+		log.Error().
+			Str("channel in config", w.config.Channel).
+			Msg("Channel not found in Discord server")
+
+		return false
+	}
+
+	for idx, message := range w.config.Messages {
+		if message.EmojiID == "" {
+			log.Error().
+				Int("message #", idx).
+				Str("emoji in config", message.Emoji).
+				Msg("Emoji not found in Discord server")
+
+			return false
+		}
+
+		if message.RoleID == "" {
+			log.Error().
+				Int("message #", idx).
+				Str("role in config", message.Role).
+				Msg("Role not found in Discord server")
+
+			return false
+		}
+	}
+
+	return true
 }
 
 // Run do the main task of Welcome
@@ -243,6 +324,7 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 				Str("user_id", user.ID).
 				Str("guild_id", w.config.GuildID).
 				Msg("Could not find Member in Guild")
+
 			continue
 		}
 

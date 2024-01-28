@@ -27,21 +27,21 @@ func main() {
 	log.Info().Msgf("Read configuration from file: %s", configurationFilename)
 	config, err := configuration.ReadConfiguration(configurationFilename)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Could not read configuration")
+		log.Fatal().Err(err).Msg("Error on configuration")
 	}
 
 	logger.Configure(config)
 
-	log.Info().Msg("Create discord session")
+	log.Info().Msg("Create discordgo session")
 	session, err := discordgo.New("Bot " + config.Discord.Token)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Could not create discord session")
+		log.Fatal().Err(err).Msg("Could not create discordgo session")
 	}
 
-	log.Info().Msg("Open discord session")
+	log.Info().Msg("Open discordgo session")
 	err = session.Open()
 	if err != nil {
-		log.Fatal().Err(err).Msg("Could not open discord session")
+		log.Fatal().Err(err).Msg("Could not open discordgo session")
 	}
 
 	for {
@@ -54,13 +54,16 @@ func main() {
 
 	log.Info().Msg("Create Welcome Manager")
 	welcomeManager := welcome.NewWelcomeManager(session, config.Discord.Name, config.Modules.WelcomeConfiguration)
-
-	log.Info().Msg("Run Welcome Manager")
-	err = welcomeManager.Run()
-	if err != nil {
-		log.Error().Err(err).Msg("could not run Welcome Manager")
-		closeSessionDiscord(session)
-		return
+	if welcomeManager == nil {
+		log.Error().Msg("Could not start Welcome Manager")
+	} else {
+		log.Info().Msg("Run Welcome Manager")
+		err = welcomeManager.Run()
+		if err != nil {
+			log.Error().Err(err).Msg("Could not run Welcome Manager")
+			closeSessionDiscord(session)
+			return
+		}
 	}
 
 	log.Info().Msg("Bot is now running. Press CTRL+C to stop")
@@ -76,9 +79,9 @@ func hasRequiredStateFieldsFilled(session *discordgo.Session) bool {
 }
 
 func closeSessionDiscord(session *discordgo.Session) {
-	log.Info().Msg("Close discord session")
+	log.Info().Msg("Close discordgo session")
 	err := session.Close()
 	if err != nil {
-		log.Fatal().Err(err).Msg("Could not close discord session")
+		log.Fatal().Err(err).Msg("Could not close discordgo session")
 	}
 }

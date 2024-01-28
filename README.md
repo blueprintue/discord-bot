@@ -74,20 +74,50 @@ Define the user's role when using an emoji.
 You can define one or more messages in only one channel.  
 In each message you can define title, description, color, role and emoji to use.  
 
+You can see an example below:  
+![Welcome module example](doc/welcome-example.png)
+
+JSON configuration used:  
+```json
+"welcome": {
+  "channel": "😃test",
+  "messages": [
+    {
+      "title": "Are you interested by blueprintUE?",
+      "description": "Click the :blueprintUE: below to join the blueprintUE part",
+      "color": 5301186,
+      "role": "is member",
+      "emoji": "blueprintUE"
+    }
+  ]
+}
+```
+
 ##### Channel
 You can define only one channel.  
 
-| JSON Parameter | Mandatory | Type   | Description                                                                     |
-| -------------- | --------- | ------ | ------------------------------------------------------------------------------- |
-| channel        | YES       | string | channel name                                                                    |
+| JSON Parameter | Mandatory | Type   | Description  |
+| -------------- | --------- | ------ | ------------ |
+| channel        | YES       | string | channel name |
 
 ##### Message
 You can defines multiple messages.  
 
-| JSON Parameter | Mandatory | Type   | Default value | Description                                                                     |
-| -------------- | --------- | ------ | ------------- | ------------------------------------------------------------------------------- |
-| title          | YES       | string |               | title's message                                                                 |
-| description    | YES       | string |               | description's message                                                           |
-| color          | NO        | int    | 0             | color on the left of the message                                                |
-| role           | YES       | string |               | role's name to assign when user use correct emoji                               |
-| emoji          | YES       | string |               | emoji to use (format is :my_emoji:)                                             |
+| JSON Parameter | Mandatory | Type   | Default value | Description                                       |
+| -------------- | --------- | ------ | ------------- | ------------------------------------------------- |
+| title          | YES       | string |               | title's message                                   |
+| description    | YES       | string |               | description's message                             |
+| color          | NO        | int    | 0             | color on the left of the message                  |
+| role           | YES       | string |               | role's name to assign when user use correct emoji |
+| emoji          | YES       | string |               | emoji to use (format is my_emoji without :)       |
+
+##### How it works?
+Each time you start `discord-bot`, welcome module will check the configuration in the `config.json`.  
+If there is nothing missing, it will fetch channels, roles and emoji.  
+Then it will do another check to see if channel, role and emoji exists.  
+
+Secondly it will listen two events on `onMessageReactionAdd` and `onMessageReactionRemove`.  
+
+After it will search the message in the channel.  
+If the message is not found then it will publish it and add a reaction to show user which emoji to use.  
+If the message is found then it will fetch all reactions by the users and apply role.  
