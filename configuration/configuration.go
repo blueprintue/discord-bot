@@ -2,7 +2,7 @@ package configuration
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"errors"
 	"os"
 	"reflect"
 	"runtime"
@@ -14,7 +14,7 @@ import (
 
 // Support only field's type string, int, bool, []string
 
-// Configuration contains Discord, Twitch, Log and Modules parameters
+// Configuration contains Discord, Log and Modules parameters
 type Configuration struct {
 	Discord struct {
 		Name  string `json:"name" env:"DBOT_DISCORD_NAME"`
@@ -31,7 +31,7 @@ type Configuration struct {
 
 // ReadConfiguration read config.json file and update some values with env if found
 func ReadConfiguration(filename string) (*Configuration, error) {
-	filedata, err := ioutil.ReadFile(filename)
+	filedata, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -43,6 +43,11 @@ func ReadConfiguration(filename string) (*Configuration, error) {
 	}
 
 	eraseConfigurationValuesWithEnv(&config)
+
+	err = checkBasicConfiguration(config)
+	if err != nil {
+		return nil, err
+	}
 
 	return &config, nil
 }
@@ -94,4 +99,20 @@ func eraseConfigurationValuesWithEnv(obj interface{}) interface{} {
 	}
 
 	return obj
+}
+
+func checkBasicConfiguration(config Configuration) error {
+	if config.Discord.Name == "" {
+		return errors.New("invalid json value: discord.name is empty")
+	}
+
+	if config.Discord.Token == "" {
+		return errors.New("invalid json value: discord.token is empty")
+	}
+
+	if config.Log.Filename == "" {
+		return errors.New("invalid json value: log.filename is empty")
+	}
+
+	return nil
 }
