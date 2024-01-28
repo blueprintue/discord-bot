@@ -41,10 +41,10 @@ docker buildx bake artifact-all
 Mandatory parameters to run discord-bot without modules.
 
 #### Discord
-| JSON Parameter | ENV Parameter      | Mandatory | Type   | Default value | Specific values | Description                                                |
-| -------------- | ------------------ | --------- | ------ | ------------- | --------------- | ---------------------------------------------------------- |
-| name           | DBOT_DISCORD_NAME  | YES       | string |               |                 | discord server name (also called guild name)               |
-| token          | DBOT_DISCORD_TOKEN | YES       | string |               |                 | token for a bot                                            |
+| JSON Parameter | ENV Parameter      | Mandatory | Type   | Description                                                |
+| -------------- | ------------------ | --------- | ------ | ---------------------------------------------------------- |
+| name           | DBOT_DISCORD_NAME  | YES       | string | discord server name (also called guild name)               |
+| token          | DBOT_DISCORD_TOKEN | YES       | string | token for a bot                                            |
 
 ##### How to get discord name?
 When you are on a discord server, you will see a list of channels on the left, at the top you will see the discord server name.
@@ -53,10 +53,10 @@ When you are on a discord server, you will see a list of channels on the left, a
 You need to create a bot, you can start by looking at tutorial from Discord: [https://discord.com/developers/docs/getting-started](https://discord.com/developers/docs/getting-started).
 
 #### Log
-| JSON Parameter | ENV Parameter      | Mandatory | Type   | Default value | Specific values                                           | Description                                                                     |
-| -------------- | ------------------ | --------- | ------ | ------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| filename       | DBOT_LOG_FILENAME  | YES       | string |               |                                                           | relative or absolute path to log file (it will create directories if not exist) |
-| level          | DBOT_LOG_LEVEL     | NO        | string |               | trace \| debug \| info \| warn \| error \| fatal \| panic | level of log (if empty then no log)                                             |
+| JSON Parameter | ENV Parameter      | Mandatory | Type   | Specific values                                           | Description                                                                     |
+| -------------- | ------------------ | --------- | ------ | --------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| filename       | DBOT_LOG_FILENAME  | YES       | string |                                                           | relative or absolute path to log file (it will create directories if not exist) |
+| level          | DBOT_LOG_LEVEL     | NO        | string | trace \| debug \| info \| warn \| error \| fatal \| panic | level of log (if empty then no log)                                             |
 
 ##### What is level?
 It uses zerolog levels (from highest to lowest):
@@ -67,3 +67,27 @@ It uses zerolog levels (from highest to lowest):
 * info (zerolog.InfoLevel, 1)
 * debug (zerolog.DebugLevel, 0)
 * trace (zerolog.TraceLevel, -1)
+
+### Modules
+#### Welcome
+Define the user's role when using an emoji.  
+You can define one or more messages in only one channel.  
+In each message you can define title, description, color, role and emoji to use.  
+
+##### Channel
+You can define only one channel.  
+
+| JSON Parameter | Mandatory | Type   | Description                                                                     |
+| -------------- | --------- | ------ | ------------------------------------------------------------------------------- |
+| channel        | YES       | string | channel name                                                                    |
+
+##### Message
+You can defines multiple messages.  
+
+| JSON Parameter | Mandatory | Type   | Default value | Description                                                                     |
+| -------------- | --------- | ------ | ------------- | ------------------------------------------------------------------------------- |
+| title          | YES       | string |               | title's message                                                                 |
+| description    | YES       | string |               | description's message                                                           |
+| color          | NO        | int    | 0             | color on the left of the message                                                |
+| role           | YES       | string |               | role's name to assign when user use correct emoji                               |
+| emoji          | YES       | string |               | emoji to use (format is :my_emoji:)                                             |
