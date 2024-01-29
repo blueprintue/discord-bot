@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   app:
-    image: discord-bot
+    image: discord-bot:local
     volumes:
       - "./config.json:/config.json"
     restart: "no"
