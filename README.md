@@ -36,6 +36,22 @@ docker buildx bake image-all
 docker buildx bake artifact-all
 ```
 
+## Run docker image inside project
+If you git clone you will see a `docker-composer.yml` already setup for local image.  
+You need to create `config.json` in project folder.  
+By default log folder is `/var/log/discord-bot` so you need to set:  
+```json
+    "log": {
+      "filename": "/var/log/discord-bot/discord-bot.log",
+      "level": "info"
+    },
+```
+Then you can run image.
+```shell
+docker-compose up --build -d
+```
+If you want to use image from repository replace `image` in `docker-composer.yml`.
+
 ## Configuration explanations
 ### General
 Mandatory parameters to run discord-bot without modules.
