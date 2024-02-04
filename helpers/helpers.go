@@ -21,12 +21,12 @@ func MessageReactionsAll(session *discordgo.Session, channelID, messageID, emoji
 	v.Set("limit", strconv.Itoa(100))
 
 	for {
-		tempUri := uri
+		tempURI := uri
 		if len(v) > 0 {
-			tempUri += "?" + v.Encode()
+			tempURI += "?" + v.Encode()
 		}
 
-		body, err = session.RequestWithBucketID("GET", tempUri, nil, discordgo.EndpointMessageReaction(channelID, "", "", ""))
+		body, err = session.RequestWithBucketID("GET", tempURI, nil, discordgo.EndpointMessageReaction(channelID, "", "", ""))
 		if err != nil {
 			return
 		}
