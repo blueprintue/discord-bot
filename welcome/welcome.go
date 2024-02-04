@@ -408,7 +408,7 @@ func (w *Manager) addMessage(message *Message) error {
 	return nil
 }
 
-func (w *Manager) onMessageReactionAdd(session *discordgo.Session, reaction *discordgo.MessageReactionAdd) {
+func (w *Manager) onMessageReactionAdd(_ *discordgo.Session, reaction *discordgo.MessageReactionAdd) {
 	log.Info().
 		Str("channel_id", reaction.ChannelID).
 		Msg("Incoming Message Reaction Add")
@@ -516,22 +516,4 @@ func (w *Manager) onMessageReactionRemove(session *discordgo.Session, reaction *
 
 func (w *Manager) isUserBot(userID string) bool {
 	return w.session.State.User.ID == userID
-}
-
-func (w *Manager) sendMessageToUser(userID string) error {
-	st, err := w.session.UserChannelCreate(userID)
-	if err != nil {
-		log.Error().Err(err).Str("user_id", userID).Msg("Could not create Channel")
-		return err
-	}
-
-	_, err = w.session.ChannelMessageSend(st.ID, "Sorry it's not possible to add role because your account is not verified and you don't have multi-factor authentication enabled")
-	if err != nil {
-		log.Error().Err(err).
-			Str("user_id", userID).
-			Msg("Could not send Message to User")
-		return err
-	}
-
-	return nil
 }

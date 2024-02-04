@@ -56,3 +56,9 @@ target "image-all" {
     "linux/arm64"
   ]
 }
+
+target "lint" {
+  dockerfile = "./hack/lint.Dockerfile"
+  target = "lint"
+  output = ["type=cacheonly"]
+}

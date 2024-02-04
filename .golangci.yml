@@ -1,0 +1,42 @@
+run:
+  timeout: 30s
+
+linters:
+  enable:
+    - gofmt
+    - govet
+    - depguard
+    - goimports
+    - ineffassign
+    - misspell
+    - unused
+    - revive
+    - staticcheck
+    - typecheck
+    - nolintlint
+    - gosec
+    - forbidigo
+    - importas
+    - errname
+    - makezero
+    - whitespace
+  disable-all: true
+
+linters-settings:
+  depguard:
+    rules:
+      main:
+        deny:
+          # The io/ioutil package has been deprecated.
+          # https://go.dev/doc/go1.16#ioutil
+          - pkg: "io/ioutil"
+            desc: The io/ioutil package has been deprecated.
+  forbidigo:
+    forbid:
+      - '^fmt\.Errorf(# use errors\.Errorf instead)?$'
+  importas:
+    no-unaliased: true
+
+# show all
+max-issues-per-linter: 0
+max-same-issues: 0
