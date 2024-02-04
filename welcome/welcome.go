@@ -463,7 +463,7 @@ func (w *Manager) onMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 	}
 }
 
-func (w *Manager) onMessageReactionRemove(session *discordgo.Session, reaction *discordgo.MessageReactionRemove) {
+func (w *Manager) onMessageReactionRemove(_ *discordgo.Session, reaction *discordgo.MessageReactionRemove) {
 	log.Info().Msg("Incoming Message Reaction Remove")
 	if reaction.ChannelID != w.config.ChannelID {
 		log.Info().
