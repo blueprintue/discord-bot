@@ -6,6 +6,7 @@
 [![Docker Stars](https://img.shields.io/docker/stars/blueprintue/discord-bot?logo=docker)](https://hub.docker.com/r/blueprintue/discord-bot/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/blueprintue/discord-bot?logo=docker)](https://hub.docker.com/r/blueprintue/discord-bot/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/blueprintue/discord-bot)](https://goreportcard.com/report/github.com/blueprintue/discord-bot)
+[![Codecov](https://img.shields.io/codecov/c/github/blueprintue/discord-bot?logo=codecov)](https://codecov.io/gh/blueprintue/discord-bot)
 
 ## Usage
 
