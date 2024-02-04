@@ -37,7 +37,7 @@ jobs:
         uses: docker/bake-action@v4
         with:
           files: ./docker-bake.hcl
-          target: lint
+          targets: lint
 
   build:
     runs-on: ubuntu-latest
