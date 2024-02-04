@@ -62,3 +62,9 @@ target "lint" {
   target = "lint"
   output = ["type=cacheonly"]
 }
+
+target "test" {
+  dockerfile = "./hack/test.Dockerfile"
+  target = "test-coverage"
+  output = ["./coverage"]
+}

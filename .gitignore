@@ -8,8 +8,11 @@ dist
 # Config
 config.json
 
-# bin
+# Binary
 discord-bot
 
-#logs
+# Logs
 discord-bot.log
+
+# Coverage
+coverage
