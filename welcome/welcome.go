@@ -22,14 +22,17 @@ type Configuration struct {
 
 // Message is a struct.
 type Message struct {
-	ID          string
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Color       int    `json:"color"`
-	Role        string `json:"role"`
-	RoleID      string
-	Emoji       string `json:"emoji"`
-	EmojiID     string
+	ID                               string
+	Title                            string `json:"title"`
+	Description                      string `json:"description"`
+	Color                            int    `json:"color"`
+	Role                             string `json:"role"`
+	RoleID                           string
+	Emoji                            string `json:"emoji"`
+	EmojiID                          string
+	CanPurgeReactions                bool `json:"can_purge_reactions"`
+	PurgeThresholdMembersReacted     int  `json:"purge_threshold_members_reacted"`
+	PurgeBelowCountMembersNotInGuild int  `json:"purge_below_count_members_not_in_guild"`
 }
 
 // Manager is a struct.
@@ -340,6 +343,8 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 		return fmt.Errorf("%w", err)
 	}
 
+	membersNotInGuild := []string{}
+
 	for _, user := range users {
 		if w.isUserBot(user.ID) {
 			log.Info().
@@ -355,6 +360,8 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 				Str("user_id", user.ID).
 				Str("guild_id", w.config.GuildID).
 				Msg("Could not find Member in Guild")
+
+			membersNotInGuild = append(membersNotInGuild, user.ID)
 
 			continue
 		}
@@ -395,6 +402,32 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 				Msg("Could not add Role to User")
 
 			return fmt.Errorf("%w", err)
+		}
+	}
+
+	if len(membersNotInGuild) > 0 {
+		log.Info().
+			Int("count_members_reacted", len(users)).
+			Int("count_members_not_found", len(membersNotInGuild)).
+			Msg("Members not found in Guild")
+
+		// use constant from config file
+		if message.CanPurgeReactions &&
+			len(users) > message.PurgeThresholdMembersReacted &&
+			len(membersNotInGuild) < message.PurgeBelowCountMembersNotInGuild {
+			log.Info().
+				Msg("Do purge")
+
+			for idx := range membersNotInGuild {
+				err = w.session.MessageReactionRemove(w.config.ChannelID, message.ID, message.Emoji+":"+message.EmojiID, membersNotInGuild[idx])
+				if err != nil {
+					log.Error().Err(err).
+						Str("role_id", message.RoleID).
+						Str("role", message.Role).
+						Str("user_id", membersNotInGuild[idx]).
+						Msg("Could not remove Reaction")
+				}
+			}
 		}
 	}
 
