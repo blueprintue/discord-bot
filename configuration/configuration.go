@@ -3,6 +3,7 @@ package configuration
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"reflect"
 	"runtime"
@@ -12,34 +13,41 @@ import (
 	"github.com/blueprintue/discord-bot/welcome"
 )
 
+var (
+	ErrDiscordName  = errors.New("invalid json value: discord.name is empty")
+	ErrDiscordToken = errors.New("invalid json value: discord.token is empty")
+	ErrLogFilename  = errors.New("invalid json value: log.filename is empty")
+)
+
 // Support only field's type string, int, bool, []string
 
-// Configuration contains Discord, Log and Modules parameters
+// Configuration contains Discord, Log and Modules parameters.
 type Configuration struct {
 	Discord struct {
-		Name  string `json:"name" env:"DBOT_DISCORD_NAME"`
-		Token string `json:"token" env:"DBOT_DISCORD_TOKEN"`
+		Name  string `env:"DBOT_DISCORD_NAME"  json:"name"`
+		Token string `env:"DBOT_DISCORD_TOKEN" json:"token"`
 	} `json:"discord"`
 	Log struct {
-		Filename string `json:"filename" env:"DBOT_LOG_FILENAME"`
-		Level    string `json:"level" env:"DBOT_LOG_LEVEL"`
-	}
+		Filename string `env:"DBOT_LOG_FILENAME" json:"filename"`
+		Level    string `env:"DBOT_LOG_LEVEL"    json:"level"`
+	} `json:"log"`
 	Modules struct {
 		WelcomeConfiguration welcome.Configuration `json:"welcome"`
 	} `json:"modules"`
 }
 
-// ReadConfiguration read config.json file and update some values with env if found
+// ReadConfiguration read config.json file and update some values with env if found.
 func ReadConfiguration(filename string) (*Configuration, error) {
 	filedata, err := os.ReadFile(filename)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w", err)
 	}
 
 	config := Configuration{}
+
 	err = json.Unmarshal(filedata, &config)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w", err)
 	}
 
 	eraseConfigurationValuesWithEnv(&config)
@@ -52,7 +60,8 @@ func ReadConfiguration(filename string) (*Configuration, error) {
 	return &config, nil
 }
 
-func eraseConfigurationValuesWithEnv(obj interface{}) interface{} {
+//nolint:cyclop
+func eraseConfigurationValuesWithEnv(obj any) {
 	var val reflect.Value
 	if reflect.TypeOf(obj).Kind() == reflect.Ptr {
 		val = reflect.ValueOf(obj).Elem()
@@ -63,15 +72,18 @@ func eraseConfigurationValuesWithEnv(obj interface{}) interface{} {
 	for idxNumField := 0; idxNumField < val.NumField(); idxNumField++ {
 		if val.Field(idxNumField).Kind() == reflect.Struct {
 			eraseConfigurationValuesWithEnv(val.Field(idxNumField).Addr().Interface())
+
 			continue
 		}
 
 		envKey := reflect.TypeOf(obj).Elem().Field(idxNumField).Tag.Get("env")
+
 		envValue, ok := os.LookupEnv(envKey)
 		if !ok {
 			continue
 		}
 
+		//nolint:exhaustive
 		switch val.Field(idxNumField).Kind() {
 		case reflect.String:
 			val.Field(idxNumField).SetString(envValue)
@@ -90,28 +102,29 @@ func eraseConfigurationValuesWithEnv(obj interface{}) interface{} {
 			if runtime.GOOS == "windows" {
 				splitter = ";"
 			}
+
 			stringEnvValues := strings.Split(envValue, splitter)
+
 			val.Field(idxNumField).Set(reflect.MakeSlice(val.Field(idxNumField).Type(), len(stringEnvValues), len(stringEnvValues)))
+
 			for idxSlice := 0; idxSlice < len(stringEnvValues); idxSlice++ {
 				val.Field(idxNumField).Index(idxSlice).SetString(stringEnvValues[idxSlice])
 			}
 		}
 	}
-
-	return obj
 }
 
 func checkBasicConfiguration(config Configuration) error {
 	if config.Discord.Name == "" {
-		return errors.New("invalid json value: discord.name is empty")
+		return ErrDiscordName
 	}
 
 	if config.Discord.Token == "" {
-		return errors.New("invalid json value: discord.token is empty")
+		return ErrDiscordToken
 	}
 
 	if config.Log.Filename == "" {
-		return errors.New("invalid json value: log.filename is empty")
+		return ErrLogFilename
 	}
 
 	return nil

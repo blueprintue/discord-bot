@@ -9,16 +9,18 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Configuration is a struct
+const limitChannelMessages = 100
+
+// Configuration is a struct.
 type Configuration struct {
-	Channel   string `json:"channel"`
-	ChannelID string
-	Guild     string
-	GuildID   string
+	Channel   string    `json:"channel"`
+	ChannelID string    `json:"-"`
+	Guild     string    `json:"-"`
+	GuildID   string    `json:"-"`
 	Messages  []Message `json:"messages"`
 }
 
-// Message is a struct
+// Message is a struct.
 type Message struct {
 	ID          string
 	Title       string `json:"title"`
@@ -30,13 +32,13 @@ type Message struct {
 	EmojiID     string
 }
 
-// Manager is a struct
+// Manager is a struct.
 type Manager struct {
 	session *discordgo.Session
 	config  Configuration
 }
 
-// NewWelcomeManager return a Manager
+// NewWelcomeManager return a Manager.
 func NewWelcomeManager(
 	session *discordgo.Session,
 	guildName string,
@@ -50,6 +52,7 @@ func NewWelcomeManager(
 	}
 
 	log.Info().Msg("Check configuration 1/2")
+
 	if !manager.hasValidConfigurationInFile() {
 		return nil
 	}
@@ -58,6 +61,7 @@ func NewWelcomeManager(
 	manager.completeConfiguration()
 
 	log.Info().Msg("Check configuration 2/2")
+
 	if !manager.hasValidConfigurationAgainstDiscordServer() {
 		return nil
 	}
@@ -104,6 +108,7 @@ func (w *Manager) hasValidConfigurationInFile() bool {
 	return true
 }
 
+//nolint:gocognit,cyclop
 func (w *Manager) completeConfiguration() {
 	for _, guild := range w.session.State.Guilds {
 		if guild.Name == w.config.Guild {
@@ -111,6 +116,7 @@ func (w *Manager) completeConfiguration() {
 				Str("guild_id", guild.ID).
 				Str("guild", w.config.Guild).
 				Msg("Set GuildID")
+
 			w.config.GuildID = guild.ID
 
 			for _, channel := range guild.Channels {
@@ -119,7 +125,9 @@ func (w *Manager) completeConfiguration() {
 						Str("channel_id", channel.ID).
 						Str("channel", w.config.Channel).
 						Msg("Set ChannelID")
+
 					w.config.ChannelID = channel.ID
+
 					break
 				}
 			}
@@ -131,6 +139,7 @@ func (w *Manager) completeConfiguration() {
 							Str("role_id", role.ID).
 							Str("role", w.config.Messages[idx].Role).
 							Msg("Set RoleID")
+
 						w.config.Messages[idx].RoleID = role.ID
 					}
 				}
@@ -139,14 +148,17 @@ func (w *Manager) completeConfiguration() {
 			for _, emoji := range guild.Emojis {
 				emojiRichEmbed := fmt.Sprintf("<:%s:%s>", emoji.Name, emoji.ID)
 				emojiInText := ":" + emoji.Name + ":"
+
 				for idx := range w.config.Messages {
 					w.config.Messages[idx].Title = strings.ReplaceAll(w.config.Messages[idx].Title, emojiInText, emojiRichEmbed)
 					w.config.Messages[idx].Description = strings.ReplaceAll(w.config.Messages[idx].Description, emojiInText, emojiRichEmbed)
+
 					if w.config.Messages[idx].Emoji == emoji.Name {
 						log.Info().
 							Str("emoji_id", emoji.ID).
 							Str("emoji", w.config.Messages[idx].Emoji).
 							Msg("Set EmojiID")
+
 						w.config.Messages[idx].EmojiID = emoji.ID
 					}
 				}
@@ -189,7 +201,7 @@ func (w *Manager) hasValidConfigurationAgainstDiscordServer() bool {
 	return true
 }
 
-// Run do the main task of Welcome
+// Run do the main task of Welcome.
 func (w *Manager) Run() error {
 	log.Info().Msg("Add Handler on Message Reaction Add")
 	w.session.AddHandler(w.onMessageReactionAdd)
@@ -198,30 +210,37 @@ func (w *Manager) Run() error {
 	w.session.AddHandler(w.onMessageReactionRemove)
 
 	log.Info().Msg("Add messages to channel")
+
 	err := w.addMessagesToChannel()
 	if err != nil {
 		log.Error().Err(err).Msg("Could not add messages to channel")
+
 		return err
 	}
 
 	return nil
 }
 
+//nolint:funlen,cyclop
 func (w *Manager) addMessagesToChannel() error {
 	log.Info().
 		Str("channel_id", w.config.ChannelID).
 		Str("channel", w.config.Channel).
 		Msg("Get Messages from Channel")
-	messages, err := w.session.ChannelMessages(w.config.ChannelID, 100, "", "", "")
+
+	messages, err := w.session.ChannelMessages(w.config.ChannelID, limitChannelMessages, "", "", "")
+
 	if err != nil {
 		log.Error().Err(err).
 			Str("channel_id", w.config.ChannelID).
 			Str("channel", w.config.Channel).
 			Msg("Could not read Messages from Channel")
-		return err
+
+		return fmt.Errorf("%w", err)
 	}
 
 	var idxsMessageTreated []int
+
 	for _, message := range messages {
 		if message.Author.ID != w.session.State.User.ID {
 			log.Info().
@@ -229,6 +248,7 @@ func (w *Manager) addMessagesToChannel() error {
 				Str("channel_id", w.config.ChannelID).
 				Str("channel", w.config.Channel).
 				Msg("SKIP - Message in Channel is not from bot")
+
 			continue
 		}
 
@@ -238,6 +258,7 @@ func (w *Manager) addMessagesToChannel() error {
 				Str("channel_id", w.config.ChannelID).
 				Str("channel", w.config.Channel).
 				Msg("SKIP - Message in Channel is not an embed")
+
 			continue
 		}
 
@@ -248,11 +269,13 @@ func (w *Manager) addMessagesToChannel() error {
 				log.Info().
 					Str("message_title", w.config.Messages[idxMessages].Title).
 					Msg("Message already sent -> update roles")
+
 				err := w.updateRoleBelongMessage(w.config.Messages[idxMessages])
 				if err != nil {
 					log.Error().Err(err).
 						Str("message_title", w.config.Messages[idxMessages].Title).
 						Msg("Could not update role belong to Message")
+
 					return err
 				}
 
@@ -265,9 +288,11 @@ func (w *Manager) addMessagesToChannel() error {
 
 	for idxMessages := range w.config.Messages {
 		messageTreated := false
+
 		for _, idxMessageTreated := range idxsMessageTreated {
 			if idxMessageTreated == idxMessages {
 				messageTreated = true
+
 				break
 			}
 		}
@@ -276,11 +301,13 @@ func (w *Manager) addMessagesToChannel() error {
 			log.Info().
 				Str("message_title", w.config.Messages[idxMessages].Title).
 				Msg("Message missing - add Message")
+
 			err := w.addMessage(&w.config.Messages[idxMessages])
 			if err != nil {
 				log.Error().Err(err).
 					Str("message_title", w.config.Messages[idxMessages].Title).
 					Msg("Could not add Message")
+
 				return err
 			}
 
@@ -291,6 +318,7 @@ func (w *Manager) addMessagesToChannel() error {
 	return nil
 }
 
+//nolint:funlen
 func (w *Manager) updateRoleBelongMessage(message Message) error {
 	log.Info().
 		Str("message_id", message.ID).
@@ -299,6 +327,7 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 		Str("channel", w.config.Channel).
 		Str("emoji", message.Emoji+":"+message.EmojiID).
 		Msg("Get all Reactions from Message")
+
 	users, err := helpers.MessageReactionsAll(w.session, w.config.ChannelID, message.ID, message.Emoji+":"+message.EmojiID)
 	if err != nil {
 		log.Error().Err(err).
@@ -307,7 +336,8 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 			Str("channel", w.config.Channel).
 			Str("emoji", message.Emoji+":"+message.EmojiID).
 			Msg("Could not get all Reactions")
-		return err
+
+		return fmt.Errorf("%w", err)
 	}
 
 	for _, user := range users {
@@ -315,6 +345,7 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 			log.Info().
 				Str("user_id", user.ID).
 				Msg("SKIP - User is the bot")
+
 			continue
 		}
 
@@ -324,13 +355,16 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 				Str("user_id", user.ID).
 				Str("guild_id", w.config.GuildID).
 				Msg("Could not find Member in Guild")
+
 			continue
 		}
 
 		skipUser := false
+
 		for _, role := range member.Roles {
 			if role == message.RoleID {
 				skipUser = true
+
 				break
 			}
 		}
@@ -340,6 +374,7 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 				Str("user_id", user.ID).
 				Str("guild_id", w.config.GuildID).
 				Msg("SKIP - User has already Role")
+
 			continue
 		}
 
@@ -349,6 +384,7 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 			Str("user_id", user.ID).
 			Str("username", user.Username).
 			Msg("Add Role to User")
+
 		err = w.session.GuildMemberRoleAdd(w.config.GuildID, user.ID, message.RoleID)
 		if err != nil {
 			log.Error().Err(err).
@@ -357,7 +393,8 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 				Str("user_id", user.ID).
 				Str("username", user.Username).
 				Msg("Could not add Role to User")
-			return err
+
+			return fmt.Errorf("%w", err)
 		}
 	}
 
@@ -370,18 +407,21 @@ func (w *Manager) addMessage(message *Message) error {
 		Str("channel_id", w.config.ChannelID).
 		Str("channel", w.config.Channel).
 		Msg("Send Message to Channel")
+
 	messageSent, err := w.session.ChannelMessageSendEmbed(w.config.ChannelID, &discordgo.MessageEmbed{
 		Title:       message.Title,
 		Description: message.Description,
 		Color:       message.Color,
 	})
+
 	if err != nil {
 		log.Error().Err(err).
 			Str("message_title", message.Title).
 			Str("channel_id", w.config.ChannelID).
 			Str("channel", w.config.Channel).
 			Msg("Could not send Message to Channel")
-		return err
+
+		return fmt.Errorf("%w", err)
 	}
 
 	log.Info().
@@ -389,6 +429,7 @@ func (w *Manager) addMessage(message *Message) error {
 		Str("channel_id", w.config.ChannelID).
 		Str("channel", w.config.Channel).
 		Msg("Message Sent")
+
 	message.ID = messageSent.ID
 
 	log.Info().
@@ -396,13 +437,15 @@ func (w *Manager) addMessage(message *Message) error {
 		Str("message_title", message.Title).
 		Str("emoji", message.Emoji+":"+message.EmojiID).
 		Msg("Add Reaction to Message")
+
 	err = w.session.MessageReactionAdd(w.config.ChannelID, message.ID, message.Emoji+":"+message.EmojiID)
 	if err != nil {
 		log.Error().Err(err).
 			Str("message_id", message.ID).
 			Str("emoji", message.Emoji+":"+message.EmojiID).
 			Msg("Could not add Reaction to Message")
-		return err
+
+		return fmt.Errorf("%w", err)
 	}
 
 	return nil
@@ -412,8 +455,10 @@ func (w *Manager) onMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 	log.Info().
 		Str("channel_id", reaction.ChannelID).
 		Msg("Incoming Message Reaction Add")
+
 	if reaction.ChannelID != w.config.ChannelID {
 		log.Info().Msg("SKIP - Channel is not matching")
+
 		return
 	}
 
@@ -421,13 +466,16 @@ func (w *Manager) onMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 		log.Info().
 			Str("channel_id", reaction.ChannelID).
 			Msg("SKIP - User is the bot")
+
 		return
 	}
 
 	idxMessageFound := -1
+
 	for idxMessage := range w.config.Messages {
 		if reaction.MessageID == w.config.Messages[idxMessage].ID {
 			idxMessageFound = idxMessage
+
 			break
 		}
 	}
@@ -436,6 +484,7 @@ func (w *Manager) onMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 		log.Info().
 			Str("channel_id", reaction.ChannelID).
 			Msg("SKIP - Message is not matching")
+
 		return
 	}
 
@@ -443,6 +492,7 @@ func (w *Manager) onMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 		log.Info().
 			Str("channel_id", reaction.ChannelID).
 			Msg("SKIP - Emoji is not matching")
+
 		return
 	}
 
@@ -452,6 +502,7 @@ func (w *Manager) onMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 		Str("channel_id", reaction.ChannelID).
 		Str("user_id", reaction.UserID).
 		Msg("Add Role to User")
+
 	err := w.session.GuildMemberRoleAdd(w.config.GuildID, reaction.UserID, w.config.Messages[idxMessageFound].RoleID)
 	if err != nil {
 		log.Error().Err(err).
@@ -465,10 +516,12 @@ func (w *Manager) onMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 
 func (w *Manager) onMessageReactionRemove(_ *discordgo.Session, reaction *discordgo.MessageReactionRemove) {
 	log.Info().Msg("Incoming Message Reaction Remove")
+
 	if reaction.ChannelID != w.config.ChannelID {
 		log.Info().
 			Str("channel_id", reaction.ChannelID).
 			Msg("SKIP - Channel is not matching")
+
 		return
 	}
 
@@ -476,19 +529,23 @@ func (w *Manager) onMessageReactionRemove(_ *discordgo.Session, reaction *discor
 		log.Info().
 			Str("user_id", reaction.UserID).
 			Msg("SKIP - User is the bot")
+
 		return
 	}
 
 	idxMessageFound := -1
+
 	for idxMessage := range w.config.Messages {
 		if reaction.MessageID == w.config.Messages[idxMessage].ID {
 			idxMessageFound = idxMessage
+
 			break
 		}
 	}
 
 	if idxMessageFound == -1 {
 		log.Info().Msg("SKIP - Message is not matching")
+
 		return
 	}
 
@@ -496,6 +553,7 @@ func (w *Manager) onMessageReactionRemove(_ *discordgo.Session, reaction *discor
 		log.Info().
 			Str("emoji", reaction.Emoji.Name).
 			Msg("SKIP - Emoji is not matching")
+
 		return
 	}
 
@@ -504,6 +562,7 @@ func (w *Manager) onMessageReactionRemove(_ *discordgo.Session, reaction *discor
 		Str("role", w.config.Messages[idxMessageFound].Role).
 		Str("user_id", reaction.UserID).
 		Msg("Remove Role to User")
+
 	err := w.session.GuildMemberRoleRemove(w.config.GuildID, reaction.UserID, w.config.Messages[idxMessageFound].RoleID)
 	if err != nil {
 		log.Error().Err(err).

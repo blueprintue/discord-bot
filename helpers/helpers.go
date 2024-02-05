@@ -2,52 +2,60 @@ package helpers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-// MessageReactionsAll retrieve all Reactions from Message taking into account pagination
-func MessageReactionsAll(session *discordgo.Session, channelID, messageID, emojiID string) (st []*discordgo.User, err error) {
-	var body []byte
+const limitMessageReactions = "100"
+
+// MessageReactionsAll retrieve all Reactions from Message taking into account pagination.
+func MessageReactionsAll(session *discordgo.Session, channelID, messageID, emojiID string) ([]*discordgo.User, error) {
 	var listUsers []*discordgo.User
-	emojiID = strings.Replace(emojiID, "#", "%23", -1)
+
+	emojiID = strings.ReplaceAll(emojiID, "#", "%23")
 	uri := discordgo.EndpointMessageReactions(channelID, messageID, emojiID)
 
-	v := url.Values{}
+	urlValues := url.Values{}
 
-	v.Set("limit", strconv.Itoa(100))
+	urlValues.Set("limit", limitMessageReactions)
 
 	for {
 		tempURI := uri
-		if len(v) > 0 {
-			tempURI += "?" + v.Encode()
+		if len(urlValues) > 0 {
+			tempURI += "?" + urlValues.Encode()
 		}
 
-		body, err = session.RequestWithBucketID("GET", tempURI, nil, discordgo.EndpointMessageReaction(channelID, "", "", ""))
+		body, err := session.RequestWithBucketID("GET", tempURI, nil, discordgo.EndpointMessageReaction(channelID, "", "", ""))
 		if err != nil {
-			return
+			return listUsers, fmt.Errorf("%w", err)
 		}
-		err = unmarshal(body, &listUsers)
 
-		if len(listUsers) == 0 {
+		var listUsersFromAPI []*discordgo.User
+
+		err = unmarshal(body, &listUsersFromAPI)
+		if err != nil {
+			return listUsers, err
+		}
+
+		if len(listUsersFromAPI) == 0 {
 			break
 		}
 
-		for k := range listUsers {
-			ptr := *listUsers[k]
-			st = append(st, &ptr)
+		for k := range listUsersFromAPI {
+			ptr := *listUsersFromAPI[k]
+			listUsers = append(listUsers, &ptr)
 		}
 
-		v.Set("after", listUsers[len(listUsers)-1].ID)
+		urlValues.Set("after", listUsersFromAPI[len(listUsersFromAPI)-1].ID)
 	}
 
-	return
+	return listUsers, nil
 }
 
-func unmarshal(data []byte, v interface{}) error {
+func unmarshal(data []byte, v any) error {
 	err := json.Unmarshal(data, v)
 	if err != nil {
 		return discordgo.ErrJSONUnmarshal
