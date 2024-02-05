@@ -43,6 +43,8 @@ func main() {
 		log.Fatal().Err(err).Msg("Could not create discordgo session")
 	}
 
+	session.Identify.Intents = discordgo.IntentsAll
+
 	log.Info().Msg("Open discordgo session")
 
 	err = session.Open()

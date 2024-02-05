@@ -104,7 +104,10 @@ JSON configuration used:
       "description": "Click the :blueprintUE: below to join the blueprintUE part",
       "color": 5301186,
       "role": "is member",
-      "emoji": "blueprintUE"
+      "emoji": "blueprintUE",
+      "can_purge_reactions": true,
+      "purge_threshold_members_reacted": 100,
+      "purge_below_count_members_not_in_guild": 10
     }
   ]
 }
@@ -120,13 +123,16 @@ You can define only one channel.
 ##### Message
 You can defines multiple messages.  
 
-| JSON Parameter | Mandatory | Type   | Default value | Description                                                                                   |
-| -------------- | --------- | ------ | ------------- | --------------------------------------------------------------------------------------------- |
-| title          | YES       | string |               | title's message                                                                               |
-| description    | YES       | string |               | description's message                                                                         |
-| color          | NO        | int    | 0             | color on the left of the message (format is integer representation of hexadecimal color code) |
-| role           | YES       | string |               | role's name to assign when user use correct emoji                                             |
-| emoji          | YES       | string |               | emoji to use (format is my_emoji without `:`)                                                 |
+| JSON Parameter                         | Mandatory | Type   | Default value | Description                                                                                         |
+| -------------------------------------- | --------- | ------ | ------------- | --------------------------------------------------------------------------------------------------- |
+| title                                  | YES       | string |               | title's message                                                                                     |
+| description                            | YES       | string |               | description's message                                                                               |
+| color                                  | NO        | int    | 0             | color on the left of the message (format is integer representation of hexadecimal color code)       |
+| role                                   | YES       | string |               | role's name to assign when user use correct emoji                                                   |
+| emoji                                  | YES       | string |               | emoji to use (format is my_emoji without `:`)                                                       |
+| can_purge_reactions                    | NO        | bool   | false         | only on startup, allow the purging of reactions from users who are not on the Discord server        |
+| purge_threshold_members_reacted        | NO        | int    | 0             | threshold for the number of users having reacted to the message                                     |
+| purge_below_count_members_not_in_guild | NO        | int    | 0             | purge only if the number of invalid users is below a certain threshold                              |
 
 ##### How it works?
 Each time you start `discord-bot`, welcome module will check the configuration in the `config.json`.  
@@ -138,3 +144,9 @@ Secondly it will listen two events on `onMessageReactionAdd` and `onMessageReact
 After it will search the message in the channel.  
 If the message is not found then it will publish it and add a reaction to show user which emoji to use.  
 If the message is found then it will fetch all reactions by the users and apply role.
+
+If the user is no longer in the Discord server and you have set `can_purge_reactions` to `true` then it will:
+1. check `purge_threshold_members_reacted` whether the threshold for the number of users who have reacted to the message has been exceeded.
+2. check `purge_below_count_members_not_in_guild` whether the number of invalid users is below a certain threshold.
+
+If the answer to these questions is positive, the reaction to the message will be deleted.

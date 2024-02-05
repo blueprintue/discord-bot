@@ -16,7 +16,10 @@
           "description": "",
           "color": 0,
           "role": "",
-          "emoji": ""
+          "emoji": "",
+          "can_purge_reactions": false,
+          "purge_threshold_members_reacted": 100,
+          "purge_below_count_members_not_in_guild": 10
         }
       ]
     }
