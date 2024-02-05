@@ -321,7 +321,7 @@ func (w *Manager) addMessagesToChannel() error {
 	return nil
 }
 
-//nolint:funlen
+//nolint:funlen,cyclop
 func (w *Manager) updateRoleBelongMessage(message Message) error {
 	log.Info().
 		Str("message_id", message.ID).

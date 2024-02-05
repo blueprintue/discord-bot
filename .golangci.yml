@@ -19,3 +19,7 @@ linters:
 linters-settings:
   lll:
     line-length: 160
+  tagliatelle:
+    case:
+      rules:
+        json: snake
