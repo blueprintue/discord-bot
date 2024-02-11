@@ -29,7 +29,7 @@ func main() {
 
 	log.Info().Msgf("Read configuration from file: %s", configurationFilename)
 
-	config, err := configuration.ReadConfiguration(configurationFilename)
+	config, err := configuration.ReadConfiguration(os.DirFS("."), configurationFilename)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error on configuration")
 	}

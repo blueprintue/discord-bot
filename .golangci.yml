@@ -23,3 +23,9 @@ linters-settings:
     case:
       rules:
         json: snake
+  varnamelen:
+    check-return: true
+    check-type-param: true
+    ignore-names:
+      - err
+      - tt
