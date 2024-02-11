@@ -34,7 +34,7 @@ func TestReadConfiguration(t *testing.T) {
 	require.Equal(t, expected, actualConfiguration)
 }
 
-// because using t.SetEnv, no `t.Parallel()` allowed here
+// because using t.SetEnv, no `t.Parallel()` allowed here.
 func TestReadConfigurationWithEnvValues(t *testing.T) {
 	fsys := fstest.MapFS{
 		"config.json": {
@@ -64,6 +64,7 @@ func TestReadConfigurationWithEnvValues(t *testing.T) {
 	require.Equal(t, expected, actualConfiguration)
 }
 
+//nolint:funlen
 func TestReadConfigurationErrors(t *testing.T) {
 	t.Parallel()
 
@@ -167,7 +168,11 @@ func TestReadConfigurationErrors(t *testing.T) {
 	}
 
 	for testCaseName, testCase := range testCases {
+		testCaseName, testCase := testCaseName, testCase
+
 		t.Run(testCaseName, func(tt *testing.T) {
+			tt.Parallel()
+
 			actualConfiguration, actualErr := configuration.ReadConfiguration(fsys, testCase.args.filename)
 
 			require.ErrorContains(tt, actualErr, testCase.want.errorMessage)

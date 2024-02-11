@@ -136,6 +136,7 @@ func checkBasicConfiguration(config Configuration) error {
 	}
 
 	isValidLogLevel := false
+
 	validLogLevelValue := []string{"", "trace", "debug", "info", "warn", "error", "fatal", "panic"}
 	for _, levelValue := range validLogLevelValue {
 		if config.Log.Level == levelValue {
