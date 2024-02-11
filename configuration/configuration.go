@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"reflect"
 	"runtime"
@@ -17,28 +18,35 @@ var (
 	ErrDiscordName  = errors.New("invalid json value: discord.name is empty")
 	ErrDiscordToken = errors.New("invalid json value: discord.token is empty")
 	ErrLogFilename  = errors.New("invalid json value: log.filename is empty")
+	ErrLogLevel     = errors.New("invalid json value: log.level is invalid")
 )
 
 // Support only field's type string, int, bool, []string
 
 // Configuration contains Discord, Log and Modules parameters.
 type Configuration struct {
-	Discord struct {
-		Name  string `env:"DBOT_DISCORD_NAME"  json:"name"`
-		Token string `env:"DBOT_DISCORD_TOKEN" json:"token"`
-	} `json:"discord"`
-	Log struct {
-		Filename string `env:"DBOT_LOG_FILENAME" json:"filename"`
-		Level    string `env:"DBOT_LOG_LEVEL"    json:"level"`
-	} `json:"log"`
-	Modules struct {
-		WelcomeConfiguration welcome.Configuration `json:"welcome"`
-	} `json:"modules"`
+	Discord `json:"discord"`
+	Log     `json:"log"`
+	Modules `json:"modules"`
 }
 
-// ReadConfiguration read config.json file and update some values with env if found.
-func ReadConfiguration(filename string) (*Configuration, error) {
-	filedata, err := os.ReadFile(filename)
+type Discord struct {
+	Name  string `env:"DBOT_DISCORD_NAME"  json:"name"`
+	Token string `env:"DBOT_DISCORD_TOKEN" json:"token"`
+}
+
+type Log struct {
+	Filename string `env:"DBOT_LOG_FILENAME" json:"filename"`
+	Level    string `env:"DBOT_LOG_LEVEL"    json:"level"`
+}
+
+type Modules struct {
+	WelcomeConfiguration welcome.Configuration `json:"welcome"`
+}
+
+// ReadConfiguration read `config.json` file and update values with env if found.
+func ReadConfiguration(fsys fs.FS, filename string) (*Configuration, error) {
+	filedata, err := fs.ReadFile(fsys, filename)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
@@ -125,6 +133,18 @@ func checkBasicConfiguration(config Configuration) error {
 
 	if config.Log.Filename == "" {
 		return ErrLogFilename
+	}
+
+	isValidLogLevel := false
+	validLogLevelValue := []string{"", "trace", "debug", "info", "warn", "error", "fatal", "panic"}
+	for _, levelValue := range validLogLevelValue {
+		if config.Log.Level == levelValue {
+			isValidLogLevel = true
+		}
+	}
+
+	if !isValidLogLevel {
+		return ErrLogLevel
 	}
 
 	return nil
