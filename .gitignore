@@ -12,6 +12,7 @@ config.json
 discord-bot
 
 # Logs
+logs
 discord-bot.log
 
 # Coverage

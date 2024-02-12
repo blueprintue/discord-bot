@@ -34,7 +34,10 @@ func main() {
 		log.Fatal().Err(err).Msg("Error on configuration")
 	}
 
-	logger.Configure(config)
+	err = logger.Configure(config.Log)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Error on logger configuration")
+	}
 
 	log.Info().Msg("Create discordgo session")
 
