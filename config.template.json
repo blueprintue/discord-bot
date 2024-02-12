@@ -5,7 +5,8 @@
   },
   "log": {
     "filename": "",
-    "level": "info"
+    "level": "info",
+    "number_files_rotation": 5
   },
   "modules": {
     "welcome": {
