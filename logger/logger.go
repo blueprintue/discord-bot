@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"path"
@@ -13,20 +14,24 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const numberFilesRotation = 5
+const formatTimestampLogger = "2006-01-02T15:04:05.000000000Z07:00"
 
 // Configure configures logger.
-func Configure(configuration *configuration.Configuration) {
+func Configure(confLog configuration.Log) error {
 	var err error
 
-	logFile := path.Clean(configuration.Log.Filename)
+	logFile := path.Clean(confLog.Filename)
 	if err := os.MkdirAll(path.Dir(logFile), os.ModePerm); err != nil {
-		log.Fatal().Err(err).Msgf("Cannot create log folder")
+		log.Error().Err(err).Msg("Cannot create log folder")
+
+		return fmt.Errorf("%w", err)
 	}
 
-	rwriter, err := rotatewriter.NewRotateWriter(logFile, numberFilesRotation)
+	rwriter, err := rotatewriter.NewRotateWriter(logFile, confLog.NumberFilesRotation)
 	if err != nil {
-		log.Fatal().Err(err).Msgf("Cannot create log file writer")
+		log.Error().Err(err).Msg("Cannot create log file writer")
+
+		return fmt.Errorf("%w", err)
 	}
 
 	sighupChan := make(chan os.Signal, 1)
@@ -41,21 +46,28 @@ func Configure(configuration *configuration.Configuration) {
 			}
 
 			if err := rwriter.Rotate(nil); err != nil {
-				log.Error().Err(err).Msgf("Cannot rotate log")
+				log.Error().Err(err).Msg("Cannot rotate log")
 			}
 		}
 	}()
 
-	log.Logger = zerolog.New(zerolog.MultiLevelWriter(
-		zerolog.ConsoleWriter{
-			Out:        os.Stdout,
-			TimeFormat: time.RFC1123,
-		}, rwriter)).With().Timestamp().Caller().Logger()
-
-	logLevel, err := zerolog.ParseLevel(configuration.Log.Level)
+	logLevel, err := zerolog.ParseLevel(confLog.Level)
 	if err != nil {
-		log.Fatal().Err(err).Msgf("Unknown log level")
-	} else {
-		zerolog.SetGlobalLevel(logLevel)
+		log.Error().Err(err).Msg("Unknown log level")
+
+		return fmt.Errorf("%w", err)
 	}
+
+	zerolog.SetGlobalLevel(logLevel)
+	zerolog.TimeFieldFormat = formatTimestampLogger
+
+	log.Logger = zerolog.New(
+		zerolog.MultiLevelWriter(
+			zerolog.ConsoleWriter{
+				Out:        os.Stdout,
+				TimeFormat: time.RFC1123,
+			}, rwriter),
+	).With().Timestamp().Caller().Logger()
+
+	return nil
 }

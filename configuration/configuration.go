@@ -36,8 +36,9 @@ type Discord struct {
 }
 
 type Log struct {
-	Filename string `env:"DBOT_LOG_FILENAME" json:"filename"`
-	Level    string `env:"DBOT_LOG_LEVEL"    json:"level"`
+	Filename            string `env:"DBOT_LOG_FILENAME"              json:"filename"`
+	Level               string `env:"DBOT_LOG_LEVEL"                 json:"level"`
+	NumberFilesRotation int    `env:"DBOT_LOG_NUMBER_FILES_ROTATION" json:"number_files_rotation"`
 }
 
 type Modules struct {

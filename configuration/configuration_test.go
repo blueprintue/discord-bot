@@ -24,7 +24,9 @@ func TestReadConfiguration(t *testing.T) {
 			Token: "bar",
 		},
 		Log: configuration.Log{
-			Filename: "oof",
+			Filename:            "oof",
+			Level:               "",
+			NumberFilesRotation: 0,
 		},
 	}
 
@@ -38,7 +40,7 @@ func TestReadConfiguration(t *testing.T) {
 func TestReadConfigurationWithEnvValues(t *testing.T) {
 	fsys := fstest.MapFS{
 		"config.json": {
-			Data: []byte(`{"discord": {"name": "foo","token": "bar"},"log": {"filename": "oof"}}`),
+			Data: []byte(`{"discord": {"name": "foo","token": "bar"},"log": {"filename": "oof", "level": "invalid", "number_files_rotation": 9}}`),
 		},
 	}
 
@@ -46,6 +48,7 @@ func TestReadConfigurationWithEnvValues(t *testing.T) {
 	t.Setenv("DBOT_DISCORD_TOKEN", "env_bar")
 	t.Setenv("DBOT_LOG_FILENAME", "env_oof")
 	t.Setenv("DBOT_LOG_LEVEL", "panic")
+	t.Setenv("DBOT_LOG_NUMBER_FILES_ROTATION", "15")
 
 	expected := &configuration.Configuration{
 		Discord: configuration.Discord{
@@ -53,8 +56,9 @@ func TestReadConfigurationWithEnvValues(t *testing.T) {
 			Token: "env_bar",
 		},
 		Log: configuration.Log{
-			Filename: "env_oof",
-			Level:    "panic",
+			Filename:            "env_oof",
+			Level:               "panic",
+			NumberFilesRotation: 15,
 		},
 	}
 

@@ -70,10 +70,11 @@ When you are on a discord server, you will see a list of channels on the left, a
 You need to create a bot, you can start by looking at tutorial from Discord: [https://discord.com/developers/docs/getting-started](https://discord.com/developers/docs/getting-started).
 
 #### Log
-| JSON Parameter | ENV Parameter      | Mandatory | Type   | Specific values                                           | Description                                                                     |
-| -------------- | ------------------ | --------- | ------ | --------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| filename       | DBOT_LOG_FILENAME  | YES       | string |                                                           | relative or absolute path to log file (it will create directories if not exist) |
-| level          | DBOT_LOG_LEVEL     | NO        | string | trace \| debug \| info \| warn \| error \| fatal \| panic | level of log (if empty then no log)                                             |
+| JSON Parameter        | ENV Parameter                  | Mandatory | Type   | Specific values                                           | Default value | Description                                                                                                                                             |
+| --------------------- | ------------------------------ | --------- | ------ | --------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| filename              | DBOT_LOG_FILENAME              | YES       | string |                                                           |               | relative or absolute path to log file (it will create directories if not exist, for rotation you must use a directory with no other directories inside) |
+| level                 | DBOT_LOG_LEVEL                 | NO        | string | trace \| debug \| info \| warn \| error \| fatal \| panic | ""            | level of log (if empty then no log)                                                                                                                     |
+| number_files_rotation | DBOT_LOG_NUMBER_FILES_ROTATION | NO        | int    |                                                           | 0             | `0` if no rotation at all - just reopen file on rotation. e.g. you would like use logrotate; `>0` if rotation enabled                                   |
 
 ##### What is level?
 It uses zerolog levels (from highest to lowest):
