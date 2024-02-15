@@ -34,8 +34,6 @@ func (r requestTest) assert(t *testing.T, req *http.Request) {
 }
 
 func (rt *mockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	defer rt.responsesMocked[rt.idxResponse].Body.Close()
-
 	rt.requestsTest[rt.idxResponse].assert(rt.test, req)
 
 	resp := rt.responsesMocked[rt.idxResponse]
@@ -62,27 +60,32 @@ func TestMessageReactionsAll(t *testing.T) {
 	emojiID := ":emoji:"
 
 	// user 111 + user 222
-	data1, _ := json.Marshal(expectedUsers[:2])
+	data1, err := json.Marshal(expectedUsers[:2])
+	require.NoError(t, err)
 	recorder1 := httptest.NewRecorder()
 	recorder1.Header().Add("Content-Type", "application/json")
-	_, err1 := recorder1.WriteString(string(data1))
-	require.NoError(t, err1)
+	_, err = recorder1.WriteString(string(data1))
+	require.NoError(t, err)
 	expectedResponse1 := recorder1.Result()
+	defer expectedResponse1.Body.Close()
 
 	// user 333
-	data2, _ := json.Marshal(expectedUsers[2:])
+	data2, err := json.Marshal(expectedUsers[2:])
+	require.NoError(t, err)
 	recorder2 := httptest.NewRecorder()
 	recorder2.Header().Add("Content-Type", "application/json")
-	_, err2 := recorder2.WriteString(string(data2))
-	require.NoError(t, err2)
+	_, err = recorder2.WriteString(string(data2))
+	require.NoError(t, err)
 	expectedResponse2 := recorder2.Result()
+	defer expectedResponse2.Body.Close()
 
 	// no user
 	recorder3 := httptest.NewRecorder()
 	recorder3.Header().Add("Content-Type", "application/json")
-	_, err3 := recorder3.WriteString("[]")
-	require.NoError(t, err3)
+	_, err = recorder3.WriteString("[]")
+	require.NoError(t, err)
 	expectedResponse3 := recorder3.Result()
+	defer expectedResponse3.Body.Close()
 
 	session.Client = createClient(t,
 		[]*http.Response{expectedResponse1, expectedResponse2, expectedResponse3},
@@ -98,7 +101,7 @@ func TestMessageReactionsAll(t *testing.T) {
 	require.Equal(t, expectedUsers, actualUsers)
 }
 
-//nolint:funlen
+//nolint:funlen,tparallel
 func TestMessageReactionsAllErrors(t *testing.T) {
 	t.Parallel()
 
@@ -115,21 +118,25 @@ func TestMessageReactionsAllErrors(t *testing.T) {
 	messageID := "message-id"
 	emojiID := ":emoji:"
 
+	//nolint:paralleltest
 	t.Run("should return users and error because json unmarshal failed", func(t *testing.T) {
 		// user 111 + user 222
-		data1, _ := json.Marshal(users[:2])
+		data1, err := json.Marshal(users[:2])
+		require.NoError(t, err)
 		recorder1 := httptest.NewRecorder()
 		recorder1.Header().Add("Content-Type", "application/json")
-		_, err1 := recorder1.WriteString(string(data1))
-		require.NoError(t, err1)
+		_, err = recorder1.WriteString(string(data1))
+		require.NoError(t, err)
 		expectedResponse1 := recorder1.Result()
+		defer expectedResponse1.Body.Close()
 
 		// invalid json
 		recorder2 := httptest.NewRecorder()
 		recorder2.Header().Add("Content-Type", "application/json")
-		_, err2 := recorder2.WriteString("-")
-		require.NoError(t, err2)
+		_, err = recorder2.WriteString("-")
+		require.NoError(t, err)
 		expectedResponse2 := recorder2.Result()
+		defer expectedResponse2.Body.Close()
 
 		session.Client = createClient(t,
 			[]*http.Response{expectedResponse1, expectedResponse2},
@@ -144,20 +151,24 @@ func TestMessageReactionsAllErrors(t *testing.T) {
 		require.Equal(t, users[:2], actualUsers)
 	})
 
+	//nolint:paralleltest
 	t.Run("should return users and error because request failed", func(t *testing.T) {
 		// user 111 + user 222
-		data1, _ := json.Marshal(users[:2])
+		data1, err := json.Marshal(users[:2])
+		require.NoError(t, err)
 		recorder1 := httptest.NewRecorder()
 		recorder1.Header().Add("Content-Type", "application/json")
-		_, err1 := recorder1.WriteString(string(data1))
-		require.NoError(t, err1)
+		_, err = recorder1.WriteString(string(data1))
+		require.NoError(t, err)
 		expectedResponse1 := recorder1.Result()
+		defer expectedResponse1.Body.Close()
 
 		// request failed
 		recorder2 := httptest.NewRecorder()
 		recorder2.Result().Status = "500 Internal Server Error"
 		recorder2.Result().StatusCode = 500
 		expectedResponse2 := recorder2.Result()
+		defer expectedResponse2.Body.Close()
 
 		session.Client = createClient(t,
 			[]*http.Response{expectedResponse1, expectedResponse2},
