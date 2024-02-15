@@ -62,20 +62,24 @@ func TestMessageReactionsAll(t *testing.T) {
 	// user 111 + user 222
 	data1, err := json.Marshal(expectedUsers[:2])
 	require.NoError(t, err)
+
 	recorder1 := httptest.NewRecorder()
 	recorder1.Header().Add("Content-Type", "application/json")
-	_, err = recorder1.WriteString(string(data1))
+	_, err = recorder1.Write(data1)
 	require.NoError(t, err)
+
 	expectedResponse1 := recorder1.Result()
 	defer expectedResponse1.Body.Close()
 
 	// user 333
 	data2, err := json.Marshal(expectedUsers[2:])
 	require.NoError(t, err)
+
 	recorder2 := httptest.NewRecorder()
 	recorder2.Header().Add("Content-Type", "application/json")
-	_, err = recorder2.WriteString(string(data2))
+	_, err = recorder2.Write(data2)
 	require.NoError(t, err)
+
 	expectedResponse2 := recorder2.Result()
 	defer expectedResponse2.Body.Close()
 
@@ -84,6 +88,7 @@ func TestMessageReactionsAll(t *testing.T) {
 	recorder3.Header().Add("Content-Type", "application/json")
 	_, err = recorder3.WriteString("[]")
 	require.NoError(t, err)
+
 	expectedResponse3 := recorder3.Result()
 	defer expectedResponse3.Body.Close()
 
@@ -123,10 +128,12 @@ func TestMessageReactionsAllErrors(t *testing.T) {
 		// user 111 + user 222
 		data1, err := json.Marshal(users[:2])
 		require.NoError(t, err)
+
 		recorder1 := httptest.NewRecorder()
 		recorder1.Header().Add("Content-Type", "application/json")
-		_, err = recorder1.WriteString(string(data1))
+		_, err = recorder1.Write(data1)
 		require.NoError(t, err)
+
 		expectedResponse1 := recorder1.Result()
 		defer expectedResponse1.Body.Close()
 
@@ -135,6 +142,7 @@ func TestMessageReactionsAllErrors(t *testing.T) {
 		recorder2.Header().Add("Content-Type", "application/json")
 		_, err = recorder2.WriteString("-")
 		require.NoError(t, err)
+
 		expectedResponse2 := recorder2.Result()
 		defer expectedResponse2.Body.Close()
 
@@ -151,15 +159,17 @@ func TestMessageReactionsAllErrors(t *testing.T) {
 		require.Equal(t, users[:2], actualUsers)
 	})
 
-	//nolint:paralleltest
+	//nolint:paralleltest,bodyclose
 	t.Run("should return users and error because request failed", func(t *testing.T) {
 		// user 111 + user 222
 		data1, err := json.Marshal(users[:2])
 		require.NoError(t, err)
+
 		recorder1 := httptest.NewRecorder()
 		recorder1.Header().Add("Content-Type", "application/json")
-		_, err = recorder1.WriteString(string(data1))
+		_, err = recorder1.Write(data1)
 		require.NoError(t, err)
+
 		expectedResponse1 := recorder1.Result()
 		defer expectedResponse1.Body.Close()
 
@@ -167,6 +177,7 @@ func TestMessageReactionsAllErrors(t *testing.T) {
 		recorder2 := httptest.NewRecorder()
 		recorder2.Result().Status = "500 Internal Server Error"
 		recorder2.Result().StatusCode = 500
+
 		expectedResponse2 := recorder2.Result()
 		defer expectedResponse2.Body.Close()
 
