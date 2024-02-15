@@ -27,7 +27,7 @@ func main() {
 
 	log.Info().Str("version", version).Msg("Starting discord-bot")
 
-	log.Info().Msgf("Read configuration from file: %s", configurationFilename)
+	log.Info().Msgf("Reading configuration from file: %s", configurationFilename)
 
 	config, err := configuration.ReadConfiguration(os.DirFS("."), configurationFilename)
 	if err != nil {
@@ -39,7 +39,7 @@ func main() {
 		log.Fatal().Err(err).Msg("Error on logger configuration")
 	}
 
-	log.Info().Msg("Create discordgo session")
+	log.Info().Msg("Creating discordgo session")
 
 	session, err := discordgo.New("Bot " + config.Discord.Token)
 	if err != nil {
@@ -48,7 +48,7 @@ func main() {
 
 	session.Identify.Intents = discordgo.IntentsAll
 
-	log.Info().Msg("Open discordgo session")
+	log.Info().Msg("Opening discordgo session")
 
 	err = session.Open()
 	if err != nil {
@@ -64,13 +64,13 @@ func main() {
 		}
 	}
 
-	log.Info().Msg("Create Welcome Manager")
+	log.Info().Msg("Creating Welcome Manager")
 
 	welcomeManager := welcome.NewWelcomeManager(session, config.Discord.Name, config.Modules.WelcomeConfiguration)
 	if welcomeManager == nil {
 		log.Error().Msg("Could not start Welcome Manager")
 	} else {
-		log.Info().Msg("Run Welcome Manager")
+		log.Info().Msg("Running Welcome Manager")
 
 		err = welcomeManager.Run()
 		if err != nil {
@@ -96,7 +96,7 @@ func hasRequiredStateFieldsFilled(session *discordgo.Session) bool {
 }
 
 func closeSessionDiscord(session *discordgo.Session) {
-	log.Info().Msg("Close discordgo session")
+	log.Info().Msg("Closing discordgo session")
 
 	err := session.Close()
 	if err != nil {
