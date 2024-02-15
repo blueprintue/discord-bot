@@ -26,12 +26,16 @@ type requestTest struct {
 }
 
 func (r requestTest) assert(t *testing.T, req *http.Request) {
+	t.Helper()
+
 	assert.Equal(t, r.method, req.Method)
 	assert.Equal(t, r.host, req.Host)
 	assert.Equal(t, r.uri, req.URL.RequestURI())
 }
 
 func (rt *mockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	defer rt.responsesMocked[rt.idxResponse].Body.Close()
+
 	rt.requestsTest[rt.idxResponse].assert(rt.test, req)
 
 	resp := rt.responsesMocked[rt.idxResponse]
@@ -42,6 +46,8 @@ func (rt *mockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error)
 }
 
 func TestMessageReactionsAll(t *testing.T) {
+	t.Parallel()
+
 	session, err := discordgo.New("fake-token")
 	require.NoError(t, err)
 
@@ -59,20 +65,23 @@ func TestMessageReactionsAll(t *testing.T) {
 	data1, _ := json.Marshal(expectedUsers[:2])
 	recorder1 := httptest.NewRecorder()
 	recorder1.Header().Add("Content-Type", "application/json")
-	recorder1.WriteString(string(data1))
+	_, err1 := recorder1.WriteString(string(data1))
+	require.NoError(t, err1)
 	expectedResponse1 := recorder1.Result()
 
 	// user 333
 	data2, _ := json.Marshal(expectedUsers[2:])
 	recorder2 := httptest.NewRecorder()
 	recorder2.Header().Add("Content-Type", "application/json")
-	recorder2.WriteString(string(data2))
+	_, err2 := recorder2.WriteString(string(data2))
+	require.NoError(t, err2)
 	expectedResponse2 := recorder2.Result()
 
 	// no user
 	recorder3 := httptest.NewRecorder()
 	recorder3.Header().Add("Content-Type", "application/json")
-	recorder3.WriteString("[]")
+	_, err3 := recorder3.WriteString("[]")
+	require.NoError(t, err3)
 	expectedResponse3 := recorder3.Result()
 
 	session.Client = createClient(t,
@@ -89,7 +98,10 @@ func TestMessageReactionsAll(t *testing.T) {
 	require.Equal(t, expectedUsers, actualUsers)
 }
 
+//nolint:funlen
 func TestMessageReactionsAllErrors(t *testing.T) {
+	t.Parallel()
+
 	session, err := discordgo.New("fake-token")
 	require.NoError(t, err)
 
@@ -108,13 +120,15 @@ func TestMessageReactionsAllErrors(t *testing.T) {
 		data1, _ := json.Marshal(users[:2])
 		recorder1 := httptest.NewRecorder()
 		recorder1.Header().Add("Content-Type", "application/json")
-		recorder1.WriteString(string(data1))
+		_, err1 := recorder1.WriteString(string(data1))
+		require.NoError(t, err1)
 		expectedResponse1 := recorder1.Result()
 
 		// invalid json
 		recorder2 := httptest.NewRecorder()
 		recorder2.Header().Add("Content-Type", "application/json")
-		recorder2.WriteString("-")
+		_, err2 := recorder2.WriteString("-")
+		require.NoError(t, err2)
 		expectedResponse2 := recorder2.Result()
 
 		session.Client = createClient(t,
@@ -135,7 +149,8 @@ func TestMessageReactionsAllErrors(t *testing.T) {
 		data1, _ := json.Marshal(users[:2])
 		recorder1 := httptest.NewRecorder()
 		recorder1.Header().Add("Content-Type", "application/json")
-		recorder1.WriteString(string(data1))
+		_, err1 := recorder1.WriteString(string(data1))
+		require.NoError(t, err1)
 		expectedResponse1 := recorder1.Result()
 
 		// request failed
