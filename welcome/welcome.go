@@ -80,6 +80,13 @@ func (w *Manager) hasValidConfigurationInFile() bool {
 		return false
 	}
 
+	if len(w.config.Messages) == 0 {
+		log.Error().
+			Msg("Messages is empty")
+
+		return false
+	}
+
 	for idx, message := range w.config.Messages {
 		if message.Title == "" && message.Description == "" {
 			log.Error().
@@ -173,6 +180,14 @@ func (w *Manager) completeConfiguration() {
 }
 
 func (w *Manager) hasValidConfigurationAgainstDiscordServer() bool {
+	if w.config.GuildID == "" {
+		log.Error().
+			Str("guild in config", w.config.Guild).
+			Msg("Guild not found in Discord server")
+
+		return false
+	}
+
 	if w.config.ChannelID == "" {
 		log.Error().
 			Str("channel in config", w.config.Channel).
