@@ -8,40 +8,8 @@ import (
 
 	"github.com/blueprintue/discord-bot/helpers"
 	"github.com/bwmarrin/discordgo"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-type mockRoundTripper struct {
-	idxResponse     int
-	test            *testing.T
-	responsesMocked []*http.Response
-	requestsTest    []requestTest
-}
-
-type requestTest struct {
-	method string
-	host   string
-	uri    string
-}
-
-func (r requestTest) assert(t *testing.T, req *http.Request) {
-	t.Helper()
-
-	assert.Equal(t, r.method, req.Method)
-	assert.Equal(t, r.host, req.Host)
-	assert.Equal(t, r.uri, req.URL.RequestURI())
-}
-
-func (rt *mockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	rt.requestsTest[rt.idxResponse].assert(rt.test, req)
-
-	resp := rt.responsesMocked[rt.idxResponse]
-
-	rt.idxResponse++
-
-	return resp, nil
-}
 
 func TestMessageReactionsAll(t *testing.T) {
 	t.Parallel()
@@ -107,7 +75,7 @@ func TestMessageReactionsAll(t *testing.T) {
 }
 
 //nolint:funlen,tparallel
-func TestMessageReactionsAllErrors(t *testing.T) {
+func TestMessageReactionsAll_Errors(t *testing.T) {
 	t.Parallel()
 
 	session, err := discordgo.New("fake-token")
@@ -193,6 +161,37 @@ func TestMessageReactionsAllErrors(t *testing.T) {
 		require.ErrorContains(t, err, "HTTP 500 Internal Server Error")
 		require.Equal(t, users[:2], actualUsers)
 	})
+}
+
+type mockRoundTripper struct {
+	idxResponse     int
+	test            *testing.T
+	responsesMocked []*http.Response
+	requestsTest    []requestTest
+}
+
+type requestTest struct {
+	method string
+	host   string
+	uri    string
+}
+
+func (r requestTest) assert(t *testing.T, req *http.Request) {
+	t.Helper()
+
+	require.Equal(t, r.method, req.Method)
+	require.Equal(t, r.host, req.Host)
+	require.Equal(t, r.uri, req.URL.RequestURI())
+}
+
+func (rt *mockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	rt.requestsTest[rt.idxResponse].assert(rt.test, req)
+
+	resp := rt.responsesMocked[rt.idxResponse]
+
+	rt.idxResponse++
+
+	return resp, nil
 }
 
 func createClient(t *testing.T, responses []*http.Response, requests []requestTest) *http.Client {

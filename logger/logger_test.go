@@ -19,7 +19,7 @@ func TestConfigure(t *testing.T) {
 }
 
 //nolint:paralleltest
-func TestConfigureErrors(t *testing.T) {
+func TestConfigure_Errors(t *testing.T) {
 	err := logger.Configure(configuration.Log{Filename: os.TempDir(), Level: "info"})
 	require.ErrorContains(t, err, "File /tmp is a directory")
 

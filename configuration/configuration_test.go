@@ -37,7 +37,7 @@ func TestReadConfiguration(t *testing.T) {
 }
 
 // because using t.SetEnv, no `t.Parallel()` allowed here.
-func TestReadConfigurationWithEnvValues(t *testing.T) {
+func TestReadConfiguration_WithEnvValues(t *testing.T) {
 	fsys := fstest.MapFS{
 		"config.json": {
 			Data: []byte(`{"discord": {"name": "foo","token": "bar"},"log": {"filename": "oof", "level": "invalid", "number_files_rotation": 9}}`),
@@ -69,7 +69,7 @@ func TestReadConfigurationWithEnvValues(t *testing.T) {
 }
 
 //nolint:funlen
-func TestReadConfigurationErrors(t *testing.T) {
+func TestReadConfiguration_Errors(t *testing.T) {
 	t.Parallel()
 
 	fsys := fstest.MapFS{
