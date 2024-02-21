@@ -411,7 +411,7 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 			Str("role", message.Role).
 			Str("user_id", user.ID).
 			Str("username", user.Username).
-			Msg("Add Role to User")
+			Msg("Adding Role to User")
 
 		err = w.session.GuildMemberRoleAdd(w.config.GuildID, user.ID, message.RoleID)
 		if err != nil {
@@ -433,17 +433,23 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 			Msg("Members not found in Guild")
 
 		if message.CanPurgeReactions &&
-			len(users) > message.PurgeThresholdMembersReacted &&
-			len(membersNotInGuild) < message.PurgeBelowCountMembersNotInGuild {
+			len(users) >= message.PurgeThresholdMembersReacted &&
+			len(membersNotInGuild) <= message.PurgeBelowCountMembersNotInGuild {
 			log.Info().
 				Msg("Do purge")
 
 			for idx := range membersNotInGuild {
+				log.Info().
+					Str("message_id", message.ID).
+					Str("emoji", message.Emoji+":"+message.EmojiID).
+					Str("user_id", membersNotInGuild[idx]).
+					Msg("Removing Reaction on Message for User")
+
 				err = w.session.MessageReactionRemove(w.config.ChannelID, message.ID, message.Emoji+":"+message.EmojiID, membersNotInGuild[idx])
 				if err != nil {
 					log.Error().Err(err).
-						Str("role_id", message.RoleID).
-						Str("role", message.Role).
+						Str("message_id", message.ID).
+						Str("emoji", message.Emoji+":"+message.EmojiID).
 						Str("user_id", membersNotInGuild[idx]).
 						Msg("Could not remove Reaction")
 				}
