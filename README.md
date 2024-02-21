@@ -147,7 +147,9 @@ If the message is not found then it will publish it and add a reaction to show u
 If the message is found then it will fetch all reactions by the users and apply role.
 
 If the user is no longer in the Discord server and you have set `can_purge_reactions` to `true` then it will:
-1. check `purge_threshold_members_reacted` whether the threshold for the number of users who have reacted to the message has been exceeded.
-2. check `purge_below_count_members_not_in_guild` whether the number of invalid users is below a certain threshold.
+1. check `purge_threshold_members_reacted` whether the threshold for the number of users who have reacted to the message has been exceeded or equal.
+2. check `purge_below_count_members_not_in_guild` whether the number of invalid users is below or equal a certain threshold.
 
-If the answer to these questions is positive, the reaction to the message will be deleted.
+If the answer to these questions is positive, the reaction to the message will be deleted.  
+For example you can set `purge_threshold_members_reacted` to 150 and `purge_below_count_members_not_in_guild` to 10.  
+It will purge only if you have 150 or more reactions and only 10 or less users not in the server.  

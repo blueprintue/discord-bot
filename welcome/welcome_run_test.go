@@ -221,7 +221,7 @@ func TestRun(t *testing.T) {
 		require.Equal(t, `{"level":"error","error":"state cache not found","user_id":"456","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[8])
 		require.Equal(t, `{"level":"info","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[9])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Add Role to User"}`, parts[10])
+		require.Equal(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[10])
 		require.Equal(t, `{"level":"info","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[11])
 		require.Equal(t, `{"level":"info","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[12])
 		require.Equal(t, ``, parts[13])
@@ -265,7 +265,7 @@ func TestRun_Errors(t *testing.T) {
 
 	bufferLogs.Reset()
 
-	//nolint:bodyclose,goconst
+	//nolint:bodyclose
 	t.Run("should return error because fetching messages from channel (ChannelMessages) return error", func(t *testing.T) {
 		bufferLogs.Reset()
 
@@ -561,7 +561,7 @@ func TestRun_Errors(t *testing.T) {
 		//nolint:lll
 		require.Equal(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Add Role to User"}`, parts[6])
+		require.Equal(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[6])
 		//nolint:lll
 		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Could not add Role to User"}`, parts[7])
 		//nolint:lll
