@@ -25,13 +25,19 @@ func TestRun(t *testing.T) {
 	session, err := discordgo.New("fake-token")
 	require.NoError(t, err)
 
-	session.State.Guilds = append(session.State.Guilds, &discordgo.Guild{
+	err = session.State.GuildAdd(&discordgo.Guild{
 		ID:       "guild-123",
 		Name:     guildName,
 		Channels: []*discordgo.Channel{{ID: "channel-123", Name: "my-channel"}},
 		Emojis:   []*discordgo.Emoji{{ID: "emoji-123", Name: "my-emoji-1"}},
 		Roles:    []*discordgo.Role{{ID: "role-123", Name: "my role 1"}},
+		Members: []*discordgo.Member{
+			{User: &discordgo.User{ID: "user-id-456"}},
+			{User: &discordgo.User{ID: "bot-123"}},
+			{User: &discordgo.User{ID: "user-id-789"}, Roles: []string{"role-123"}},
+		},
 	})
+	require.NoError(t, err)
 
 	session.State.User = &discordgo.User{
 		ID: "bot-123",
@@ -104,9 +110,125 @@ func TestRun(t *testing.T) {
 		require.Equal(t, `{"level":"info","message_id":"123","message_title":"my title 1","emoji":"my-emoji-1:emoji-123","message":"Adding Reaction to Message"}`, parts[7])
 		require.Equal(t, ``, parts[8])
 	})
+
+	t.Run("should find message and update roles for users which added reaction on it", func(t *testing.T) {
+		bufferLogs.Reset()
+
+		data1, err := json.Marshal([]*discordgo.Message{
+			{
+				ID:      "101",
+				Content: "this message is skipped because author is not bot",
+				Author:  &discordgo.User{ID: "123"},
+			},
+			{
+				ID:      "102",
+				Content: "this message is skipped because embed is empty",
+				Author:  &discordgo.User{ID: "bot-123"},
+			},
+			{
+				ID:      "103",
+				Content: "this message is skipped because embed is not same against config",
+				Author:  &discordgo.User{ID: "bot-123"},
+				Embeds: []*discordgo.MessageEmbed{
+					{
+						Title:       "foo",
+						Description: "bar",
+						Color:       10,
+					},
+				},
+			},
+			{
+				ID:      "104",
+				Content: "this message is kept because embed is same against config",
+				Author:  &discordgo.User{ID: "bot-123"},
+				Embeds: []*discordgo.MessageEmbed{
+					{
+						Title:       "my title 1",
+						Description: "",
+						Color:       0,
+					},
+				},
+			},
+		})
+		require.NoError(t, err)
+
+		recorder1 := httptest.NewRecorder()
+		recorder1.Header().Add("Content-Type", "application/json")
+		_, err = recorder1.Write(data1)
+		require.NoError(t, err)
+
+		expectedResponse1 := recorder1.Result()
+		defer expectedResponse1.Body.Close()
+
+		data2, err := json.Marshal([]discordgo.User{
+			{ID: "456", Username: "user not in discord"},
+			{ID: "bot-123", Username: "user is bot"},
+			{ID: "user-id-456", Username: "user lambda 456"},
+			{ID: "user-id-789", Username: "user lambda 789 already has role"},
+		})
+		require.NoError(t, err)
+
+		recorder2 := httptest.NewRecorder()
+		recorder2.Header().Add("Content-Type", "application/json")
+		_, err = recorder2.Write(data2)
+		require.NoError(t, err)
+
+		expectedResponse2 := recorder2.Result()
+		defer expectedResponse2.Body.Close()
+
+		data3, err := json.Marshal([]discordgo.User{})
+		require.NoError(t, err)
+
+		recorder3 := httptest.NewRecorder()
+		recorder3.Header().Add("Content-Type", "application/json")
+		_, err = recorder3.Write(data3)
+		require.NoError(t, err)
+
+		expectedResponse3 := recorder3.Result()
+		defer expectedResponse3.Body.Close()
+
+		recorder4 := httptest.NewRecorder()
+
+		expectedResponse4 := recorder4.Result()
+		defer expectedResponse4.Body.Close()
+
+		session.Client = createClient(t,
+			[]*http.Response{expectedResponse1, expectedResponse2, expectedResponse3, expectedResponse4},
+			[]requestTest{
+				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
+				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/104/reactions/my-emoji-1:emoji-123?limit=100"},
+				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/104/reactions/my-emoji-1:emoji-123?after=user-id-789&limit=100"},
+				{method: "PUT", host: "discord.com", uri: "/api/v9/guilds/guild-123/members/user-id-456/roles/role-123"},
+			},
+		)
+
+		err = welcomeManager.Run()
+		require.NoError(t, err)
+
+		parts := strings.Split(bufferLogs.String(), "\n")
+		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.Equal(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
+		require.Equal(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		//nolint:lll
+		require.Equal(t, `{"level":"info","message_id":"101","channel_id":"channel-123","channel":"my-channel","message":"SKIP - Message in Channel is not from bot"}`, parts[4])
+		//nolint:lll
+		require.Equal(t, `{"level":"info","message_id":"102","channel_id":"channel-123","channel":"my-channel","message":"SKIP - Message in Channel is not an embed"}`, parts[5])
+		require.Equal(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[6])
+		//nolint:lll
+		require.Equal(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[7])
+		//nolint:lll
+		require.Equal(t, `{"level":"error","error":"state cache not found","user_id":"456","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[8])
+		require.Equal(t, `{"level":"info","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[9])
+		//nolint:lll
+		require.Equal(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Add Role to User"}`, parts[10])
+		require.Equal(t, `{"level":"info","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[11])
+		require.Equal(t, `{"level":"info","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[12])
+		require.Equal(t, ``, parts[13])
+	})
 }
 
-//nolint:funlen
+//nolint:funlen,maintidx
 func TestRun_Errors(t *testing.T) {
 	var bufferLogs bytes.Buffer
 	log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
@@ -114,13 +236,19 @@ func TestRun_Errors(t *testing.T) {
 	session, err := discordgo.New("fake-token")
 	require.NoError(t, err)
 
-	session.State.Guilds = append(session.State.Guilds, &discordgo.Guild{
+	err = session.State.GuildAdd(&discordgo.Guild{
 		ID:       "guild-123",
 		Name:     guildName,
 		Channels: []*discordgo.Channel{{ID: "channel-123", Name: "my-channel"}},
 		Emojis:   []*discordgo.Emoji{{ID: "emoji-123", Name: "my-emoji-1"}},
 		Roles:    []*discordgo.Role{{ID: "role-123", Name: "my role 1"}},
+		Members: []*discordgo.Member{
+			{User: &discordgo.User{ID: "user-id-456"}},
+			{User: &discordgo.User{ID: "bot-123"}},
+			{User: &discordgo.User{ID: "user-id-789"}, Roles: []string{"role-123"}},
+		},
 	})
+	require.NoError(t, err)
 
 	session.State.User = &discordgo.User{
 		ID: "bot-123",
@@ -286,6 +414,160 @@ func TestRun_Errors(t *testing.T) {
 		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_title":"my title 1","message":"Could not add Message"}`, parts[9])
 		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message":"Could not add messages to channel"}`, parts[10])
 		require.Equal(t, ``, parts[11])
+	})
+
+	t.Run("should return error because fetching all reactions from message (MessageReactionsAll) return error", func(t *testing.T) {
+		bufferLogs.Reset()
+
+		data1, err := json.Marshal([]*discordgo.Message{
+			{
+				ID:      "104",
+				Content: "this message is kept because embed is same against config",
+				Author:  &discordgo.User{ID: "bot-123"},
+				Embeds: []*discordgo.MessageEmbed{
+					{
+						Title:       "my title 1",
+						Description: "",
+						Color:       0,
+					},
+				},
+			},
+		})
+		require.NoError(t, err)
+
+		recorder1 := httptest.NewRecorder()
+		recorder1.Header().Add("Content-Type", "application/json")
+		_, err = recorder1.Write(data1)
+		require.NoError(t, err)
+
+		expectedResponse1 := recorder1.Result()
+		defer expectedResponse1.Body.Close()
+
+		recorder2 := httptest.NewRecorder()
+		recorder2.Header().Add("Content-Type", "application/json")
+		_, err = recorder2.WriteString("-")
+		require.NoError(t, err)
+
+		expectedResponse2 := recorder2.Result()
+		defer expectedResponse2.Body.Close()
+
+		session.Client = createClient(t,
+			[]*http.Response{expectedResponse1, expectedResponse2},
+			[]requestTest{
+				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
+				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/104/reactions/my-emoji-1:emoji-123?limit=100"},
+			},
+		)
+
+		err = welcomeManager.Run()
+		require.Error(t, err)
+		require.ErrorContains(t, err, "json unmarshal")
+
+		parts := strings.Split(bufferLogs.String(), "\n")
+		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.Equal(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
+		require.Equal(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		require.Equal(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
+		//nolint:lll
+		require.Equal(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
+		//nolint:lll
+		require.Equal(t, `{"level":"error","error":"json unmarshal","message_id":"104","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Could not get all Reactions"}`, parts[6])
+		require.Equal(t, `{"level":"error","error":"json unmarshal","message_title":"my title 1","message":"Could not update role belong to Message"}`, parts[7])
+		require.Equal(t, `{"level":"error","error":"json unmarshal","message":"Could not add messages to channel"}`, parts[8])
+		require.Equal(t, ``, parts[9])
+	})
+
+	//nolint:bodyclose
+	t.Run("should return error because adding role to user (GuildMemberRoleAdd) return error", func(t *testing.T) {
+		bufferLogs.Reset()
+
+		data1, err := json.Marshal([]*discordgo.Message{
+			{
+				ID:      "104",
+				Content: "this message is kept because embed is same against config",
+				Author:  &discordgo.User{ID: "bot-123"},
+				Embeds: []*discordgo.MessageEmbed{
+					{
+						Title:       "my title 1",
+						Description: "",
+						Color:       0,
+					},
+				},
+			},
+		})
+		require.NoError(t, err)
+
+		recorder1 := httptest.NewRecorder()
+		recorder1.Header().Add("Content-Type", "application/json")
+		_, err = recorder1.Write(data1)
+		require.NoError(t, err)
+
+		expectedResponse1 := recorder1.Result()
+		defer expectedResponse1.Body.Close()
+
+		data2, err := json.Marshal([]discordgo.User{
+			{ID: "user-id-456", Username: "user lambda 456"},
+		})
+		require.NoError(t, err)
+
+		recorder2 := httptest.NewRecorder()
+		recorder2.Header().Add("Content-Type", "application/json")
+		_, err = recorder2.Write(data2)
+		require.NoError(t, err)
+
+		expectedResponse2 := recorder2.Result()
+		defer expectedResponse2.Body.Close()
+
+		data3, err := json.Marshal([]discordgo.User{})
+		require.NoError(t, err)
+
+		recorder3 := httptest.NewRecorder()
+		recorder3.Header().Add("Content-Type", "application/json")
+		_, err = recorder3.Write(data3)
+		require.NoError(t, err)
+
+		expectedResponse3 := recorder3.Result()
+		defer expectedResponse3.Body.Close()
+
+		// request failed
+		recorder4 := httptest.NewRecorder()
+		recorder4.Result().Status = "500 Internal Server Error"
+		recorder4.Result().StatusCode = 500
+
+		expectedResponse4 := recorder4.Result()
+		defer expectedResponse4.Body.Close()
+
+		session.Client = createClient(t,
+			[]*http.Response{expectedResponse1, expectedResponse2, expectedResponse3, expectedResponse4},
+			[]requestTest{
+				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
+				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/104/reactions/my-emoji-1:emoji-123?limit=100"},
+				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/104/reactions/my-emoji-1:emoji-123?after=user-id-456&limit=100"},
+				{method: "PUT", host: "discord.com", uri: "/api/v9/guilds/guild-123/members/user-id-456/roles/role-123"},
+			},
+		)
+
+		err = welcomeManager.Run()
+		require.Error(t, err)
+		require.ErrorContains(t, err, "HTTP 500 Internal Server Error")
+
+		parts := strings.Split(bufferLogs.String(), "\n")
+		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.Equal(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
+		require.Equal(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		require.Equal(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
+		//nolint:lll
+		require.Equal(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
+		//nolint:lll
+		require.Equal(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Add Role to User"}`, parts[6])
+		//nolint:lll
+		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Could not add Role to User"}`, parts[7])
+		//nolint:lll
+		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_title":"my title 1","message":"Could not update role belong to Message"}`, parts[8])
+		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message":"Could not add messages to channel"}`, parts[9])
+		require.Equal(t, ``, parts[10])
 	})
 }
 

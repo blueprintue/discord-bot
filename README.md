@@ -142,7 +142,7 @@ Then it will do another check to see if channel, role and emoji exists.
 
 Secondly it will listen two events on `onMessageReactionAdd` and `onMessageReactionRemove`.  
 
-After it will search the message in the channel.  
+After it will search the last 100 messages in the channel.  
 If the message is not found then it will publish it and add a reaction to show user which emoji to use.  
 If the message is found then it will fetch all reactions by the users and apply role.
 
