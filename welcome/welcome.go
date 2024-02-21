@@ -281,7 +281,7 @@ func (w *Manager) addMessagesToChannel() error {
 		}
 
 		for idxMessages := range w.config.Messages {
-			if message.Embeds[0].Title == w.config.Messages[idxMessages].Title {
+			if w.isSameMessageAgainstConfig(message.Embeds[0], w.config.Messages[idxMessages]) {
 				w.config.Messages[idxMessages].ID = message.ID
 
 				log.Info().
@@ -334,6 +334,12 @@ func (w *Manager) addMessagesToChannel() error {
 	}
 
 	return nil
+}
+
+func (w *Manager) isSameMessageAgainstConfig(messageFromDiscord *discordgo.MessageEmbed, messageFromConfig Message) bool {
+	return messageFromDiscord.Title == messageFromConfig.Title &&
+		messageFromDiscord.Description == messageFromConfig.Description &&
+		messageFromDiscord.Color == messageFromConfig.Color
 }
 
 //nolint:funlen,cyclop
@@ -426,7 +432,6 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 			Int("count_members_not_found", len(membersNotInGuild)).
 			Msg("Members not found in Guild")
 
-		// use constant from config file
 		if message.CanPurgeReactions &&
 			len(users) > message.PurgeThresholdMembersReacted &&
 			len(membersNotInGuild) < message.PurgeBelowCountMembersNotInGuild {
