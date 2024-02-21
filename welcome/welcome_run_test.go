@@ -25,7 +25,7 @@ func TestRun(t *testing.T) {
 	session, err := discordgo.New("fake-token")
 	require.NoError(t, err)
 
-	session.State.GuildAdd(&discordgo.Guild{
+	err = session.State.GuildAdd(&discordgo.Guild{
 		ID:       "guild-123",
 		Name:     guildName,
 		Channels: []*discordgo.Channel{{ID: "channel-123", Name: "my-channel"}},
@@ -37,6 +37,7 @@ func TestRun(t *testing.T) {
 			{User: &discordgo.User{ID: "user-id-789"}, Roles: []string{"role-123"}},
 		},
 	})
+	require.NoError(t, err)
 
 	session.State.User = &discordgo.User{
 		ID: "bot-123",
@@ -216,8 +217,10 @@ func TestRun(t *testing.T) {
 		require.Equal(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[6])
 		//nolint:lll
 		require.Equal(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[7])
+		//nolint:lll
 		require.Equal(t, `{"level":"error","error":"state cache not found","user_id":"456","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[8])
 		require.Equal(t, `{"level":"info","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[9])
+		//nolint:lll
 		require.Equal(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Add Role to User"}`, parts[10])
 		require.Equal(t, `{"level":"info","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[11])
 		require.Equal(t, `{"level":"info","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[12])
@@ -225,7 +228,7 @@ func TestRun(t *testing.T) {
 	})
 }
 
-//nolint:funlen
+//nolint:funlen,maintidx
 func TestRun_Errors(t *testing.T) {
 	var bufferLogs bytes.Buffer
 	log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
@@ -233,7 +236,7 @@ func TestRun_Errors(t *testing.T) {
 	session, err := discordgo.New("fake-token")
 	require.NoError(t, err)
 
-	session.State.GuildAdd(&discordgo.Guild{
+	err = session.State.GuildAdd(&discordgo.Guild{
 		ID:       "guild-123",
 		Name:     guildName,
 		Channels: []*discordgo.Channel{{ID: "channel-123", Name: "my-channel"}},
@@ -245,6 +248,7 @@ func TestRun_Errors(t *testing.T) {
 			{User: &discordgo.User{ID: "user-id-789"}, Roles: []string{"role-123"}},
 		},
 	})
+	require.NoError(t, err)
 
 	session.State.User = &discordgo.User{
 		ID: "bot-123",
@@ -474,6 +478,7 @@ func TestRun_Errors(t *testing.T) {
 		require.Equal(t, ``, parts[9])
 	})
 
+	//nolint:bodyclose
 	t.Run("should return error because adding role to user (GuildMemberRoleAdd) return error", func(t *testing.T) {
 		bufferLogs.Reset()
 
