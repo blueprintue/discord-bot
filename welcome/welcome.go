@@ -222,10 +222,10 @@ func (w *Manager) hasValidConfigurationAgainstDiscordServer() bool {
 // Run do the main task of Welcome.
 func (w *Manager) Run() error {
 	log.Info().Msg("Adding Handler on Message Reaction Add")
-	w.session.AddHandler(w.onMessageReactionAdd)
+	w.session.AddHandler(w.OnMessageReactionAdd)
 
 	log.Info().Msg("Adding Handler on Message Reaction Remove")
-	w.session.AddHandler(w.onMessageReactionRemove)
+	w.session.AddHandler(w.OnMessageReactionRemove)
 
 	log.Info().Msg("Adding messages to channel")
 
@@ -510,13 +510,26 @@ func (w *Manager) addMessage(message *Message) error {
 	return nil
 }
 
-func (w *Manager) onMessageReactionAdd(_ *discordgo.Session, reaction *discordgo.MessageReactionAdd) {
+// OnMessageReactionAdd is public for tests, never call it directly
+//
+//nolint:dupl,funlen
+func (w *Manager) OnMessageReactionAdd(_ *discordgo.Session, reaction *discordgo.MessageReactionAdd) {
+	if reaction == nil || reaction.MessageReaction == nil {
+		log.Error().Msg("OnMessageReactionAdd - SKIP - Reaction is nil")
+
+		return
+	}
+
 	log.Info().
 		Str("channel_id", reaction.ChannelID).
+		Str("message_id", reaction.MessageID).
 		Msg("Incoming Message Reaction Add")
 
 	if reaction.ChannelID != w.config.ChannelID {
-		log.Info().Msg("SKIP - Channel is not matching")
+		log.Info().
+			Str("channel_id", reaction.ChannelID).
+			Str("message_id", reaction.MessageID).
+			Msg("SKIP - Channel is not matching")
 
 		return
 	}
@@ -524,6 +537,8 @@ func (w *Manager) onMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 	if w.isUserBot(reaction.UserID) {
 		log.Info().
 			Str("channel_id", reaction.ChannelID).
+			Str("message_id", reaction.MessageID).
+			Str("user_id", reaction.UserID).
 			Msg("SKIP - User is the bot")
 
 		return
@@ -542,6 +557,7 @@ func (w *Manager) onMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 	if idxMessageFound == -1 {
 		log.Info().
 			Str("channel_id", reaction.ChannelID).
+			Str("message_id", reaction.MessageID).
 			Msg("SKIP - Message is not matching")
 
 		return
@@ -550,66 +566,7 @@ func (w *Manager) onMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 	if reaction.Emoji.Name != w.config.Messages[idxMessageFound].Emoji {
 		log.Info().
 			Str("channel_id", reaction.ChannelID).
-			Msg("SKIP - Emoji is not matching")
-
-		return
-	}
-
-	log.Info().
-		Str("role_id", w.config.Messages[idxMessageFound].RoleID).
-		Str("role", w.config.Messages[idxMessageFound].Role).
-		Str("channel_id", reaction.ChannelID).
-		Str("user_id", reaction.UserID).
-		Msg("Adding Role to User")
-
-	err := w.session.GuildMemberRoleAdd(w.config.GuildID, reaction.UserID, w.config.Messages[idxMessageFound].RoleID)
-	if err != nil {
-		log.Error().Err(err).
-			Str("role_id", w.config.Messages[idxMessageFound].RoleID).
-			Str("role", w.config.Messages[idxMessageFound].Role).
-			Str("channel_id", reaction.ChannelID).
-			Str("user_id", reaction.UserID).
-			Msg("Could not add Role to User")
-	}
-}
-
-func (w *Manager) onMessageReactionRemove(_ *discordgo.Session, reaction *discordgo.MessageReactionRemove) {
-	log.Info().Msg("Incoming Message Reaction Remove")
-
-	if reaction.ChannelID != w.config.ChannelID {
-		log.Info().
-			Str("channel_id", reaction.ChannelID).
-			Msg("SKIP - Channel is not matching")
-
-		return
-	}
-
-	if w.isUserBot(reaction.UserID) {
-		log.Info().
-			Str("user_id", reaction.UserID).
-			Msg("SKIP - User is the bot")
-
-		return
-	}
-
-	idxMessageFound := -1
-
-	for idxMessage := range w.config.Messages {
-		if reaction.MessageID == w.config.Messages[idxMessage].ID {
-			idxMessageFound = idxMessage
-
-			break
-		}
-	}
-
-	if idxMessageFound == -1 {
-		log.Info().Msg("SKIP - Message is not matching")
-
-		return
-	}
-
-	if reaction.Emoji.Name != w.config.Messages[idxMessageFound].Emoji {
-		log.Info().
+			Str("message_id", reaction.MessageID).
 			Str("emoji", reaction.Emoji.Name).
 			Msg("SKIP - Emoji is not matching")
 
@@ -619,6 +576,91 @@ func (w *Manager) onMessageReactionRemove(_ *discordgo.Session, reaction *discor
 	log.Info().
 		Str("role_id", w.config.Messages[idxMessageFound].RoleID).
 		Str("role", w.config.Messages[idxMessageFound].Role).
+		Str("channel_id", reaction.ChannelID).
+		Str("message_id", reaction.MessageID).
+		Str("user_id", reaction.UserID).
+		Msg("Adding Role to User")
+
+	err := w.session.GuildMemberRoleAdd(w.config.GuildID, reaction.UserID, w.config.Messages[idxMessageFound].RoleID)
+	if err != nil {
+		log.Error().Err(err).
+			Str("role_id", w.config.Messages[idxMessageFound].RoleID).
+			Str("role", w.config.Messages[idxMessageFound].Role).
+			Str("channel_id", reaction.ChannelID).
+			Str("message_id", reaction.MessageID).
+			Str("user_id", reaction.UserID).
+			Msg("Could not add Role to User")
+	}
+}
+
+// OnMessageReactionRemove is public for tests, never call it directly
+//
+//nolint:dupl,funlen
+func (w *Manager) OnMessageReactionRemove(_ *discordgo.Session, reaction *discordgo.MessageReactionRemove) {
+	if reaction == nil || reaction.MessageReaction == nil {
+		log.Error().Msg("OnMessageReactionRemove - SKIP - Reaction is nil")
+
+		return
+	}
+
+	log.Info().
+		Str("channel_id", reaction.ChannelID).
+		Str("message_id", reaction.MessageID).
+		Msg("Incoming Message Reaction Remove")
+
+	if reaction.ChannelID != w.config.ChannelID {
+		log.Info().
+			Str("channel_id", reaction.ChannelID).
+			Str("message_id", reaction.MessageID).
+			Msg("SKIP - Channel is not matching")
+
+		return
+	}
+
+	if w.isUserBot(reaction.UserID) {
+		log.Info().
+			Str("channel_id", reaction.ChannelID).
+			Str("message_id", reaction.MessageID).
+			Str("user_id", reaction.UserID).
+			Msg("SKIP - User is the bot")
+
+		return
+	}
+
+	idxMessageFound := -1
+
+	for idxMessage := range w.config.Messages {
+		if reaction.MessageID == w.config.Messages[idxMessage].ID {
+			idxMessageFound = idxMessage
+
+			break
+		}
+	}
+
+	if idxMessageFound == -1 {
+		log.Info().
+			Str("channel_id", reaction.ChannelID).
+			Str("message_id", reaction.MessageID).
+			Msg("SKIP - Message is not matching")
+
+		return
+	}
+
+	if reaction.Emoji.Name != w.config.Messages[idxMessageFound].Emoji {
+		log.Info().
+			Str("channel_id", reaction.ChannelID).
+			Str("message_id", reaction.MessageID).
+			Str("emoji", reaction.Emoji.Name).
+			Msg("SKIP - Emoji is not matching")
+
+		return
+	}
+
+	log.Info().
+		Str("role_id", w.config.Messages[idxMessageFound].RoleID).
+		Str("role", w.config.Messages[idxMessageFound].Role).
+		Str("channel_id", reaction.ChannelID).
+		Str("message_id", reaction.MessageID).
 		Str("user_id", reaction.UserID).
 		Msg("Removing Role to User")
 
@@ -627,6 +669,8 @@ func (w *Manager) onMessageReactionRemove(_ *discordgo.Session, reaction *discor
 		log.Error().Err(err).
 			Str("role_id", w.config.Messages[idxMessageFound].RoleID).
 			Str("role", w.config.Messages[idxMessageFound].Role).
+			Str("channel_id", reaction.ChannelID).
+			Str("message_id", reaction.MessageID).
 			Str("user_id", reaction.UserID).
 			Msg("Could not remove Role to User")
 	}
