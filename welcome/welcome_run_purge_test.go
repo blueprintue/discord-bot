@@ -416,7 +416,7 @@ func TestRunPurge(t *testing.T) {
 
 		// request failed
 		recorder6 := httptest.NewRecorder()
-		//nolint:goconst
+
 		recorder6.Result().Status = "500 Internal Server Error"
 		recorder6.Result().StatusCode = 500
 
