@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/blueprintue/discord-bot/healthchecks"
 	"github.com/blueprintue/discord-bot/welcome"
 )
 
@@ -42,7 +43,8 @@ type Log struct {
 }
 
 type Modules struct {
-	WelcomeConfiguration welcome.Configuration `json:"welcome"`
+	WelcomeConfiguration     welcome.Configuration      `json:"welcome"`
+	HealthcheckConfiguration healthchecks.Configuration `json:"healthchecks"`
 }
 
 // ReadConfiguration read `config.json` file and update values with env if found.

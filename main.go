@@ -8,6 +8,7 @@ import (
 	_ "time/tzdata"
 
 	"github.com/blueprintue/discord-bot/configuration"
+	"github.com/blueprintue/discord-bot/healthchecks"
 	"github.com/blueprintue/discord-bot/logger"
 	"github.com/blueprintue/discord-bot/welcome"
 	"github.com/bwmarrin/discordgo"
@@ -21,7 +22,7 @@ const (
 
 var version = "edge"
 
-//nolint:funlen
+//nolint:funlen,cyclop
 func main() {
 	var err error
 
@@ -82,13 +83,35 @@ func main() {
 		}
 	}
 
+	log.Info().Msg("Creating Healthchecks Manager")
+
+	healthchecksManager := healthchecks.NewHealthchecksManager(config.Modules.HealthcheckConfiguration)
+	if healthchecksManager == nil {
+		log.Error().Msg("Could not start Healthchecks Manager")
+	} else {
+		log.Info().Msg("Running Healthchecks Manager")
+
+		err = healthchecksManager.Run()
+		if err != nil {
+			log.Error().Err(err).Msg("Could not run Healthchecks Manager")
+		}
+	}
+
 	log.Info().Msg("Bot is now running. Press CTRL+C to stop")
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
-	<-sc
+	sig := <-sc
 
 	closeSessionDiscord(session)
+
+	if healthchecksManager != nil {
+		healthchecksManager.Fail()
+	}
+
+	log.Warn().Msgf("Caught signal %v", sig)
+
+	os.Exit(0)
 }
 
 func hasRequiredStateFieldsFilled(session *discordgo.Session) bool {

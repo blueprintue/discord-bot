@@ -23,6 +23,12 @@
           "purge_below_count_members_not_in_guild": 10
         }
       ]
+    },
+    "healthchecks": {
+      "base_url": "",
+      "uuid": "",
+      "started_message": "",
+      "failed_message": ""
     }
   }
 }

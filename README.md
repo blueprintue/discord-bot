@@ -87,6 +87,35 @@ It uses zerolog levels (from highest to lowest):
 * trace (zerolog.TraceLevel, -1)
 
 ### Modules
+#### Healthchecks
+Use service [Healthchecks.io](https://healthchecks.io) to check if `discord-bot` is up or not.  
+Can triggers alert on multiple systems if down.  
+
+**If you don't want to use it, do not fill `uuid`.**  
+You can use your own version by using custom `base_url`.  
+
+JSON configuration used:  
+```json
+"healthchecks": {
+  "base_url": "https://hc-ping.com/",
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "started_message": "discord-bot started",
+  "failed_message": "discord-bot failed"
+}
+```
+
+| JSON Parameter  | Mandatory | Type   | Default value        | Description                                                       |
+| --------------- | --------- | ------ | -------------------- | ----------------------------------------------------------------- |
+| base_url        | NO        | string | https://hc-ping.com/ | url to ping, by default use the healthchecks service              |
+| uuid            | YES       | string |                      | uuid, on healthchecks dashboard it's after `https://hc-ping.com/` |
+| started_message | NO        | string | discord-bot started  | message sent to healthchecks when discord-bot starts              |
+| failed_message  | NO        | string | discord-bot failed   | message sent to healthchecks when discord-bot stops               |
+
+##### How it works?
+Each time you start `discord-bot`, the healthchecks module will check the configuration in `config.json`.  
+Then, when all modules have been started, it sends a `Start` ping message to indicate that the discord-bot is up and running.  
+Finally, if `discord-bot` receives a signal from the OS to terminate the program, it will send a `Fail` ping message.
+
 #### Welcome
 Define the user's role when using an emoji.  
 You can define one or more messages in only one channel.  
