@@ -88,11 +88,12 @@ It uses zerolog levels (from highest to lowest):
 
 ### Modules
 #### Healthchecks
-Use service [Healthchecks.io](https://healthchecks.io) to check if `discord-bot` is up or not.  
-Can triggers alert on multiple systems if down.  
+Uses the [Healthchecks.io](https://healthchecks.io) service to check whether `discord-bot` is online or not.  
+It can triggers alerts on several systems if it is down.  
 
-**If you don't want to use it, do not fill `uuid`.**  
-You can use your own version by using custom `base_url`.  
+**If you don't want to use it, leave `uuid` empty.**  
+
+You can use your own version by using a custom `base_url`.  
 
 JSON configuration used:  
 ```json
