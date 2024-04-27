@@ -87,7 +87,7 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 		[]requestTest{
 			{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
 			{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-				body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null}`},
+				body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
 			{method: "PUT", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123/@me"},
 			{method: "PUT", host: "discord.com", uri: "/api/v9/guilds/guild-123/members/user-id-456/roles/role-123"},
 		},
@@ -277,7 +277,7 @@ func TestHandlers_OnMessageReactionAdd_Errors(t *testing.T) {
 		[]requestTest{
 			{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
 			{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-				body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null}`},
+				body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
 			{method: "PUT", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123/@me"},
 			{method: "PUT", host: "discord.com", uri: "/api/v9/guilds/guild-123/members/user-id-456/roles/role-123"},
 		},
@@ -377,7 +377,7 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 		[]requestTest{
 			{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
 			{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-				body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null}`},
+				body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
 			{method: "PUT", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123/@me"},
 			{method: "DELETE", host: "discord.com", uri: "/api/v9/guilds/guild-123/members/user-id-789/roles/role-123"},
 		},
@@ -566,7 +566,7 @@ func TestHandlers_OnMessageReactionRemove_Errors(t *testing.T) {
 		[]requestTest{
 			{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
 			{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-				body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null}`},
+				body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
 			{method: "PUT", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123/@me"},
 			{method: "DELETE", host: "discord.com", uri: "/api/v9/guilds/guild-123/members/user-id-789/roles/role-123"},
 		},

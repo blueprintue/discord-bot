@@ -56,6 +56,7 @@ func ReadConfiguration(fsys fs.FS, filename string) (*Configuration, error) {
 
 	config := Configuration{}
 
+	//nolint:musttag
 	err = json.Unmarshal(filedata, &config)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)

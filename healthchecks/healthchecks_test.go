@@ -89,8 +89,6 @@ func TestNewHealthchecksManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 	}
 
 	for testCaseName, testCase := range testCases {
-		testCaseName, testCase := testCaseName, testCase
-
 		t.Run(testCaseName, func(tt *testing.T) {
 			var bufferLogs bytes.Buffer
 			log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()

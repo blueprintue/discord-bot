@@ -172,8 +172,6 @@ func TestReadConfiguration_Errors(t *testing.T) {
 	}
 
 	for testCaseName, testCase := range testCases {
-		testCaseName, testCase := testCaseName, testCase
-
 		t.Run(testCaseName, func(tt *testing.T) {
 			tt.Parallel()
 
