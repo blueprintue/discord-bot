@@ -15,6 +15,11 @@ linters:
     - scopelint
     - structcheck
     - varcheck
+    - intrange
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
 
 linters-settings:
   lll:

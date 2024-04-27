@@ -1,5 +1,5 @@
-github.com/bwmarrin/discordgo v0.27.1 h1:ib9AIc/dom1E/fSIulrBwnez0CToJE113ZGt4HoliGY=
-github.com/bwmarrin/discordgo v0.27.1/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
+github.com/bwmarrin/discordgo v0.28.1 h1:gXsuo2GBO7NbR6uqmrrBDplPUx2T3nzu775q/Rd1aG4=
+github.com/bwmarrin/discordgo v0.28.1/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
 github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=
 github.com/crazy-max/gohealthchecks v0.4.1 h1:gbjZzF/GxwDyP78u37B2/c2iQfq8BEjAHS3eBLM6FcQ=
 github.com/crazy-max/gohealthchecks v0.4.1/go.mod h1:gkT8QSdEXZJahyswdTGDbd+q20fWm0DmWW7TWBNtgJg=

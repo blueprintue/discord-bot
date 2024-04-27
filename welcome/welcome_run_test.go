@@ -89,7 +89,7 @@ func TestRun(t *testing.T) {
 			[]requestTest{
 				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
 				{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-					body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null}`},
+					body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
 				{method: "PUT", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123/@me"},
 			},
 		)
@@ -327,7 +327,7 @@ func TestRun_Errors(t *testing.T) {
 			[]requestTest{
 				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
 				{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-					body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null}`},
+					body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
 			},
 		)
 
@@ -389,7 +389,7 @@ func TestRun_Errors(t *testing.T) {
 			[]requestTest{
 				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
 				{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-					body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null}`},
+					body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
 				{method: "PUT", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123/@me"},
 			},
 		)
