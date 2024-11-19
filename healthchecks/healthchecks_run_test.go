@@ -12,6 +12,7 @@ import (
 	"github.com/blueprintue/discord-bot/healthchecks"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -20,10 +21,10 @@ func TestRun(t *testing.T) {
 	log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
 	svr := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-		require.Equal(t, "/00000000-0000-0000-0000-000000000000/start", req.RequestURI)
+		assert.Equal(t, "/00000000-0000-0000-0000-000000000000/start", req.RequestURI)
 		startedMessage, err := io.ReadAll(req.Body)
-		require.NoError(t, err)
-		require.Equal(t, "starts", string(startedMessage))
+		assert.NoError(t, err)
+		assert.Equal(t, "starts", string(startedMessage))
 
 		res.WriteHeader(http.StatusOK)
 	}))
@@ -69,6 +70,6 @@ func TestRun_Errors(t *testing.T) {
 	require.Error(t, err)
 
 	parts := strings.Split(bufferLogs.String(), "\n")
-	require.Equal(t, `{"level":"error","error":"HTTP error 500","message":"Could not send Start HealthChecks client"}`, parts[0])
+	require.JSONEq(t, `{"level":"error","error":"HTTP error 500","message":"Could not send Start HealthChecks client"}`, parts[0])
 	require.Equal(t, ``, parts[1])
 }

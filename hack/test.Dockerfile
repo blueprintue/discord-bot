@@ -6,7 +6,7 @@ ENV GOFLAGS="-buildvcs=false"
 RUN apk add --no-cache gcc linux-headers musl-dev
 WORKDIR /src
 
-FROM base as test
+FROM base AS test
 RUN --mount=type=bind,target=. \
   --mount=type=cache,target=/root/.cache \
   --mount=type=cache,target=/go/pkg/mod \

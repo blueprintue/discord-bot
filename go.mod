@@ -1,6 +1,6 @@
 module github.com/blueprintue/discord-bot
 
-go 1.22
+go 1.23
 
 require (
 	github.com/bwmarrin/discordgo v0.28.1
