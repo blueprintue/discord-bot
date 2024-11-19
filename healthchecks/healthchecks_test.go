@@ -25,7 +25,7 @@ func TestNewHealthchecksManager(t *testing.T) {
 	require.NotNil(t, healthchecksManager)
 
 	parts := strings.Split(bufferLogs.String(), "\n")
-	require.Equal(t, `{"level":"info","message":"Checking configuration for Healthchecks"}`, parts[0])
+	require.JSONEq(t, `{"level":"info","message":"Checking configuration for Healthchecks"}`, parts[0])
 	require.Equal(t, ``, parts[1])
 
 	bufferLogs.Reset()
@@ -36,10 +36,10 @@ func TestNewHealthchecksManager(t *testing.T) {
 	require.NotNil(t, healthchecksManager)
 
 	parts = strings.Split(bufferLogs.String(), "\n")
-	require.Equal(t, `{"level":"info","message":"Checking configuration for Healthchecks"}`, parts[0])
-	require.Equal(t, `{"level":"info","message":"BaseURL is empty, use default URL https://hc-ping.com/"}`, parts[1])
-	require.Equal(t, `{"level":"info","message":"StartedMessage is empty, use default \"discord-bot started\""}`, parts[2])
-	require.Equal(t, `{"level":"info","message":"FailedMessage is empty, use default \"discord-bot stopped\""}`, parts[3])
+	require.JSONEq(t, `{"level":"info","message":"Checking configuration for Healthchecks"}`, parts[0])
+	require.JSONEq(t, `{"level":"info","message":"BaseURL is empty, use default URL https://hc-ping.com/"}`, parts[1])
+	require.JSONEq(t, `{"level":"info","message":"StartedMessage is empty, use default \"discord-bot started\""}`, parts[2])
+	require.JSONEq(t, `{"level":"info","message":"FailedMessage is empty, use default \"discord-bot stopped\""}`, parts[3])
 	require.Equal(t, ``, parts[4])
 }
 

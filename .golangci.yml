@@ -5,17 +5,7 @@ linters:
     - exhaustruct
     - gofumpt
     # deprecated
-    - deadcode
-    - exhaustivestruct
-    - golint
-    - ifshort
-    - interfacer
-    - maligned
-    - nosnakecase
-    - scopelint
-    - structcheck
-    - varcheck
-    - intrange
+    - exportloopref
 
 issues:
   max-issues-per-linter: 0

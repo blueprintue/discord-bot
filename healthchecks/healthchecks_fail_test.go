@@ -12,6 +12,7 @@ import (
 	"github.com/blueprintue/discord-bot/healthchecks"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -23,15 +24,15 @@ func TestFail(t *testing.T) {
 
 	svr := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		if currentRequestIdx == 0 {
-			require.Equal(t, "/00000000-0000-0000-0000-000000000000/start", req.RequestURI)
+			assert.Equal(t, "/00000000-0000-0000-0000-000000000000/start", req.RequestURI)
 			startedMessage, err := io.ReadAll(req.Body)
-			require.NoError(t, err)
-			require.Equal(t, "starts", string(startedMessage))
+			assert.NoError(t, err)
+			assert.Equal(t, "starts", string(startedMessage))
 		} else {
-			require.Equal(t, "/00000000-0000-0000-0000-000000000000/fail", req.RequestURI)
+			assert.Equal(t, "/00000000-0000-0000-0000-000000000000/fail", req.RequestURI)
 			failedMessage, err := io.ReadAll(req.Body)
-			require.NoError(t, err)
-			require.Equal(t, "stops", string(failedMessage))
+			assert.NoError(t, err)
+			assert.Equal(t, "stops", string(failedMessage))
 		}
 
 		currentRequestIdx++
@@ -84,6 +85,6 @@ func TestFail_Errors(t *testing.T) {
 	healthchecksManager.Fail()
 
 	parts := strings.Split(bufferLogs.String(), "\n")
-	require.Equal(t, `{"level":"error","error":"HTTP error 500","message":"Could not send Fail HealthChecks client"}`, parts[0])
+	require.JSONEq(t, `{"level":"error","error":"HTTP error 500","message":"Could not send Fail HealthChecks client"}`, parts[0])
 	require.Equal(t, ``, parts[1])
 }

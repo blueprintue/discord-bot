@@ -98,16 +98,16 @@ func TestRun(t *testing.T) {
 		require.NoError(t, err)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
-		require.Equal(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
-		require.Equal(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
-		require.Equal(t, `{"level":"info","message_title":"my title 1","message":"Message missing - add Message"}`, parts[4])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
+		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		require.JSONEq(t, `{"level":"info","message_title":"my title 1","message":"Message missing - add Message"}`, parts[4])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","message":"Sending Message to Channel"}`, parts[5])
-		require.Equal(t, `{"level":"info","message_id":"123","channel_id":"channel-123","channel":"my-channel","message":"Message Sent"}`, parts[6])
+		require.JSONEq(t, `{"level":"info","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","message":"Sending Message to Channel"}`, parts[5])
+		require.JSONEq(t, `{"level":"info","message_id":"123","channel_id":"channel-123","channel":"my-channel","message":"Message Sent"}`, parts[6])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","message_id":"123","message_title":"my title 1","emoji":"my-emoji-1:emoji-123","message":"Adding Reaction to Message"}`, parts[7])
+		require.JSONEq(t, `{"level":"info","message_id":"123","message_title":"my title 1","emoji":"my-emoji-1:emoji-123","message":"Adding Reaction to Message"}`, parts[7])
 		require.Equal(t, ``, parts[8])
 	})
 
@@ -206,24 +206,24 @@ func TestRun(t *testing.T) {
 		require.NoError(t, err)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
-		require.Equal(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
-		require.Equal(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
+		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","message_id":"101","channel_id":"channel-123","channel":"my-channel","message":"SKIP - Message in Channel is not from bot"}`, parts[4])
+		require.JSONEq(t, `{"level":"info","message_id":"101","channel_id":"channel-123","channel":"my-channel","message":"SKIP - Message in Channel is not from bot"}`, parts[4])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","message_id":"102","channel_id":"channel-123","channel":"my-channel","message":"SKIP - Message in Channel is not an embed"}`, parts[5])
-		require.Equal(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[6])
+		require.JSONEq(t, `{"level":"info","message_id":"102","channel_id":"channel-123","channel":"my-channel","message":"SKIP - Message in Channel is not an embed"}`, parts[5])
+		require.JSONEq(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[6])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[7])
+		require.JSONEq(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[7])
 		//nolint:lll
-		require.Equal(t, `{"level":"error","error":"state cache not found","user_id":"456","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[8])
-		require.Equal(t, `{"level":"info","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[9])
+		require.JSONEq(t, `{"level":"error","error":"state cache not found","user_id":"456","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[8])
+		require.JSONEq(t, `{"level":"info","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[9])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[10])
-		require.Equal(t, `{"level":"info","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[11])
-		require.Equal(t, `{"level":"info","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[12])
+		require.JSONEq(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[10])
+		require.JSONEq(t, `{"level":"info","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[11])
+		require.JSONEq(t, `{"level":"info","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[12])
 		require.Equal(t, ``, parts[13])
 	})
 }
@@ -289,13 +289,13 @@ func TestRun_Errors(t *testing.T) {
 		require.ErrorContains(t, err, "HTTP 500 Internal Server Error")
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
-		require.Equal(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
-		require.Equal(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
+		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
 		//nolint:lll
-		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","channel_id":"channel-123","channel":"my-channel","message":"Could not read Messages from Channel"}`, parts[4])
-		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message":"Could not add messages to channel"}`, parts[5])
+		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","channel_id":"channel-123","channel":"my-channel","message":"Could not read Messages from Channel"}`, parts[4])
+		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message":"Could not add messages to channel"}`, parts[5])
 		require.Equal(t, ``, parts[6])
 	})
 
@@ -336,17 +336,17 @@ func TestRun_Errors(t *testing.T) {
 		require.ErrorContains(t, err, "HTTP 500 Internal Server Error")
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
-		require.Equal(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
-		require.Equal(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
-		require.Equal(t, `{"level":"info","message_title":"my title 1","message":"Message missing - add Message"}`, parts[4])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
+		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		require.JSONEq(t, `{"level":"info","message_title":"my title 1","message":"Message missing - add Message"}`, parts[4])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","message":"Sending Message to Channel"}`, parts[5])
+		require.JSONEq(t, `{"level":"info","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","message":"Sending Message to Channel"}`, parts[5])
 		//nolint:lll
-		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","message":"Could not send Message to Channel"}`, parts[6])
-		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_title":"my title 1","message":"Could not add Message"}`, parts[7])
-		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message":"Could not add messages to channel"}`, parts[8])
+		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","message":"Could not send Message to Channel"}`, parts[6])
+		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_title":"my title 1","message":"Could not add Message"}`, parts[7])
+		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message":"Could not add messages to channel"}`, parts[8])
 		require.Equal(t, ``, parts[9])
 	})
 
@@ -399,20 +399,20 @@ func TestRun_Errors(t *testing.T) {
 		require.ErrorContains(t, err, "HTTP 500 Internal Server Error")
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
-		require.Equal(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
-		require.Equal(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
-		require.Equal(t, `{"level":"info","message_title":"my title 1","message":"Message missing - add Message"}`, parts[4])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
+		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		require.JSONEq(t, `{"level":"info","message_title":"my title 1","message":"Message missing - add Message"}`, parts[4])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","message":"Sending Message to Channel"}`, parts[5])
-		require.Equal(t, `{"level":"info","message_id":"123","channel_id":"channel-123","channel":"my-channel","message":"Message Sent"}`, parts[6])
+		require.JSONEq(t, `{"level":"info","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","message":"Sending Message to Channel"}`, parts[5])
+		require.JSONEq(t, `{"level":"info","message_id":"123","channel_id":"channel-123","channel":"my-channel","message":"Message Sent"}`, parts[6])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","message_id":"123","message_title":"my title 1","emoji":"my-emoji-1:emoji-123","message":"Adding Reaction to Message"}`, parts[7])
+		require.JSONEq(t, `{"level":"info","message_id":"123","message_title":"my title 1","emoji":"my-emoji-1:emoji-123","message":"Adding Reaction to Message"}`, parts[7])
 		//nolint:lll
-		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_id":"123","emoji":"my-emoji-1:emoji-123","message":"Could not add Reaction to Message"}`, parts[8])
-		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_title":"my title 1","message":"Could not add Message"}`, parts[9])
-		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message":"Could not add messages to channel"}`, parts[10])
+		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_id":"123","emoji":"my-emoji-1:emoji-123","message":"Could not add Reaction to Message"}`, parts[8])
+		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_title":"my title 1","message":"Could not add Message"}`, parts[9])
+		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message":"Could not add messages to channel"}`, parts[10])
 		require.Equal(t, ``, parts[11])
 	})
 
@@ -464,17 +464,17 @@ func TestRun_Errors(t *testing.T) {
 		require.ErrorContains(t, err, "json unmarshal")
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
-		require.Equal(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
-		require.Equal(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
-		require.Equal(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
+		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		require.JSONEq(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
+		require.JSONEq(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
 		//nolint:lll
-		require.Equal(t, `{"level":"error","error":"json unmarshal","message_id":"104","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Could not get all Reactions"}`, parts[6])
-		require.Equal(t, `{"level":"error","error":"json unmarshal","message_title":"my title 1","message":"Could not update role belong to Message"}`, parts[7])
-		require.Equal(t, `{"level":"error","error":"json unmarshal","message":"Could not add messages to channel"}`, parts[8])
+		require.JSONEq(t, `{"level":"error","error":"json unmarshal","message_id":"104","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Could not get all Reactions"}`, parts[6])
+		require.JSONEq(t, `{"level":"error","error":"json unmarshal","message_title":"my title 1","message":"Could not update role belong to Message"}`, parts[7])
+		require.JSONEq(t, `{"level":"error","error":"json unmarshal","message":"Could not add messages to channel"}`, parts[8])
 		require.Equal(t, ``, parts[9])
 	})
 
@@ -553,20 +553,20 @@ func TestRun_Errors(t *testing.T) {
 		require.ErrorContains(t, err, "HTTP 500 Internal Server Error")
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
-		require.Equal(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
-		require.Equal(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
-		require.Equal(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
-		require.Equal(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
+		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		require.JSONEq(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
+		require.JSONEq(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
 		//nolint:lll
-		require.Equal(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[6])
+		require.JSONEq(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[6])
 		//nolint:lll
-		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Could not add Role to User"}`, parts[7])
+		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Could not add Role to User"}`, parts[7])
 		//nolint:lll
-		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_title":"my title 1","message":"Could not update role belong to Message"}`, parts[8])
-		require.Equal(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message":"Could not add messages to channel"}`, parts[9])
+		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_title":"my title 1","message":"Could not update role belong to Message"}`, parts[8])
+		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message":"Could not add messages to channel"}`, parts[9])
 		require.Equal(t, ``, parts[10])
 	})
 }

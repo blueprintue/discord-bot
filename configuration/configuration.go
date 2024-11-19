@@ -81,7 +81,7 @@ func eraseConfigurationValuesWithEnv(obj any) {
 		val = reflect.ValueOf(obj)
 	}
 
-	for idxNumField := 0; idxNumField < val.NumField(); idxNumField++ {
+	for idxNumField := range val.NumField() {
 		if val.Field(idxNumField).Kind() == reflect.Struct {
 			eraseConfigurationValuesWithEnv(val.Field(idxNumField).Addr().Interface())
 
@@ -119,7 +119,7 @@ func eraseConfigurationValuesWithEnv(obj any) {
 
 			val.Field(idxNumField).Set(reflect.MakeSlice(val.Field(idxNumField).Type(), len(stringEnvValues), len(stringEnvValues)))
 
-			for idxSlice := 0; idxSlice < len(stringEnvValues); idxSlice++ {
+			for idxSlice := range stringEnvValues {
 				val.Field(idxNumField).Index(idxSlice).SetString(stringEnvValues[idxSlice])
 			}
 		}
