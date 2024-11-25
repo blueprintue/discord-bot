@@ -7,7 +7,7 @@ require (
 	github.com/crazy-max/gohealthchecks v0.4.1
 	github.com/ilya1st/rotatewriter v0.0.0-20171126183947-3df0c1a3ed6d
 	github.com/rs/zerolog v1.33.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 )
 
 require (
