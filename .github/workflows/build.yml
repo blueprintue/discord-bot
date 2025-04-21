@@ -36,6 +36,7 @@ jobs:
         name: Lint
         uses: docker/bake-action@v6
         with:
+          source: .
           files: ./docker-bake.hcl
           targets: lint
 
@@ -52,6 +53,7 @@ jobs:
         name: Test
         uses: docker/bake-action@v6
         with:
+          source: .
           files: ./docker-bake.hcl
           targets: test
       -
@@ -109,6 +111,7 @@ jobs:
         name: Build artifacts
         uses: docker/bake-action@v6
         with:
+          source: .
           targets: artifact-all
           provenance: false
       -
@@ -126,6 +129,7 @@ jobs:
         name: Build
         uses: docker/bake-action@v6
         with:
+          source: .
           files: |
             ./docker-bake.hcl
             ${{ steps.docker_meta.outputs.bake-file }}
