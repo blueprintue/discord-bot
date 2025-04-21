@@ -11,13 +11,13 @@ ARG TARGETPLATFORM
 ARG GIT_REF
 RUN --mount=type=bind,source=.,target=/src,rw \
   goreleaser-xx --debug \
-    --name="discord-bot" \
-    --dist="/out" \
-    --hooks="go mod tidy" \
-    --hooks="go mod download" \
-    --ldflags="-s -w -X 'main.version={{.Version}}'" \
-    --files="LICENSE" \
-    --files="README.md"
+  --name="discord-bot" \
+  --dist="/out" \
+  --hooks="go mod tidy" \
+  --hooks="go mod download" \
+  --ldflags="-s -w -X 'main.version={{.Version}}'" \
+  --files="LICENSE" \
+  --files="README.md"
 
 FROM scratch AS artifact
 COPY --from=build /out/*.tar.gz /
@@ -28,7 +28,7 @@ RUN apk --update --no-cache add ca-certificates libressl shadow \
   && addgroup -g 1000 discord-bot \
   && adduser -u 1000 -G discord-bot -s /sbin/nologin -D discord-bot \
   && mkdir -p /var/log/discord-bot \
-  && chown discord-bot. /var/log/discord-bot
+  && chown discord-bot /var/log/discord-bot
 COPY --from=build /usr/local/bin/discord-bot /usr/local/bin/discord-bot
 USER discord-bot
 ENTRYPOINT [ "discord-bot" ]
