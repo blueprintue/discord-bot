@@ -339,7 +339,6 @@ func TestRunPurge(t *testing.T) {
 		require.Equal(t, ``, parts[11])
 	})
 
-	//nolint:bodyclose
 	t.Run("should do purge", func(t *testing.T) {
 		welcomeManager := welcome.NewWelcomeManager(session, guildName, welcome.Configuration{
 			Channel:   "my-channel",
