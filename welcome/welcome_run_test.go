@@ -265,7 +265,6 @@ func TestRun_Errors(t *testing.T) {
 
 	bufferLogs.Reset()
 
-	//nolint:bodyclose
 	t.Run("should return error because fetching messages from channel (ChannelMessages) return error", func(t *testing.T) {
 		bufferLogs.Reset()
 
@@ -299,7 +298,6 @@ func TestRun_Errors(t *testing.T) {
 		require.Equal(t, ``, parts[6])
 	})
 
-	//nolint:bodyclose
 	t.Run("should return error because adding message in channel (ChannelMessageSendEmbed) return error", func(t *testing.T) {
 		bufferLogs.Reset()
 
@@ -350,7 +348,6 @@ func TestRun_Errors(t *testing.T) {
 		require.Equal(t, ``, parts[9])
 	})
 
-	//nolint:bodyclose
 	t.Run("should return error because adding reaction on message in channel (MessageReactionAdd) return error", func(t *testing.T) {
 		bufferLogs.Reset()
 
@@ -478,7 +475,6 @@ func TestRun_Errors(t *testing.T) {
 		require.Equal(t, ``, parts[9])
 	})
 
-	//nolint:bodyclose
 	t.Run("should return error because adding role to user (GuildMemberRoleAdd) return error", func(t *testing.T) {
 		bufferLogs.Reset()
 

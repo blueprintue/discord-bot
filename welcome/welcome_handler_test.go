@@ -1,4 +1,4 @@
-//nolint:paralleltest,dupl,bodyclose,funlen,dupword
+//nolint:paralleltest,dupl,funlen,dupword
 package welcome_test
 
 import (

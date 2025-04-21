@@ -5,7 +5,7 @@ linters:
     - exhaustruct
     - gofumpt
     # deprecated
-    - exportloopref
+    - tenv
 
 issues:
   max-issues-per-linter: 0

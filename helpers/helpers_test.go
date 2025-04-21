@@ -127,7 +127,7 @@ func TestMessageReactionsAll_Errors(t *testing.T) {
 		require.Equal(t, users[:2], actualUsers)
 	})
 
-	//nolint:paralleltest,bodyclose
+	//nolint:paralleltest
 	t.Run("should return users and error because request failed", func(t *testing.T) {
 		// user 111 + user 222
 		data1, err := json.Marshal(users[:2])
