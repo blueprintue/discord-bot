@@ -71,11 +71,6 @@ jobs:
       - test
     steps:
       -
-        name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      -
         name: Docker meta
         id: docker_meta
         uses: docker/metadata-action@v5
@@ -129,10 +124,9 @@ jobs:
         name: Build
         uses: docker/bake-action@v6
         with:
-          source: .
           files: |
             ./docker-bake.hcl
-            ${{ steps.docker_meta.outputs.bake-file }}
+            cwd://${{ steps.docker_meta.outputs.bake-file }}
           targets: image-all
           push: ${{ github.event_name != 'pull_request' }}
       -
