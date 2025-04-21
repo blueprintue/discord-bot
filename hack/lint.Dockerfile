@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:alpine AS base
+FROM golang:1.23-alpine AS base
 ENV GOFLAGS="-buildvcs=false"
 RUN apk add --no-cache gcc linux-headers musl-dev
 WORKDIR /src
