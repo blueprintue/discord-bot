@@ -25,6 +25,8 @@ env:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       -
         name: Checkout
@@ -41,6 +43,8 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       -
         name: Checkout
@@ -67,6 +71,9 @@ jobs:
     needs:
       - lint
       - test
+    permissions:
+      contents: read
+      packages: write
     steps:
       -
         name: Checkout
