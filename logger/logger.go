@@ -1,3 +1,4 @@
+// Package logger create logs folder, defines log level, how to rotate logs and how to format logs.
 package logger
 
 import (

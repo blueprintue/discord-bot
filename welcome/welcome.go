@@ -1,3 +1,4 @@
+// Package welcome defines configuration struct, add messages, update roles.
 package welcome
 
 import (

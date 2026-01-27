@@ -1,3 +1,4 @@
+// Package healthchecks defines configuration struct and how to ping healthchecks for status.
 package healthchecks
 
 import (
@@ -10,6 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Configuration contains healthchecks parameters.
 type Configuration struct {
 	BaseURL        string `json:"base_url"`
 	UUID           string `json:"uuid"`
@@ -17,6 +19,7 @@ type Configuration struct {
 	FailedMessage  string `json:"failed_message"`
 }
 
+// Manager is a struct.
 type Manager struct {
 	client         *gohealthchecks.Client
 	baseURL        *url.URL
@@ -25,6 +28,7 @@ type Manager struct {
 	failedMessage  string
 }
 
+// NewHealthchecksManager checks configuration and returns a manager.
 func NewHealthchecksManager(
 	config Configuration,
 ) *Manager {
@@ -92,6 +96,7 @@ func (m *Manager) hasValidConfigurationInFile(config Configuration) bool {
 	return true
 }
 
+// Run creates a client and start the monitoring by sending a ping status with a message.
 func (m *Manager) Run() error {
 	m.client = gohealthchecks.NewClient(
 		&gohealthchecks.ClientOptions{
@@ -117,6 +122,7 @@ func (m *Manager) Run() error {
 	return nil
 }
 
+// Fail send a ping status with a message.
 func (m *Manager) Fail() {
 	err := m.client.Fail(
 		context.Background(),
