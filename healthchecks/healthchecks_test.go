@@ -105,7 +105,7 @@ func TestNewHealthchecksManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 				require.Equal(tt, testCase.want.logs[idx], parts[idx])
 			}
 
-			require.Len(tt, len(testCase.want.logs), len(parts))
+			require.Len(tt, parts, len(testCase.want.logs))
 		})
 	}
 }

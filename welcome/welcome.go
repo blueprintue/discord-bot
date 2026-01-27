@@ -2,6 +2,7 @@ package welcome
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/blueprintue/discord-bot/helpers"
@@ -304,15 +305,7 @@ func (w *Manager) addMessagesToChannel() error {
 	}
 
 	for idxMessages := range w.config.Messages {
-		messageTreated := false
-
-		for _, idxMessageTreated := range idxsMessageTreated {
-			if idxMessageTreated == idxMessages {
-				messageTreated = true
-
-				break
-			}
-		}
+		messageTreated := slices.Contains(idxsMessageTreated, idxMessages)
 
 		if !messageTreated {
 			log.Info().
@@ -386,15 +379,7 @@ func (w *Manager) updateRoleBelongMessage(message Message) error {
 			continue
 		}
 
-		skipUser := false
-
-		for _, role := range member.Roles {
-			if role == message.RoleID {
-				skipUser = true
-
-				break
-			}
-		}
+		skipUser := slices.Contains(member.Roles, message.RoleID)
 
 		if skipUser {
 			log.Info().
