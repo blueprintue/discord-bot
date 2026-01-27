@@ -18,6 +18,7 @@ import (
 
 func TestRun(t *testing.T) {
 	var bufferLogs bytes.Buffer
+
 	log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
 	svr := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
@@ -44,11 +45,12 @@ func TestRun(t *testing.T) {
 	require.NoError(t, err)
 
 	parts := strings.Split(bufferLogs.String(), "\n")
-	require.Equal(t, ``, parts[0])
+	require.Empty(t, parts[0])
 }
 
 func TestRun_Errors(t *testing.T) {
 	var bufferLogs bytes.Buffer
+
 	log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
 	svr := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, _ *http.Request) {
@@ -71,5 +73,5 @@ func TestRun_Errors(t *testing.T) {
 
 	parts := strings.Split(bufferLogs.String(), "\n")
 	require.JSONEq(t, `{"level":"error","error":"HTTP error 500","message":"Could not send Start HealthChecks client"}`, parts[0])
-	require.Equal(t, ``, parts[1])
+	require.Empty(t, parts[1])
 }

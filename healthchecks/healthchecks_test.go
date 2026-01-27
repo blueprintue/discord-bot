@@ -14,6 +14,7 @@ import (
 
 func TestNewHealthchecksManager(t *testing.T) {
 	var bufferLogs bytes.Buffer
+
 	log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
 	healthchecksManager := healthchecks.NewHealthchecksManager(healthchecks.Configuration{
@@ -26,7 +27,7 @@ func TestNewHealthchecksManager(t *testing.T) {
 
 	parts := strings.Split(bufferLogs.String(), "\n")
 	require.JSONEq(t, `{"level":"info","message":"Checking configuration for Healthchecks"}`, parts[0])
-	require.Equal(t, ``, parts[1])
+	require.Empty(t, parts[1])
 
 	bufferLogs.Reset()
 
@@ -40,7 +41,7 @@ func TestNewHealthchecksManager(t *testing.T) {
 	require.JSONEq(t, `{"level":"info","message":"BaseURL is empty, use default URL https://hc-ping.com/"}`, parts[1])
 	require.JSONEq(t, `{"level":"info","message":"StartedMessage is empty, use default \"discord-bot started\""}`, parts[2])
 	require.JSONEq(t, `{"level":"info","message":"FailedMessage is empty, use default \"discord-bot stopped\""}`, parts[3])
-	require.Equal(t, ``, parts[4])
+	require.Empty(t, parts[4])
 }
 
 //nolint:funlen,tparallel
@@ -91,6 +92,7 @@ func TestNewHealthchecksManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 	for testCaseName, testCase := range testCases {
 		t.Run(testCaseName, func(tt *testing.T) {
 			var bufferLogs bytes.Buffer
+
 			log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
 			bufferLogs.Reset()
@@ -103,7 +105,7 @@ func TestNewHealthchecksManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 				require.Equal(tt, testCase.want.logs[idx], parts[idx])
 			}
 
-			require.Equal(tt, len(testCase.want.logs), len(parts))
+			require.Len(tt, len(testCase.want.logs), len(parts))
 		})
 	}
 }

@@ -7,3 +7,7 @@ dist
 
 # Config
 config.json
+
+# Coverage
+coverage
+coverage.txt

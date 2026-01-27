@@ -21,7 +21,9 @@ func Configure(confLog configuration.Log) error {
 	var err error
 
 	logFile := path.Clean(confLog.Filename)
-	if err := os.MkdirAll(path.Dir(logFile), os.ModePerm); err != nil {
+
+	err = os.MkdirAll(path.Dir(logFile), os.ModePerm)
+	if err != nil {
 		log.Error().Err(err).Msg("Cannot create log folder")
 
 		return fmt.Errorf("%w", err)
@@ -45,8 +47,9 @@ func Configure(confLog configuration.Log) error {
 				return
 			}
 
-			if err := rwriter.Rotate(nil); err != nil {
-				log.Error().Err(err).Msg("Cannot rotate log")
+			errRotate := rwriter.Rotate(nil)
+			if errRotate != nil {
+				log.Error().Err(errRotate).Msg("Cannot rotate log")
 			}
 		}
 	}()
@@ -59,6 +62,7 @@ func Configure(confLog configuration.Log) error {
 	}
 
 	zerolog.SetGlobalLevel(logLevel)
+
 	zerolog.TimeFieldFormat = formatTimestampLogger
 
 	log.Logger = zerolog.New(

@@ -247,7 +247,6 @@ func (w *Manager) addMessagesToChannel() error {
 		Msg("Getting Messages from Channel")
 
 	messages, err := w.session.ChannelMessages(w.config.ChannelID, limitChannelMessages, "", "", "")
-
 	if err != nil {
 		log.Error().Err(err).
 			Str("channel_id", w.config.ChannelID).
@@ -472,7 +471,6 @@ func (w *Manager) addMessage(message *Message) error {
 		Description: message.Description,
 		Color:       message.Color,
 	})
-
 	if err != nil {
 		log.Error().Err(err).
 			Str("message_title", message.Title).
