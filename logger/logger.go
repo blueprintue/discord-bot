@@ -14,7 +14,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const formatTimestampLogger = "2006-01-02T15:04:05.000000000Z07:00"
+const (
+	formatTimestampLogger = "2006-01-02T15:04:05.000000000Z07:00"
+	permissionDirectory   = 0750
+)
 
 // Configure configures logger.
 func Configure(confLog configuration.Log) error {
@@ -22,7 +25,7 @@ func Configure(confLog configuration.Log) error {
 
 	logFile := path.Clean(confLog.Filename)
 
-	err = os.MkdirAll(path.Dir(logFile), os.ModePerm)
+	err = os.MkdirAll(path.Dir(logFile), permissionDirectory)
 	if err != nil {
 		log.Error().Err(err).Msg("Cannot create log folder")
 
