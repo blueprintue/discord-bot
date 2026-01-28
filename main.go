@@ -9,6 +9,7 @@ import (
 	_ "time/tzdata"
 
 	"github.com/blueprintue/discord-bot/configuration"
+	"github.com/blueprintue/discord-bot/exporter"
 	"github.com/blueprintue/discord-bot/healthchecks"
 	"github.com/blueprintue/discord-bot/logger"
 	"github.com/blueprintue/discord-bot/welcome"
@@ -103,6 +104,8 @@ pending_discord_session_open_completely:
 		}
 	}
 
+	startModuleExporter(config.Modules.ExporterConfiguration, config.Discord.Name, discordSession)
+
 	log.Info().
 		Msg("discord_bot.main.discord_session_opened")
 
@@ -150,6 +153,31 @@ func closeSessionDiscord(discordSession *discordgo.Session) {
 		log.Fatal().Err(err).
 			Msg("discord_bot.main.discord_session_close_failed")
 	}
+}
+
+func startModuleExporter(configuration *exporter.Configuration, guildName string, discordSession *discordgo.Session) {
+	if configuration == nil {
+		log.Info().
+			Msg("discord_bot.main.exporter.skipped")
+
+		return
+	}
+
+	log.Info().
+		Msg("discord_bot.main.exporter.creating")
+
+	exporterManager := exporter.NewExporterManager(*configuration, guildName, discordSession)
+	if exporterManager == nil {
+		log.Error().
+			Msg("discord_bot.main.exporter.creating_failed")
+
+		return
+	}
+
+	log.Info().
+		Msg("discord_bot.main.exporter.created")
+
+	exporterManager.Run()
 }
 
 func startModuleHealthchecks(configuration *healthchecks.Configuration) *healthchecks.Manager {

@@ -18,3 +18,7 @@ discord-bot.log
 # Coverage
 coverage
 coverage.txt
+
+# Exports
+exports
+*.db

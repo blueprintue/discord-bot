@@ -9,6 +9,10 @@ linters:
   settings:
     lll:
       line-length: 160
+    revive:
+      rules:
+        - name: blank-imports
+          disabled: true
     staticcheck:
       checks:
         - "-QF1008"
@@ -22,6 +26,7 @@ linters:
       ignore-names:
         - err
         - tt
+        - db
   exclusions:
     rules:
       - path: _test\.go
