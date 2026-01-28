@@ -19,6 +19,7 @@ import (
 //nolint:funlen,maintidx
 func TestRunPurge(t *testing.T) {
 	var bufferLogs bytes.Buffer
+
 	log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
 	session, err := discordgo.New("fake-token")
@@ -138,7 +139,7 @@ func TestRunPurge(t *testing.T) {
 		require.JSONEq(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[8])
 		require.JSONEq(t, `{"level":"info","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[9])
 		require.JSONEq(t, `{"level":"info","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[10])
-		require.Equal(t, ``, parts[11])
+		require.Empty(t, parts[11])
 	})
 
 	t.Run("should not purge because PurgeThresholdMembersReacted is not equal or greater than members reacted", func(t *testing.T) {
@@ -237,7 +238,7 @@ func TestRunPurge(t *testing.T) {
 		require.JSONEq(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[8])
 		require.JSONEq(t, `{"level":"info","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[9])
 		require.JSONEq(t, `{"level":"info","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[10])
-		require.Equal(t, ``, parts[11])
+		require.Empty(t, parts[11])
 	})
 
 	t.Run("should not purge because count members not in discord is equal or greater than PurgeBelowCountMembersNotInGuild", func(t *testing.T) {
@@ -336,7 +337,7 @@ func TestRunPurge(t *testing.T) {
 		require.JSONEq(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[8])
 		require.JSONEq(t, `{"level":"info","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[9])
 		require.JSONEq(t, `{"level":"info","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[10])
-		require.Equal(t, ``, parts[11])
+		require.Empty(t, parts[11])
 	})
 
 	t.Run("should do purge", func(t *testing.T) {
@@ -416,7 +417,7 @@ func TestRunPurge(t *testing.T) {
 		// request failed
 		recorder6 := httptest.NewRecorder()
 
-		recorder6.Result().Status = "500 Internal Server Error"
+		recorder6.Result().Status = internalServerError
 		recorder6.Result().StatusCode = 500
 
 		expectedResponse6 := recorder6.Result()
@@ -461,6 +462,6 @@ func TestRunPurge(t *testing.T) {
 		require.JSONEq(t, `{"level":"info","message_id":"104","emoji":"my-emoji-1:emoji-123","user_id":"678","message":"Removing Reaction on Message for User"}`, parts[14])
 		//nolint:lll
 		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_id":"104","emoji":"my-emoji-1:emoji-123","user_id":"678","message":"Could not remove Reaction"}`, parts[15])
-		require.Equal(t, ``, parts[16])
+		require.Empty(t, parts[16])
 	})
 }

@@ -1,3 +1,4 @@
+// Package logger create logs folder, defines log level, how to rotate logs and how to format logs.
 package logger
 
 import (
@@ -14,14 +15,19 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const formatTimestampLogger = "2006-01-02T15:04:05.000000000Z07:00"
+const (
+	formatTimestampLogger = "2006-01-02T15:04:05.000000000Z07:00"
+	permissionDirectory   = 0750
+)
 
 // Configure configures logger.
 func Configure(confLog configuration.Log) error {
 	var err error
 
 	logFile := path.Clean(confLog.Filename)
-	if err := os.MkdirAll(path.Dir(logFile), os.ModePerm); err != nil {
+
+	err = os.MkdirAll(path.Dir(logFile), permissionDirectory)
+	if err != nil {
 		log.Error().Err(err).Msg("Cannot create log folder")
 
 		return fmt.Errorf("%w", err)
@@ -45,8 +51,9 @@ func Configure(confLog configuration.Log) error {
 				return
 			}
 
-			if err := rwriter.Rotate(nil); err != nil {
-				log.Error().Err(err).Msg("Cannot rotate log")
+			errRotate := rwriter.Rotate(nil)
+			if errRotate != nil {
+				log.Error().Err(errRotate).Msg("Cannot rotate log")
 			}
 		}
 	}()
@@ -59,6 +66,7 @@ func Configure(confLog configuration.Log) error {
 	}
 
 	zerolog.SetGlobalLevel(logLevel)
+
 	zerolog.TimeFieldFormat = formatTimestampLogger
 
 	log.Logger = zerolog.New(

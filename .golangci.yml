@@ -1,26 +1,32 @@
+version: "2"
 linters:
-  enable-all: true
+  default: all
   disable:
     - depguard
     - exhaustruct
-    - gofumpt
-    # deprecated
-    - tenv
-
+    - funcorder
+    - wsl
+  settings:
+    lll:
+      line-length: 160
+    staticcheck:
+      checks:
+        - "-QF1008"
+    tagliatelle:
+      case:
+        rules:
+          json: snake
+    varnamelen:
+      check-return: true
+      check-type-param: true
+      ignore-names:
+        - err
+        - tt
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-
-linters-settings:
-  lll:
-    line-length: 160
-  tagliatelle:
-    case:
-      rules:
-        json: snake
-  varnamelen:
-    check-return: true
-    check-type-param: true
-    ignore-names:
-      - err
-      - tt

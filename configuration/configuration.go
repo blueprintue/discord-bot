@@ -1,3 +1,4 @@
+// Package configuration defines configuration struct and how to read from file and environment variables.
 package configuration
 
 import (
@@ -16,32 +17,42 @@ import (
 )
 
 var (
+	// ErrDiscordName is when discord.name value is empty.
 	ErrDiscordName  = errors.New("invalid json value: discord.name is empty")
+	
+	// ErrDiscordToken is when discord.token value is empty.
 	ErrDiscordToken = errors.New("invalid json value: discord.token is empty")
-	ErrLogFilename  = errors.New("invalid json value: log.filename is empty")
-	ErrLogLevel     = errors.New("invalid json value: log.level is invalid")
+	
+	// ErrLogFilename is when log.filename value is empty.
+	ErrLogFilename = errors.New("invalid json value: log.filename is empty")
+	
+	// ErrLogLevel is when log.level value is invalid.
+	ErrLogLevel = errors.New("invalid json value: log.level is invalid")
 )
 
 // Support only field's type string, int, bool, []string
 
-// Configuration contains Discord, Log and Modules parameters.
+// Configuration contains Discord, Log and Modules struct parameters.
 type Configuration struct {
 	Discord `json:"discord"`
 	Log     `json:"log"`
 	Modules `json:"modules"`
 }
 
+// Discord contains parameters for discord.
 type Discord struct {
 	Name  string `env:"DBOT_DISCORD_NAME"  json:"name"`
 	Token string `env:"DBOT_DISCORD_TOKEN" json:"token"`
 }
 
+// Log contains parameters for log.
 type Log struct {
 	Filename            string `env:"DBOT_LOG_FILENAME"              json:"filename"`
 	Level               string `env:"DBOT_LOG_LEVEL"                 json:"level"`
 	NumberFilesRotation int    `env:"DBOT_LOG_NUMBER_FILES_ROTATION" json:"number_files_rotation"`
 }
 
+// Modules contains configuration for each modules: welcome, healthchecks.
 type Modules struct {
 	WelcomeConfiguration     welcome.Configuration      `json:"welcome"`
 	HealthcheckConfiguration healthchecks.Configuration `json:"healthchecks"`

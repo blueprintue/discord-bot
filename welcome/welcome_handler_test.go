@@ -18,6 +18,7 @@ import (
 
 func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 	var bufferLogs bytes.Buffer
+
 	log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
 	session, err := discordgo.New("fake-token")
@@ -105,7 +106,7 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"error","message":"OnMessageReactionAdd - SKIP - Reaction is nil"}`, parts[0])
-		require.Equal(t, ``, parts[1])
+		require.Empty(t, parts[1])
 	})
 
 	t.Run("should stop process because MessageReactionAdd.MessageReaction is nil", func(t *testing.T) {
@@ -115,7 +116,7 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"error","message":"OnMessageReactionAdd - SKIP - Reaction is nil"}`, parts[0])
-		require.Equal(t, ``, parts[1])
+		require.Empty(t, parts[1])
 	})
 
 	t.Run("should stop process because Channel is not not matching", func(t *testing.T) {
@@ -130,7 +131,7 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-id","message_id":"","message":"Incoming Message Reaction Add"}`, parts[0])
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-id","message_id":"","message":"SKIP - Channel is not matching"}`, parts[1])
-		require.Equal(t, ``, parts[2])
+		require.Empty(t, parts[2])
 	})
 
 	t.Run("should stop process because Author is the bot", func(t *testing.T) {
@@ -146,7 +147,7 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"","message":"Incoming Message Reaction Add"}`, parts[0])
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[1])
-		require.Equal(t, ``, parts[2])
+		require.Empty(t, parts[2])
 	})
 
 	t.Run("should stop process because Message ID is not matching", func(t *testing.T) {
@@ -162,7 +163,7 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"","message":"Incoming Message Reaction Add"}`, parts[0])
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"","message":"SKIP - Message is not matching"}`, parts[1])
-		require.Equal(t, ``, parts[2])
+		require.Empty(t, parts[2])
 	})
 
 	t.Run("should stop process because Emoji.Name is not matching", func(t *testing.T) {
@@ -179,7 +180,7 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"123","message":"Incoming Message Reaction Add"}`, parts[0])
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"123","emoji":"","message":"SKIP - Emoji is not matching"}`, parts[1])
-		require.Equal(t, ``, parts[2])
+		require.Empty(t, parts[2])
 	})
 
 	t.Run("should add role to user", func(t *testing.T) {
@@ -198,12 +199,13 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"123","message":"Incoming Message Reaction Add"}`, parts[0])
 		//nolint:lll
 		require.JSONEq(t, `{"level":"info","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-456","message":"Adding Role to User"}`, parts[1])
-		require.Equal(t, ``, parts[2])
+		require.Empty(t, parts[2])
 	})
 }
 
 func TestHandlers_OnMessageReactionAdd_Errors(t *testing.T) {
 	var bufferLogs bytes.Buffer
+
 	log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
 	session, err := discordgo.New("fake-token")
@@ -265,8 +267,8 @@ func TestHandlers_OnMessageReactionAdd_Errors(t *testing.T) {
 
 	// request failed
 	recorder4 := httptest.NewRecorder()
-	//nolint:goconst
-	recorder4.Result().Status = "500 Internal Server Error"
+
+	recorder4.Result().Status = internalServerError
 	recorder4.Result().StatusCode = 500
 
 	expectedResponse4 := recorder4.Result()
@@ -303,11 +305,12 @@ func TestHandlers_OnMessageReactionAdd_Errors(t *testing.T) {
 	require.JSONEq(t, `{"level":"info","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-456","message":"Adding Role to User"}`, parts[1])
 	//nolint:lll
 	require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-456","message":"Could not add Role to User"}`, parts[2])
-	require.Equal(t, ``, parts[3])
+	require.Empty(t, parts[3])
 }
 
 func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 	var bufferLogs bytes.Buffer
+
 	log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
 	session, err := discordgo.New("fake-token")
@@ -395,7 +398,7 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"error","message":"OnMessageReactionRemove - SKIP - Reaction is nil"}`, parts[0])
-		require.Equal(t, ``, parts[1])
+		require.Empty(t, parts[1])
 	})
 
 	t.Run("should stop process because MessageReactionRemove.MessageReaction is nil", func(t *testing.T) {
@@ -405,7 +408,7 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"error","message":"OnMessageReactionRemove - SKIP - Reaction is nil"}`, parts[0])
-		require.Equal(t, ``, parts[1])
+		require.Empty(t, parts[1])
 	})
 
 	t.Run("should stop process because Channel is not not matching", func(t *testing.T) {
@@ -420,7 +423,7 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-id","message_id":"","message":"Incoming Message Reaction Remove"}`, parts[0])
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-id","message_id":"","message":"SKIP - Channel is not matching"}`, parts[1])
-		require.Equal(t, ``, parts[2])
+		require.Empty(t, parts[2])
 	})
 
 	t.Run("should stop process because Author is the bot", func(t *testing.T) {
@@ -436,7 +439,7 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"","message":"Incoming Message Reaction Remove"}`, parts[0])
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[1])
-		require.Equal(t, ``, parts[2])
+		require.Empty(t, parts[2])
 	})
 
 	t.Run("should stop process because Message ID is not matching", func(t *testing.T) {
@@ -452,7 +455,7 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"","message":"Incoming Message Reaction Remove"}`, parts[0])
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"","message":"SKIP - Message is not matching"}`, parts[1])
-		require.Equal(t, ``, parts[2])
+		require.Empty(t, parts[2])
 	})
 
 	t.Run("should stop process because Emoji ID is not matching", func(t *testing.T) {
@@ -469,7 +472,7 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"123","message":"Incoming Message Reaction Remove"}`, parts[0])
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"123","emoji":"","message":"SKIP - Emoji is not matching"}`, parts[1])
-		require.Equal(t, ``, parts[2])
+		require.Empty(t, parts[2])
 	})
 
 	t.Run("should add role to user", func(t *testing.T) {
@@ -488,12 +491,13 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","message_id":"123","message":"Incoming Message Reaction Remove"}`, parts[0])
 		//nolint:lll
 		require.JSONEq(t, `{"level":"info","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-789","message":"Removing Role to User"}`, parts[1])
-		require.Equal(t, ``, parts[2])
+		require.Empty(t, parts[2])
 	})
 }
 
 func TestHandlers_OnMessageReactionRemove_Errors(t *testing.T) {
 	var bufferLogs bytes.Buffer
+
 	log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
 	session, err := discordgo.New("fake-token")
@@ -555,7 +559,7 @@ func TestHandlers_OnMessageReactionRemove_Errors(t *testing.T) {
 
 	// request failed
 	recorder4 := httptest.NewRecorder()
-	recorder4.Result().Status = "500 Internal Server Error"
+	recorder4.Result().Status = internalServerError
 	recorder4.Result().StatusCode = 500
 
 	expectedResponse4 := recorder4.Result()
@@ -592,5 +596,5 @@ func TestHandlers_OnMessageReactionRemove_Errors(t *testing.T) {
 	require.JSONEq(t, `{"level":"info","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-789","message":"Removing Role to User"}`, parts[1])
 	//nolint:lll
 	require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-789","message":"Could not remove Role to User"}`, parts[2])
-	require.Equal(t, ``, parts[3])
+	require.Empty(t, parts[3])
 }
