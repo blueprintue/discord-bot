@@ -26,7 +26,7 @@ func TestNewHealthchecksManager(t *testing.T) {
 	require.NotNil(t, healthchecksManager)
 
 	parts := strings.Split(bufferLogs.String(), "\n")
-	require.JSONEq(t, `{"level":"info","message":"Checking configuration for Healthchecks"}`, parts[0])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"Checking configuration for Healthchecks"}`, parts[0])
 	require.Empty(t, parts[1])
 
 	bufferLogs.Reset()
@@ -37,10 +37,10 @@ func TestNewHealthchecksManager(t *testing.T) {
 	require.NotNil(t, healthchecksManager)
 
 	parts = strings.Split(bufferLogs.String(), "\n")
-	require.JSONEq(t, `{"level":"info","message":"Checking configuration for Healthchecks"}`, parts[0])
-	require.JSONEq(t, `{"level":"info","message":"BaseURL is empty, use default URL https://hc-ping.com/"}`, parts[1])
-	require.JSONEq(t, `{"level":"info","message":"StartedMessage is empty, use default \"discord-bot started\""}`, parts[2])
-	require.JSONEq(t, `{"level":"info","message":"FailedMessage is empty, use default \"discord-bot stopped\""}`, parts[3])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"Checking configuration for Healthchecks"}`, parts[0])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"BaseURL is empty, use default URL https://hc-ping.com/"}`, parts[1])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"StartedMessage is empty, use default \"discord-bot started\""}`, parts[2])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"FailedMessage is empty, use default \"discord-bot stopped\""}`, parts[3])
 	require.Empty(t, parts[4])
 }
 
@@ -66,9 +66,9 @@ func TestNewHealthchecksManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 			},
 			want: want{
 				logs: []string{
-					`{"level":"info","message":"Checking configuration for Healthchecks"}`,
-					`{"level":"info","message":"BaseURL is empty, use default URL https://hc-ping.com/"}`,
-					`{"level":"error","message":"UUID is empty"}`,
+					`{"level":"info","package":"healthchecks","message":"Checking configuration for Healthchecks"}`,
+					`{"level":"info","package":"healthchecks","message":"BaseURL is empty, use default URL https://hc-ping.com/"}`,
+					`{"level":"error","package":"healthchecks","message":"UUID is empty"}`,
 					``,
 				},
 			},
@@ -81,8 +81,8 @@ func TestNewHealthchecksManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 			},
 			want: want{
 				logs: []string{
-					`{"level":"info","message":"Checking configuration for Healthchecks"}`,
-					`{"level":"error","error":"parse \":::::..:::::\": missing protocol scheme","base_url":":::::..:::::","message":"BaseURL is invalid"}`,
+					`{"level":"info","package":"healthchecks","message":"Checking configuration for Healthchecks"}`,
+					`{"level":"error","error":"parse \":::::..:::::\": missing protocol scheme","package":"healthchecks","base_url":":::::..:::::","message":"BaseURL is invalid"}`,
 					``,
 				},
 			},

@@ -34,7 +34,9 @@ func NewHealthchecksManager(
 ) *Manager {
 	manager := &Manager{}
 
-	log.Info().Msg("Checking configuration for Healthchecks")
+	log.Info().
+		Str("package", "healthchecks").
+		Msg("Checking configuration for Healthchecks")
 
 	if !manager.hasValidConfigurationInFile(config) {
 		return nil
@@ -47,6 +49,7 @@ func (m *Manager) hasValidConfigurationInFile(config Configuration) bool {
 	baseRawURL := config.BaseURL
 	if baseRawURL == "" {
 		log.Info().
+			Str("package", "healthchecks").
 			Msg("BaseURL is empty, use default URL https://hc-ping.com/")
 
 		baseRawURL = "https://hc-ping.com/"
@@ -54,8 +57,8 @@ func (m *Manager) hasValidConfigurationInFile(config Configuration) bool {
 
 	baseURL, err := url.Parse(baseRawURL)
 	if err != nil {
-		log.Error().
-			Err(err).
+		log.Error().Err(err).
+			Str("package", "healthchecks").
 			Str("base_url", baseRawURL).
 			Msg("BaseURL is invalid")
 
@@ -70,6 +73,7 @@ func (m *Manager) hasValidConfigurationInFile(config Configuration) bool {
 
 	if config.UUID == "" {
 		log.Error().
+			Str("package", "healthchecks").
 			Msg("UUID is empty")
 
 		return false
@@ -80,6 +84,7 @@ func (m *Manager) hasValidConfigurationInFile(config Configuration) bool {
 	m.startedMessage = config.StartedMessage
 	if m.startedMessage == "" {
 		log.Info().
+			Str("package", "healthchecks").
 			Msg(`StartedMessage is empty, use default "discord-bot started"`)
 
 		m.startedMessage = "discord-bot started"
@@ -88,6 +93,7 @@ func (m *Manager) hasValidConfigurationInFile(config Configuration) bool {
 	m.failedMessage = config.FailedMessage
 	if m.failedMessage == "" {
 		log.Info().
+			Str("package", "healthchecks").
 			Msg(`FailedMessage is empty, use default "discord-bot stopped"`)
 
 		m.failedMessage = "discord-bot stopped"
@@ -112,8 +118,8 @@ func (m *Manager) Run() error {
 		},
 	)
 	if err != nil {
-		log.Error().
-			Err(err).
+		log.Error().Err(err).
+			Str("package", "healthchecks").
 			Msg("Could not send Start HealthChecks client")
 
 		return fmt.Errorf("%w", err)
@@ -132,8 +138,8 @@ func (m *Manager) Fail() {
 		},
 	)
 	if err != nil {
-		log.Error().
-			Err(err).
+		log.Error().Err(err).
+			Str("package", "healthchecks").
 			Msg("Could not send Fail HealthChecks client")
 	}
 }

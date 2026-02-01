@@ -125,20 +125,17 @@ func TestRunPurge(t *testing.T) {
 		require.NoError(t, err)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
-		require.JSONEq(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
-		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
-		require.JSONEq(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"error","error":"state cache not found","user_id":"456","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[6])
-		require.JSONEq(t, `{"level":"info","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[7])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[8])
-		require.JSONEq(t, `{"level":"info","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[9])
-		require.JSONEq(t, `{"level":"info","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[10])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Adding messages to channel"}`, parts[2])
+		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
+		require.JSONEq(t, `{"level":"error","package":"welcome","error":"state cache not found","user_id":"456","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[6])
+		require.JSONEq(t, `{"level":"info","package":"welcome","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[7])
+		require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[8])
+		require.JSONEq(t, `{"level":"info","package":"welcome","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[9])
+		require.JSONEq(t, `{"level":"info","package":"welcome","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[10])
 		require.Empty(t, parts[11])
 	})
 
@@ -224,20 +221,17 @@ func TestRunPurge(t *testing.T) {
 		require.NoError(t, err)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
-		require.JSONEq(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
-		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
-		require.JSONEq(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"error","error":"state cache not found","user_id":"456","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[6])
-		require.JSONEq(t, `{"level":"info","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[7])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[8])
-		require.JSONEq(t, `{"level":"info","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[9])
-		require.JSONEq(t, `{"level":"info","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[10])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Adding messages to channel"}`, parts[2])
+		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
+		require.JSONEq(t, `{"level":"error","package":"welcome","error":"state cache not found","user_id":"456","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[6])
+		require.JSONEq(t, `{"level":"info","package":"welcome","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[7])
+		require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[8])
+		require.JSONEq(t, `{"level":"info","package":"welcome","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[9])
+		require.JSONEq(t, `{"level":"info","package":"welcome","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[10])
 		require.Empty(t, parts[11])
 	})
 
@@ -323,20 +317,17 @@ func TestRunPurge(t *testing.T) {
 		require.NoError(t, err)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
-		require.JSONEq(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
-		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
-		require.JSONEq(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"error","error":"state cache not found","user_id":"456","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[6])
-		require.JSONEq(t, `{"level":"info","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[7])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[8])
-		require.JSONEq(t, `{"level":"info","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[9])
-		require.JSONEq(t, `{"level":"info","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[10])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Adding messages to channel"}`, parts[2])
+		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
+		require.JSONEq(t, `{"level":"error","error":"state cache not found","package":"welcome","user_id":"456","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[6])
+		require.JSONEq(t, `{"level":"info","package":"welcome","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[7])
+		require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[8])
+		require.JSONEq(t, `{"level":"info","package":"welcome","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[9])
+		require.JSONEq(t, `{"level":"info","package":"welcome","count_members_reacted":4,"count_members_not_found":1,"message":"Members not found in Guild"}`, parts[10])
 		require.Empty(t, parts[11])
 	})
 
@@ -439,29 +430,22 @@ func TestRunPurge(t *testing.T) {
 		require.NoError(t, err)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Add"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
-		require.JSONEq(t, `{"level":"info","message":"Adding messages to channel"}`, parts[2])
-		require.JSONEq(t, `{"level":"info","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
-		require.JSONEq(t, `{"level":"info","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"info","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"error","error":"state cache not found","user_id":"456","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[6])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"error","error":"state cache not found","user_id":"678","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[7])
-		require.JSONEq(t, `{"level":"info","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[8])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"info","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[9])
-		require.JSONEq(t, `{"level":"info","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[10])
-		require.JSONEq(t, `{"level":"info","count_members_reacted":5,"count_members_not_found":2,"message":"Members not found in Guild"}`, parts[11])
-		require.JSONEq(t, `{"level":"info","message":"Do purge"}`, parts[12])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"info","message_id":"104","emoji":"my-emoji-1:emoji-123","user_id":"456","message":"Removing Reaction on Message for User"}`, parts[13])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"info","message_id":"104","emoji":"my-emoji-1:emoji-123","user_id":"678","message":"Removing Reaction on Message for User"}`, parts[14])
-		//nolint:lll
-		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","message_id":"104","emoji":"my-emoji-1:emoji-123","user_id":"678","message":"Could not remove Reaction"}`, parts[15])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Adding Handler on Message Reaction Add"}`, parts[0])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Adding Handler on Message Reaction Remove"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Adding messages to channel"}`, parts[2])
+		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","channel":"my-channel","message":"Getting Messages from Channel"}`, parts[3])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
+		require.JSONEq(t, `{"level":"error","error":"state cache not found","package":"welcome","user_id":"456","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[6])
+		require.JSONEq(t, `{"level":"error","error":"state cache not found","package":"welcome","user_id":"678","guild_id":"guild-123","message":"Could not find Member in Guild"}`, parts[7])
+		require.JSONEq(t, `{"level":"info","package":"welcome","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[8])
+		require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[9])
+		require.JSONEq(t, `{"level":"info","package":"welcome","user_id":"user-id-789","guild_id":"guild-123","message":"SKIP - User has already Role"}`, parts[10])
+		require.JSONEq(t, `{"level":"info","package":"welcome","count_members_reacted":5,"count_members_not_found":2,"message":"Members not found in Guild"}`, parts[11])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Do purge"}`, parts[12])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message_id":"104","emoji":"my-emoji-1:emoji-123","user_id":"456","message":"Removing Reaction on Message for User"}`, parts[13])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message_id":"104","emoji":"my-emoji-1:emoji-123","user_id":"678","message":"Removing Reaction on Message for User"}`, parts[14])
+		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","package":"welcome","message_id":"104","emoji":"my-emoji-1:emoji-123","user_id":"678","message":"Could not remove Reaction"}`, parts[15])
 		require.Empty(t, parts[16])
 	})
 }
