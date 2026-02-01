@@ -24,7 +24,7 @@ const (
 
 var version = "edge"
 
-//nolint:funlen,cyclop
+//nolint:funlen
 func main() {
 	var err error
 
@@ -125,71 +125,9 @@ pending_discord_session_open_completely:
 		Str("module", "main").
 		Msg("discord_bot.discord_session_opened")
 
-	log.Info().
-		Str("module", "main").
-		Msg("discord_bot.welcome.creating")
+	healthchecksManager := startModuleHealthchecks(config.Modules.HealthcheckConfiguration)
 
-	welcomeManager := welcome.NewWelcomeManager(discordSession, config.Discord.Name, config.Modules.WelcomeConfiguration)
-	if welcomeManager == nil {
-		log.Error().
-			Str("module", "main").
-			Msg("discord_bot.welcome.creation_failed")
-	} else {
-		log.Info().
-			Str("module", "main").
-			Msg("discord_bot.welcome.created")
-
-		log.Info().
-			Str("module", "main").
-			Msg("discord_bot.welcome.starting")
-
-		err = welcomeManager.Run()
-		if err != nil {
-			log.Error().
-				Str("module", "main").
-				Err(err).
-				Msg("discord_bot.welcome.start_failed")
-
-			closeSessionDiscord(discordSession)
-
-			return
-		}
-
-		log.Info().
-			Str("module", "main").
-			Msg("discord_bot.welcome.started")
-	}
-
-	log.Info().
-		Str("module", "main").
-		Msg("discord_bot.healthchecks.creating")
-
-	healthchecksManager := healthchecks.NewHealthchecksManager(config.Modules.HealthcheckConfiguration)
-	if healthchecksManager == nil {
-		log.Error().
-			Str("module", "main").
-			Msg("discord_bot.healthchecks.creation_failed")
-	} else {
-		log.Info().
-			Str("module", "main").
-			Msg("discord_bot.healthchecks.created")
-
-		log.Info().
-			Str("module", "main").
-			Msg("discord_bot.healthchecks.starting")
-
-		err = healthchecksManager.Run()
-		if err != nil {
-			log.Error().
-				Str("module", "main").
-				Err(err).
-				Msg("discord_bot.healthchecks.start_failed")
-		} else {
-			log.Info().
-				Str("module", "main").
-				Msg("discord_bot.healthchecks.started")
-		}
-	}
+	startModuleWelcome(config.Modules.WelcomeConfiguration, config.Discord.Name, discordSession)
 
 	log.Info().
 		Str("module", "main").
@@ -236,4 +174,96 @@ func closeSessionDiscord(discordSession *discordgo.Session) {
 			Err(err).
 			Msg("discord_bot.discord_session_close_failed")
 	}
+}
+
+func startModuleHealthchecks(configuration *healthchecks.Configuration) *healthchecks.Manager {
+	if configuration == nil {
+		log.Info().
+			Str("module", "main").
+			Msg("discord_bot.healthchecks.skipped")
+
+		return nil
+	}
+
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.healthchecks.creating")
+
+	healthchecksManager := healthchecks.NewHealthchecksManager(*configuration)
+	if healthchecksManager == nil {
+		log.Error().
+			Str("module", "main").
+			Msg("discord_bot.healthchecks.creation_failed")
+		
+		return nil
+	}
+
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.healthchecks.created")
+
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.healthchecks.starting")
+
+	err := healthchecksManager.Run()
+	if err != nil {
+		log.Error().
+			Str("module", "main").
+			Err(err).
+			Msg("discord_bot.healthchecks.start_failed")
+
+		return nil
+	}
+
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.healthchecks.started")
+	
+	return healthchecksManager
+}
+
+func startModuleWelcome(configuration *welcome.Configuration, guildName string, discordSession *discordgo.Session) {
+	if configuration == nil {
+		log.Info().
+			Str("module", "main").
+			Msg("discord_bot.welcome.skipped")
+
+		return
+	}
+
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.welcome.creating")
+
+	welcomeManager := welcome.NewWelcomeManager(*configuration, guildName, discordSession)
+	if welcomeManager == nil {
+		log.Error().
+			Str("module", "main").
+			Msg("discord_bot.welcome.creation_failed")
+		
+		return
+	}
+
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.welcome.created")
+
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.welcome.starting")
+
+	err := welcomeManager.Run()
+	if err != nil {
+		log.Error().
+			Str("module", "main").
+			Err(err).
+			Msg("discord_bot.welcome.start_failed")
+
+		return
+	}
+
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.welcome.started")
 }

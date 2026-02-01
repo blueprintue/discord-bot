@@ -54,8 +54,8 @@ type Log struct {
 
 // Modules contains configuration for each modules: welcome, healthchecks.
 type Modules struct {
-	WelcomeConfiguration     welcome.Configuration      `json:"welcome"`
-	HealthcheckConfiguration healthchecks.Configuration `json:"healthchecks"`
+	HealthcheckConfiguration *healthchecks.Configuration `json:"healthchecks,omitempty"`
+	WelcomeConfiguration     *welcome.Configuration      `json:"welcome,omitempty"`
 }
 
 // ReadConfiguration read `config.json` file and update values with env if found.
