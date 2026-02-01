@@ -29,72 +29,68 @@ func main() {
 	var err error
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Str("version", version).
 		Msg("discord_bot.starting")
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Str("configuration_file", configurationFilename).
 		Msg("discord_bot.reading_configuration")
 
 	config, err := configuration.ReadConfiguration(os.DirFS("."), configurationFilename)
 	if err != nil {
-		log.Fatal().
-			Str("module", "main").
+		log.Fatal().Err(err).
+			Str("package", "main").
 			Str("configuration_file", configurationFilename).
-			Err(err).
 			Msg("discord_bot.configuration_read_failed")
 	}
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Str("configuration_file", configurationFilename).
 		Msg("discord_bot.configuration_read")
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.configuring_logger")
 
 	err = logger.Configure(config.Log)
 	if err != nil {
-		log.Fatal().
-			Str("module", "main").
-			Err(err).
+		log.Fatal().Err(err).
+			Str("package", "main").
 			Msg("discord_bot.logger_configured_failed")
 	}
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.logger_configured")
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.creating_discord_session")
 
 	discordSession, err := discordgo.New("Bot " + config.Discord.Token)
 	if err != nil {
-		log.Fatal().
-			Str("module", "main").
-			Err(err).
+		log.Fatal().Err(err).
+			Str("package", "main").
 			Msg("discord_bot.discord_session_creation_failed")
 	}
 
 	discordSession.Identify.Intents = discordgo.IntentsAll
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.discord_session_created")
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.opening_discord_session")
 
 	err = discordSession.Open()
 	if err != nil {
-		log.Fatal().
-			Str("module", "main").
-			Err(err).
+		log.Fatal().Err(err).
+			Str("package", "main").
 			Msg("discord_bot.discord_session_open_failed")
 	}
 
@@ -104,13 +100,12 @@ pending_discord_session_open_completely:
 	for {
 		select {
 		case <-timeoutChan:
-			log.Fatal().
-				Str("module", "main").
-				Err(err).
+			log.Fatal().Err(err).
+				Str("package", "main").
 				Msg("discord_bot.discord_session_open_completely_failed")
 		default:
 			log.Info().
-				Str("module", "main").
+				Str("package", "main").
 				Msg("discord_bot.pending_discord_session_open_completely")
 	
 			time.Sleep(waitStateFilled)
@@ -122,7 +117,7 @@ pending_discord_session_open_completely:
 	}
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.discord_session_opened")
 
 	healthchecksManager := startModuleHealthchecks(config.Modules.HealthcheckConfiguration)
@@ -130,7 +125,7 @@ pending_discord_session_open_completely:
 	startModuleWelcome(config.Modules.WelcomeConfiguration, config.Discord.Name, discordSession)
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Str("help", "Press CTRL+C to stop").
 		Msg("discord_bot.started")
 
@@ -145,7 +140,7 @@ pending_discord_session_open_completely:
 	}
 
 	log.Warn().
-		Str("module", "main").
+		Str("package", "main").
 		Any("signal", sig).
 		Msgf("discord_bot.closed")
 
@@ -164,14 +159,13 @@ func hasRequiredStateFieldsFilled(discordSession *discordgo.Session) bool {
 
 func closeSessionDiscord(discordSession *discordgo.Session) {
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.closing")
 
 	err := discordSession.Close()
 	if err != nil {
-		log.Fatal().
-			Str("module", "main").
-			Err(err).
+		log.Fatal().Err(err).
+			Str("package", "main").
 			Msg("discord_bot.discord_session_close_failed")
 	}
 }
@@ -179,45 +173,44 @@ func closeSessionDiscord(discordSession *discordgo.Session) {
 func startModuleHealthchecks(configuration *healthchecks.Configuration) *healthchecks.Manager {
 	if configuration == nil {
 		log.Info().
-			Str("module", "main").
+			Str("package", "main").
 			Msg("discord_bot.healthchecks.skipped")
 
 		return nil
 	}
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.healthchecks.creating")
 
 	healthchecksManager := healthchecks.NewHealthchecksManager(*configuration)
 	if healthchecksManager == nil {
 		log.Error().
-			Str("module", "main").
+			Str("package", "main").
 			Msg("discord_bot.healthchecks.creation_failed")
 		
 		return nil
 	}
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.healthchecks.created")
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.healthchecks.starting")
 
 	err := healthchecksManager.Run()
 	if err != nil {
-		log.Error().
-			Str("module", "main").
-			Err(err).
+		log.Error().Err(err).
+			Str("package", "main").
 			Msg("discord_bot.healthchecks.start_failed")
 
 		return nil
 	}
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.healthchecks.started")
 	
 	return healthchecksManager
@@ -226,44 +219,43 @@ func startModuleHealthchecks(configuration *healthchecks.Configuration) *healthc
 func startModuleWelcome(configuration *welcome.Configuration, guildName string, discordSession *discordgo.Session) {
 	if configuration == nil {
 		log.Info().
-			Str("module", "main").
+			Str("package", "main").
 			Msg("discord_bot.welcome.skipped")
 
 		return
 	}
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.welcome.creating")
 
 	welcomeManager := welcome.NewWelcomeManager(*configuration, guildName, discordSession)
 	if welcomeManager == nil {
 		log.Error().
-			Str("module", "main").
+			Str("package", "main").
 			Msg("discord_bot.welcome.creation_failed")
 		
 		return
 	}
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.welcome.created")
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.welcome.starting")
 
 	err := welcomeManager.Run()
 	if err != nil {
-		log.Error().
-			Str("module", "main").
-			Err(err).
+		log.Error().Err(err).
+			Str("package", "main").
 			Msg("discord_bot.welcome.start_failed")
 
 		return
 	}
 
 	log.Info().
-		Str("module", "main").
+		Str("package", "main").
 		Msg("discord_bot.welcome.started")
 }

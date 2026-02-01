@@ -21,6 +21,8 @@ const (
 )
 
 // Configure configures logger.
+//
+//nolint:funlen
 func Configure(confLog configuration.Log) error {
 	var err error
 
@@ -28,14 +30,18 @@ func Configure(confLog configuration.Log) error {
 
 	err = os.MkdirAll(path.Dir(logFile), permissionDirectory)
 	if err != nil {
-		log.Error().Err(err).Msg("Cannot create log folder")
+		log.Error().Err(err).
+			Str("package", "logger").
+			Msg("Cannot create log folder")
 
 		return fmt.Errorf("%w", err)
 	}
 
 	rwriter, err := rotatewriter.NewRotateWriter(logFile, confLog.NumberFilesRotation)
 	if err != nil {
-		log.Error().Err(err).Msg("Cannot create log file writer")
+		log.Error().Err(err).
+			Str("package", "logger").
+			Msg("Cannot create log file writer")
 
 		return fmt.Errorf("%w", err)
 	}
@@ -53,14 +59,18 @@ func Configure(confLog configuration.Log) error {
 
 			errRotate := rwriter.Rotate(nil)
 			if errRotate != nil {
-				log.Error().Err(errRotate).Msg("Cannot rotate log")
+				log.Error().Err(errRotate).
+					Str("package", "logger").
+					Msg("Cannot rotate log")
 			}
 		}
 	}()
 
 	logLevel, err := zerolog.ParseLevel(confLog.Level)
 	if err != nil {
-		log.Error().Err(err).Msg("Unknown log level")
+		log.Error().Err(err).
+			Str("package", "logger").
+			Msg("Unknown log level")
 
 		return fmt.Errorf("%w", err)
 	}

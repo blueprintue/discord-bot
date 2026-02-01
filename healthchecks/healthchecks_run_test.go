@@ -72,6 +72,6 @@ func TestRun_Errors(t *testing.T) {
 	require.Error(t, err)
 
 	parts := strings.Split(bufferLogs.String(), "\n")
-	require.JSONEq(t, `{"level":"error","error":"HTTP error 500","message":"Could not send Start HealthChecks client"}`, parts[0])
+	require.JSONEq(t, `{"level":"error","package":"healthchecks","error":"HTTP error 500","message":"Could not send Start HealthChecks client"}`, parts[0])
 	require.Empty(t, parts[1])
 }
