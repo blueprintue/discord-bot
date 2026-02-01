@@ -45,9 +45,9 @@ type Manager struct {
 
 // NewWelcomeManager return a Manager.
 func NewWelcomeManager(
-	session *discordgo.Session,
-	guildName string,
 	config Configuration,
+	guildName string,
+	session *discordgo.Session,
 ) *Manager {
 	config.Guild = guildName
 

@@ -34,13 +34,13 @@ func TestNewWelcomeManager(t *testing.T) {
 		Roles:    []*discordgo.Role{{ID: "role-123", Name: "my role 1"}},
 	})
 
-	welcomeManager := welcome.NewWelcomeManager(session, guildName, welcome.Configuration{
+	welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 		Channel:   "my-channel",
 		ChannelID: "channel-123",
 		Messages: []welcome.Message{
 			{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1"},
 		},
-	})
+	}, guildName, session)
 	require.NotNil(t, welcomeManager)
 
 	parts := strings.Split(bufferLogs.String(), "\n")
@@ -64,7 +64,7 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 
 		log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
-		welcomeManager := welcome.NewWelcomeManager(session, guildName, welcome.Configuration{})
+		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{}, guildName, session)
 		require.Nil(t, welcomeManager)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
@@ -78,9 +78,9 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 
 		log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
-		welcomeManager := welcome.NewWelcomeManager(session, guildName, welcome.Configuration{
+		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 			Channel: "my-channel",
-		})
+		}, guildName, session)
 		require.Nil(t, welcomeManager)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
@@ -94,10 +94,10 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 
 		log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
-		welcomeManager := welcome.NewWelcomeManager(session, guildName, welcome.Configuration{
+		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 			Channel:  "my-channel",
 			Messages: []welcome.Message{{}},
-		})
+		}, guildName, session)
 		require.Nil(t, welcomeManager)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
@@ -111,10 +111,10 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 
 		log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
-		welcomeManager := welcome.NewWelcomeManager(session, guildName, welcome.Configuration{
+		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 			Channel:  "my-channel",
 			Messages: []welcome.Message{{Title: "my title"}},
-		})
+		}, guildName, session)
 		require.Nil(t, welcomeManager)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
@@ -128,10 +128,10 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 
 		log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
-		welcomeManager := welcome.NewWelcomeManager(session, guildName, welcome.Configuration{
+		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 			Channel:  "my-channel",
 			Messages: []welcome.Message{{Title: "my title", Emoji: "my-emoji"}},
-		})
+		}, guildName, session)
 		require.Nil(t, welcomeManager)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
@@ -145,13 +145,13 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 
 		log.Logger = zerolog.New(&bufferLogs).Level(zerolog.TraceLevel).With().Logger()
 
-		welcomeManager := welcome.NewWelcomeManager(session, guildName, welcome.Configuration{
+		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 			Channel: "my-channel",
 			Messages: []welcome.Message{
 				{Title: "my title 1", Emoji: "my-emoji-1", Role: "my role 1"},
 				{Title: "my title 2", Emoji: "my-emoji-2"},
 			},
-		})
+		}, guildName, session)
 		require.Nil(t, welcomeManager)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
@@ -171,12 +171,12 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationAgainstDiscordServer(t *tes
 		session, err := discordgo.New("fake-token")
 		require.NoError(t, err)
 
-		welcomeManager := welcome.NewWelcomeManager(session, guildName, welcome.Configuration{
+		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 			Channel: "my-channel",
 			Messages: []welcome.Message{
 				{Title: "my title 1", Emoji: "my-emoji-1", Role: "my role 1"},
 			},
-		})
+		}, guildName, session)
 		require.Nil(t, welcomeManager)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
@@ -197,12 +197,12 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationAgainstDiscordServer(t *tes
 
 		session.State.Guilds = append(session.State.Guilds, &discordgo.Guild{ID: "guild-123", Name: guildName})
 
-		welcomeManager := welcome.NewWelcomeManager(session, guildName, welcome.Configuration{
+		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 			Channel: "my-channel",
 			Messages: []welcome.Message{
 				{Title: "my title 1", Emoji: "my-emoji-1", Role: "my role 1"},
 			},
-		})
+		}, guildName, session)
 		require.Nil(t, welcomeManager)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
@@ -228,12 +228,12 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationAgainstDiscordServer(t *tes
 			Channels: []*discordgo.Channel{{ID: "channel-123", Name: "my-channel"}},
 		})
 
-		welcomeManager := welcome.NewWelcomeManager(session, guildName, welcome.Configuration{
+		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 			Channel: "my-channel",
 			Messages: []welcome.Message{
 				{Title: "my title 1", Emoji: "my-emoji-1", Role: "my role 1"},
 			},
-		})
+		}, guildName, session)
 		require.Nil(t, welcomeManager)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
@@ -261,13 +261,13 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationAgainstDiscordServer(t *tes
 			Emojis:   []*discordgo.Emoji{{ID: "emoji-123", Name: "my-emoji-1"}},
 		})
 
-		welcomeManager := welcome.NewWelcomeManager(session, guildName, welcome.Configuration{
+		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 			Channel:   "my-channel",
 			ChannelID: "channel-123",
 			Messages: []welcome.Message{
 				{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1"},
 			},
-		})
+		}, guildName, session)
 		require.Nil(t, welcomeManager)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
