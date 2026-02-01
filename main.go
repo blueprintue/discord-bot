@@ -18,6 +18,7 @@ import (
 
 const (
 	waitStateFilled       = 250 * time.Millisecond
+	timeoutStateFilled    = 10 * time.Second
 	configurationFilename = "config.json"
 )
 
@@ -27,103 +28,212 @@ var version = "edge"
 func main() {
 	var err error
 
-	log.Info().Str("version", version).Msg("Starting discord-bot")
+	log.Info().
+		Str("module", "main").
+		Str("version", version).
+		Msg("discord_bot.starting")
 
-	log.Info().Msgf("Reading configuration from file: %s", configurationFilename)
+	log.Info().
+		Str("module", "main").
+		Str("configuration_file", configurationFilename).
+		Msg("discord_bot.reading_configuration")
 
 	config, err := configuration.ReadConfiguration(os.DirFS("."), configurationFilename)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Error on configuration")
+		log.Fatal().
+			Str("module", "main").
+			Str("configuration_file", configurationFilename).
+			Err(err).
+			Msg("discord_bot.configuration_read_failed")
 	}
+
+	log.Info().
+		Str("module", "main").
+		Str("configuration_file", configurationFilename).
+		Msg("discord_bot.configuration_read")
+
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.configuring_logger")
 
 	err = logger.Configure(config.Log)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Error on logger configuration")
+		log.Fatal().
+			Str("module", "main").
+			Err(err).
+			Msg("discord_bot.logger_configured_failed")
 	}
 
-	log.Info().Msg("Creating discordgo session")
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.logger_configured")
 
-	session, err := discordgo.New("Bot " + config.Discord.Token)
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.creating_discord_session")
+
+	discordSession, err := discordgo.New("Bot " + config.Discord.Token)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Could not create discordgo session")
+		log.Fatal().
+			Str("module", "main").
+			Err(err).
+			Msg("discord_bot.discord_session_creation_failed")
 	}
 
-	session.Identify.Intents = discordgo.IntentsAll
+	discordSession.Identify.Intents = discordgo.IntentsAll
 
-	log.Info().Msg("Opening discordgo session")
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.discord_session_created")
 
-	err = session.Open()
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.opening_discord_session")
+
+	err = discordSession.Open()
 	if err != nil {
-		log.Fatal().Err(err).Msg("Could not open discordgo session")
+		log.Fatal().
+			Str("module", "main").
+			Err(err).
+			Msg("discord_bot.discord_session_open_failed")
 	}
 
+	timeoutChan := time.After(timeoutStateFilled)
+
+pending_discord_session_open_completely:
 	for {
-		log.Info().Msg("Pending session to be ready...")
-		time.Sleep(waitStateFilled)
-
-		if hasRequiredStateFieldsFilled(session) {
-			break
+		select {
+		case <-timeoutChan:
+			log.Fatal().
+				Str("module", "main").
+				Err(err).
+				Msg("discord_bot.discord_session_open_completely_failed")
+		default:
+			log.Info().
+				Str("module", "main").
+				Msg("discord_bot.pending_discord_session_open_completely")
+	
+			time.Sleep(waitStateFilled)
+	
+			if hasRequiredStateFieldsFilled(discordSession) {
+				break pending_discord_session_open_completely
+			}
 		}
 	}
 
-	log.Info().Msg("Creating Welcome Manager")
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.discord_session_opened")
 
-	welcomeManager := welcome.NewWelcomeManager(session, config.Discord.Name, config.Modules.WelcomeConfiguration)
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.welcome.creating")
+
+	welcomeManager := welcome.NewWelcomeManager(discordSession, config.Discord.Name, config.Modules.WelcomeConfiguration)
 	if welcomeManager == nil {
-		log.Error().Msg("Could not start Welcome Manager")
+		log.Error().
+			Str("module", "main").
+			Msg("discord_bot.welcome.creation_failed")
 	} else {
-		log.Info().Msg("Running Welcome Manager")
+		log.Info().
+			Str("module", "main").
+			Msg("discord_bot.welcome.created")
+
+		log.Info().
+			Str("module", "main").
+			Msg("discord_bot.welcome.starting")
 
 		err = welcomeManager.Run()
 		if err != nil {
-			log.Error().Err(err).Msg("Could not run Welcome Manager")
+			log.Error().
+				Str("module", "main").
+				Err(err).
+				Msg("discord_bot.welcome.start_failed")
 
-			closeSessionDiscord(session)
+			closeSessionDiscord(discordSession)
 
 			return
 		}
+
+		log.Info().
+			Str("module", "main").
+			Msg("discord_bot.welcome.started")
 	}
 
-	log.Info().Msg("Creating Healthchecks Manager")
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.healthchecks.creating")
 
 	healthchecksManager := healthchecks.NewHealthchecksManager(config.Modules.HealthcheckConfiguration)
 	if healthchecksManager == nil {
-		log.Error().Msg("Could not start Healthchecks Manager")
+		log.Error().
+			Str("module", "main").
+			Msg("discord_bot.healthchecks.creation_failed")
 	} else {
-		log.Info().Msg("Running Healthchecks Manager")
+		log.Info().
+			Str("module", "main").
+			Msg("discord_bot.healthchecks.created")
+
+		log.Info().
+			Str("module", "main").
+			Msg("discord_bot.healthchecks.starting")
 
 		err = healthchecksManager.Run()
 		if err != nil {
-			log.Error().Err(err).Msg("Could not run Healthchecks Manager")
+			log.Error().
+				Str("module", "main").
+				Err(err).
+				Msg("discord_bot.healthchecks.start_failed")
+		} else {
+			log.Info().
+				Str("module", "main").
+				Msg("discord_bot.healthchecks.started")
 		}
 	}
 
-	log.Info().Msg("Bot is now running. Press CTRL+C to stop")
+	log.Info().
+		Str("module", "main").
+		Str("help", "Press CTRL+C to stop").
+		Msg("discord_bot.started")
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	sig := <-sc
 
-	closeSessionDiscord(session)
+	closeSessionDiscord(discordSession)
 
 	if healthchecksManager != nil {
 		healthchecksManager.Fail()
 	}
 
-	log.Warn().Msgf("Caught signal %v", sig)
+	log.Warn().
+		Str("module", "main").
+		Any("signal", sig).
+		Msgf("discord_bot.closed")
 
 	os.Exit(0)
 }
 
-func hasRequiredStateFieldsFilled(session *discordgo.Session) bool {
-	return session.State.Guilds[0].Channels != nil && session.State.User != nil
+func hasRequiredStateFieldsFilled(discordSession *discordgo.Session) bool {
+	return discordSession != nil &&
+		discordSession.State != nil &&
+		discordSession.State.User != nil &&
+		len(discordSession.State.Guilds) > 0 &&
+		discordSession.State.Guilds[0] != nil &&
+		len(discordSession.State.Guilds[0].Channels) > 0 &&
+		discordSession.State.Guilds[0].Channels[0] != nil
 }
 
-func closeSessionDiscord(session *discordgo.Session) {
-	log.Info().Msg("Closing discordgo session")
+func closeSessionDiscord(discordSession *discordgo.Session) {
+	log.Info().
+		Str("module", "main").
+		Msg("discord_bot.closing")
 
-	err := session.Close()
+	err := discordSession.Close()
 	if err != nil {
-		log.Fatal().Err(err).Msg("Could not close discordgo session")
+		log.Fatal().
+			Str("module", "main").
+			Err(err).
+			Msg("discord_bot.discord_session_close_failed")
 	}
 }
