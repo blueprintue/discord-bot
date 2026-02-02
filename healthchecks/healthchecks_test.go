@@ -26,8 +26,13 @@ func TestNewHealthchecksManager(t *testing.T) {
 	require.NotNil(t, healthchecksManager)
 
 	parts := strings.Split(bufferLogs.String(), "\n")
-	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"Checking configuration for Healthchecks"}`, parts[0])
-	require.Empty(t, parts[1])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"discord_bot.healthchecks.validating_configuration"}`, parts[0])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","base_url":"https://example.com/","message":"discord_bot.healthchecks.set_base_url"}`, parts[1])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"discord_bot.healthchecks.set_uuid"}`, parts[2])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","started_message":"starts","message":"discord_bot.healthchecks.set_started_message"}`, parts[3])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","failed_message":"stops","message":"discord_bot.healthchecks.set_failed_message"}`, parts[4])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"discord_bot.healthchecks.configuration_validated"}`, parts[5])
+	require.Empty(t, parts[6])
 
 	bufferLogs.Reset()
 
@@ -37,11 +42,14 @@ func TestNewHealthchecksManager(t *testing.T) {
 	require.NotNil(t, healthchecksManager)
 
 	parts = strings.Split(bufferLogs.String(), "\n")
-	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"Checking configuration for Healthchecks"}`, parts[0])
-	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"BaseURL is empty, use default URL https://hc-ping.com/"}`, parts[1])
-	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"StartedMessage is empty, use default \"discord-bot started\""}`, parts[2])
-	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"FailedMessage is empty, use default \"discord-bot stopped\""}`, parts[3])
-	require.Empty(t, parts[4])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"discord_bot.healthchecks.validating_configuration"}`, parts[0])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","help":"BaseURL is empty, use default URL https://hc-ping.com/","message":"discord_bot.healthchecks.use_default_base_url"}`, parts[1])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","base_url":"https://hc-ping.com/","message":"discord_bot.healthchecks.set_base_url"}`, parts[2])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"discord_bot.healthchecks.set_uuid"}`, parts[3])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","help":"StartedMessage is empty, use default \"discord-bot started\"","message":"discord_bot.healthchecks.set_default_started_message"}`, parts[4])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","help":"FailedMessage is empty, use default \"discord-bot stopped\"","message":"discord_bot.healthchecks.set_default_failed_message"}`, parts[5])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"discord_bot.healthchecks.configuration_validated"}`, parts[6])
+	require.Empty(t, parts[7])
 }
 
 //nolint:funlen,tparallel
@@ -66,9 +74,11 @@ func TestNewHealthchecksManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 			},
 			want: want{
 				logs: []string{
-					`{"level":"info","package":"healthchecks","message":"Checking configuration for Healthchecks"}`,
-					`{"level":"info","package":"healthchecks","message":"BaseURL is empty, use default URL https://hc-ping.com/"}`,
-					`{"level":"error","package":"healthchecks","message":"UUID is empty"}`,
+					`{"level":"info","package":"healthchecks","message":"discord_bot.healthchecks.validating_configuration"}`,
+					`{"level":"info","package":"healthchecks","help":"BaseURL is empty, use default URL https://hc-ping.com/","message":"discord_bot.healthchecks.use_default_base_url"}`,
+					`{"level":"info","package":"healthchecks","base_url":"https://hc-ping.com/","message":"discord_bot.healthchecks.set_base_url"}`,
+					`{"level":"error","package":"healthchecks","message":"discord_bot.healthchecks.empty_uuid"}`,
+					`{"level":"error","package":"healthchecks","message":"discord_bot.healthchecks.configuration_validation_failed"}`,
 					``,
 				},
 			},
@@ -81,8 +91,9 @@ func TestNewHealthchecksManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 			},
 			want: want{
 				logs: []string{
-					`{"level":"info","package":"healthchecks","message":"Checking configuration for Healthchecks"}`,
-					`{"level":"error","error":"parse \":::::..:::::\": missing protocol scheme","package":"healthchecks","base_url":":::::..:::::","message":"BaseURL is invalid"}`,
+					`{"level":"info","package":"healthchecks","message":"discord_bot.healthchecks.validating_configuration"}`,
+					`{"level":"error","error":"parse \":::::..:::::\": missing protocol scheme","package":"healthchecks","base_url":":::::..:::::","message":"discord_bot.healthchecks.base_url_parsing_failed"}`,
+					`{"level":"error","package":"healthchecks","message":"discord_bot.healthchecks.configuration_validation_failed"}`,
 					``,
 				},
 			},

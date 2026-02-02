@@ -36,21 +36,31 @@ func NewHealthchecksManager(
 
 	log.Info().
 		Str("package", "healthchecks").
-		Msg("Checking configuration for Healthchecks")
+		Msg("discord_bot.healthchecks.validating_configuration")
 
 	if !manager.hasValidConfigurationInFile(config) {
+		log.Error().
+			Str("package", "healthchecks").
+			Msg("discord_bot.healthchecks.configuration_validation_failed")
+
 		return nil
 	}
+
+	log.Info().
+		Str("package", "healthchecks").
+		Msg("discord_bot.healthchecks.configuration_validated")
 
 	return manager
 }
 
+//nolint:funlen
 func (m *Manager) hasValidConfigurationInFile(config Configuration) bool {
 	baseRawURL := config.BaseURL
 	if baseRawURL == "" {
 		log.Info().
 			Str("package", "healthchecks").
-			Msg("BaseURL is empty, use default URL https://hc-ping.com/")
+			Str("help", "BaseURL is empty, use default URL https://hc-ping.com/").
+			Msg("discord_bot.healthchecks.use_default_base_url")
 
 		baseRawURL = "https://hc-ping.com/"
 	}
@@ -60,7 +70,7 @@ func (m *Manager) hasValidConfigurationInFile(config Configuration) bool {
 		log.Error().Err(err).
 			Str("package", "healthchecks").
 			Str("base_url", baseRawURL).
-			Msg("BaseURL is invalid")
+			Msg("discord_bot.healthchecks.base_url_parsing_failed")
 
 		return false
 	}
@@ -69,15 +79,24 @@ func (m *Manager) hasValidConfigurationInFile(config Configuration) bool {
 		baseURL.Path += "/"
 	}
 
+	log.Info().
+		Str("package", "healthchecks").
+		Str("base_url", baseURL.String()).
+		Msg("discord_bot.healthchecks.set_base_url")
+
 	m.baseURL = baseURL
 
 	if config.UUID == "" {
 		log.Error().
 			Str("package", "healthchecks").
-			Msg("UUID is empty")
+			Msg("discord_bot.healthchecks.empty_uuid")
 
 		return false
 	}
+
+	log.Info().
+		Str("package", "healthchecks").
+		Msg("discord_bot.healthchecks.set_uuid")
 
 	m.uuid = config.UUID
 
@@ -85,18 +104,30 @@ func (m *Manager) hasValidConfigurationInFile(config Configuration) bool {
 	if m.startedMessage == "" {
 		log.Info().
 			Str("package", "healthchecks").
-			Msg(`StartedMessage is empty, use default "discord-bot started"`)
+			Str("help", `StartedMessage is empty, use default "discord-bot started"`).
+			Msg("discord_bot.healthchecks.set_default_started_message")
 
 		m.startedMessage = "discord-bot started"
+	} else {
+		log.Info().
+			Str("package", "healthchecks").
+			Str("started_message", m.startedMessage).
+			Msg("discord_bot.healthchecks.set_started_message")
 	}
 
 	m.failedMessage = config.FailedMessage
 	if m.failedMessage == "" {
 		log.Info().
 			Str("package", "healthchecks").
-			Msg(`FailedMessage is empty, use default "discord-bot stopped"`)
+			Str("help", `FailedMessage is empty, use default "discord-bot stopped"`).
+			Msg("discord_bot.healthchecks.set_default_failed_message")
 
 		m.failedMessage = "discord-bot stopped"
+	} else {
+		log.Info().
+			Str("package", "healthchecks").
+			Str("failed_message", m.failedMessage).
+			Msg("discord_bot.healthchecks.set_failed_message")
 	}
 
 	return true
@@ -120,10 +151,14 @@ func (m *Manager) Run() error {
 	if err != nil {
 		log.Error().Err(err).
 			Str("package", "healthchecks").
-			Msg("Could not send Start HealthChecks client")
+			Msg("discord_bot.healthchecks.send_started_message_failed")
 
 		return fmt.Errorf("%w", err)
 	}
+
+	log.Info().
+		Str("package", "healthchecks").
+		Msg("discord_bot.healthchecks.send_started_message")
 
 	return nil
 }
@@ -140,6 +175,12 @@ func (m *Manager) Fail() {
 	if err != nil {
 		log.Error().Err(err).
 			Str("package", "healthchecks").
-			Msg("Could not send Fail HealthChecks client")
+			Msg("discord_bot.healthchecks.send_failed_message_failed")
+		
+		return
 	}
+
+	log.Info().
+		Str("package", "healthchecks").
+		Msg("discord_bot.healthchecks.send_failed_message")
 }

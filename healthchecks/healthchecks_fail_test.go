@@ -58,7 +58,8 @@ func TestFail(t *testing.T) {
 	healthchecksManager.Fail()
 
 	parts := strings.Split(bufferLogs.String(), "\n")
-	require.Empty(t, parts[0])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"discord_bot.healthchecks.send_failed_message"}`, parts[0])
+	require.Empty(t, parts[1])
 }
 
 func TestFail_Errors(t *testing.T) {
@@ -87,6 +88,6 @@ func TestFail_Errors(t *testing.T) {
 	healthchecksManager.Fail()
 
 	parts := strings.Split(bufferLogs.String(), "\n")
-	require.JSONEq(t, `{"level":"error","package":"healthchecks","error":"HTTP error 500","message":"Could not send Fail HealthChecks client"}`, parts[0])
+	require.JSONEq(t, `{"level":"error","package":"healthchecks","error":"HTTP error 500","message":"discord_bot.healthchecks.send_failed_message_failed"}`, parts[0])
 	require.Empty(t, parts[1])
 }

@@ -129,9 +129,9 @@ pending_discord_session_open_completely:
 		Str("help", "Press CTRL+C to stop").
 		Msg("discord_bot.started")
 
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
-	sig := <-sc
+	sighupChan := make(chan os.Signal, 1)
+	signal.Notify(sighupChan, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
+	sig := <-sighupChan
 
 	closeSessionDiscord(discordSession)
 

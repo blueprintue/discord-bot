@@ -45,7 +45,8 @@ func TestRun(t *testing.T) {
 	require.NoError(t, err)
 
 	parts := strings.Split(bufferLogs.String(), "\n")
-	require.Empty(t, parts[0])
+	require.JSONEq(t, `{"level":"info","package":"healthchecks","message":"discord_bot.healthchecks.send_started_message"}`, parts[0])
+	require.Empty(t, parts[1])
 }
 
 func TestRun_Errors(t *testing.T) {
@@ -72,6 +73,6 @@ func TestRun_Errors(t *testing.T) {
 	require.Error(t, err)
 
 	parts := strings.Split(bufferLogs.String(), "\n")
-	require.JSONEq(t, `{"level":"error","package":"healthchecks","error":"HTTP error 500","message":"Could not send Start HealthChecks client"}`, parts[0])
+	require.JSONEq(t, `{"level":"error","package":"healthchecks","error":"HTTP error 500","message":"discord_bot.healthchecks.send_started_message_failed"}`, parts[0])
 	require.Empty(t, parts[1])
 }
