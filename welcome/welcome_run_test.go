@@ -543,7 +543,7 @@ func TestRun_Errors(t *testing.T) {
 		require.JSONEq(t, `{"level":"info","package":"welcome","message_title":"my title 1","message":"Message already sent -> update roles"}`, parts[4])
 		require.JSONEq(t, `{"level":"info","package":"welcome","message_id":"104","message_title":"my title 1","channel_id":"channel-123","channel":"my-channel","emoji":"my-emoji-1:emoji-123","message":"Getting all Reactions from Message"}`, parts[5])
 		require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Adding Role to User"}`, parts[6])
-		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","package":"welcome","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"Could not add Role to User"}`, parts[7])
+		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","package":"welcome","role_id":"role-123","role":"my role 1","user_id":"user-id-456","username":"user lambda 456","message":"discord_bot.welcome.user_role_adding_failed"}`, parts[7])
 		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","package":"welcome","message_title":"my title 1","message":"Could not update role belong to Message"}`, parts[8])
 		require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","package":"welcome","message":"Could not add messages to channel"}`, parts[9])
 		require.Empty(t, parts[10])
