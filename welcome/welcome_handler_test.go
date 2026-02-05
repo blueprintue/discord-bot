@@ -105,7 +105,7 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 		welcomeManager.OnMessageReactionAdd(nil, nil)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"error","package":"welcome","message":"OnMessageReactionAdd - SKIP - Reaction is nil"}`, parts[0])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_add_received", "package":"welcome"}`, parts[0])
 		require.Empty(t, parts[1])
 	})
 
@@ -115,7 +115,7 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 		welcomeManager.OnMessageReactionAdd(nil, &discordgo.MessageReactionAdd{MessageReaction: nil})
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"error","package":"welcome","message":"OnMessageReactionAdd - SKIP - Reaction is nil"}`, parts[0])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_add_received", "package":"welcome"}`, parts[0])
 		require.Empty(t, parts[1])
 	})
 
@@ -129,9 +129,8 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 		})
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-id","message_id":"","message":"Incoming Message Reaction Add"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-id","message_id":"","message":"SKIP - Channel is not matching"}`, parts[1])
-		require.Empty(t, parts[2])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_add_received", "package":"welcome"}`, parts[0])
+		require.Empty(t, parts[1])
 	})
 
 	t.Run("should stop process because Author is the bot", func(t *testing.T) {
@@ -145,9 +144,8 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 		})
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"","message":"Incoming Message Reaction Add"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[1])
-		require.Empty(t, parts[2])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_add_received", "package":"welcome"}`, parts[0])
+		require.Empty(t, parts[1])
 	})
 
 	t.Run("should stop process because Message ID is not matching", func(t *testing.T) {
@@ -161,9 +159,8 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 		})
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"","message":"Incoming Message Reaction Add"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"","message":"SKIP - Message is not matching"}`, parts[1])
-		require.Empty(t, parts[2])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_add_received", "package":"welcome"}`, parts[0])
+		require.Empty(t, parts[1])
 	})
 
 	t.Run("should stop process because Emoji.Name is not matching", func(t *testing.T) {
@@ -178,9 +175,8 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 		})
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"123","message":"Incoming Message Reaction Add"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"123","emoji":"","message":"SKIP - Emoji is not matching"}`, parts[1])
-		require.Empty(t, parts[2])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_add_received", "package":"welcome"}`, parts[0])
+		require.Empty(t, parts[1])
 	})
 
 	t.Run("should add role to user", func(t *testing.T) {
@@ -196,9 +192,10 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 		})
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"123","message":"Incoming Message Reaction Add"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-456","message":"Adding Role to User"}`, parts[1])
-		require.Empty(t, parts[2])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_add_received", "package":"welcome"}`, parts[0])
+		require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-456","message":"discord_bot.welcome.user_role_adding"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-456","message":"discord_bot.welcome.user_role_added"}`, parts[2])
+		require.Empty(t, parts[3])
 	})
 }
 
@@ -299,8 +296,8 @@ func TestHandlers_OnMessageReactionAdd_Errors(t *testing.T) {
 	})
 
 	parts := strings.Split(bufferLogs.String(), "\n")
-	require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"123","message":"Incoming Message Reaction Add"}`, parts[0])
-	require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-456","message":"Adding Role to User"}`, parts[1])
+	require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_add_received", "package":"welcome"}`, parts[0])
+	require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-456","message":"discord_bot.welcome.user_role_adding"}`, parts[1])
 	require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","package":"welcome","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-456","message":"discord_bot.welcome.user_role_adding_failed"}`, parts[2])
 	require.Empty(t, parts[3])
 }
@@ -394,7 +391,7 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 		welcomeManager.OnMessageReactionRemove(nil, nil)
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"error","package":"welcome","message":"OnMessageReactionRemove - SKIP - Reaction is nil"}`, parts[0])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_remove_received", "package":"welcome"}`, parts[0])
 		require.Empty(t, parts[1])
 	})
 
@@ -404,7 +401,7 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 		welcomeManager.OnMessageReactionRemove(nil, &discordgo.MessageReactionRemove{MessageReaction: nil})
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"error","package":"welcome","message":"OnMessageReactionRemove - SKIP - Reaction is nil"}`, parts[0])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_remove_received", "package":"welcome"}`, parts[0])
 		require.Empty(t, parts[1])
 	})
 
@@ -418,9 +415,8 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 		})
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-id","message_id":"","message":"Incoming Message Reaction Remove"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-id","message_id":"","message":"SKIP - Channel is not matching"}`, parts[1])
-		require.Empty(t, parts[2])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_remove_received", "package":"welcome"}`, parts[0])
+		require.Empty(t, parts[1])
 	})
 
 	t.Run("should stop process because Author is the bot", func(t *testing.T) {
@@ -434,9 +430,8 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 		})
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"","message":"Incoming Message Reaction Remove"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"","user_id":"bot-123","message":"SKIP - User is the bot"}`, parts[1])
-		require.Empty(t, parts[2])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_remove_received", "package":"welcome"}`, parts[0])
+		require.Empty(t, parts[1])
 	})
 
 	t.Run("should stop process because Message ID is not matching", func(t *testing.T) {
@@ -450,9 +445,8 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 		})
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"","message":"Incoming Message Reaction Remove"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"","message":"SKIP - Message is not matching"}`, parts[1])
-		require.Empty(t, parts[2])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_remove_received", "package":"welcome"}`, parts[0])
+		require.Empty(t, parts[1])
 	})
 
 	t.Run("should stop process because Emoji ID is not matching", func(t *testing.T) {
@@ -467,12 +461,11 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 		})
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"123","message":"Incoming Message Reaction Remove"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"123","emoji":"","message":"SKIP - Emoji is not matching"}`, parts[1])
-		require.Empty(t, parts[2])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_remove_received", "package":"welcome"}`, parts[0])
+		require.Empty(t, parts[1])
 	})
 
-	t.Run("should add role to user", func(t *testing.T) {
+	t.Run("should remove role to user", func(t *testing.T) {
 		bufferLogs.Reset()
 
 		welcomeManager.OnMessageReactionRemove(nil, &discordgo.MessageReactionRemove{
@@ -485,9 +478,10 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 		})
 
 		parts := strings.Split(bufferLogs.String(), "\n")
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"123","message":"Incoming Message Reaction Remove"}`, parts[0])
+		require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_remove_received", "package":"welcome"}`, parts[0])
 		require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-789","message":"discord_bot.welcome.user_role_removing"}`, parts[1])
-		require.Empty(t, parts[2])
+		require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-789","message":"discord_bot.welcome.user_role_removed"}`, parts[2])
+		require.Empty(t, parts[3])
 	})
 }
 
@@ -587,7 +581,7 @@ func TestHandlers_OnMessageReactionRemove_Errors(t *testing.T) {
 	})
 
 	parts := strings.Split(bufferLogs.String(), "\n")
-	require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","message_id":"123","message":"Incoming Message Reaction Remove"}`, parts[0])
+	require.JSONEq(t, `{"level":"debug", "message":"discord_bot.welcome.event_message_reaction_remove_received", "package":"welcome"}`, parts[0])
 	require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-789","message":"discord_bot.welcome.user_role_removing"}`, parts[1])
 	require.JSONEq(t, `{"level":"error","error":"HTTP 500 Internal Server Error, ","package":"welcome","role_id":"role-123","role":"my role 1","channel_id":"channel-123","message_id":"123","user_id":"user-id-789","message":"discord_bot.welcome.user_role_removing_failed"}`, parts[2])
 	require.Empty(t, parts[3])
