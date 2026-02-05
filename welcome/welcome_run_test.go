@@ -46,7 +46,6 @@ func TestRun(t *testing.T) {
 
 	welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 		Channel:   "my-channel",
-		ChannelID: "channel-123",
 		Messages: []welcome.Message{
 			{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1"},
 		},
@@ -249,7 +248,6 @@ func TestRun_Errors(t *testing.T) {
 
 	welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 		Channel:   "my-channel",
-		ChannelID: "channel-123",
 		Messages: []welcome.Message{
 			{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1"},
 		},

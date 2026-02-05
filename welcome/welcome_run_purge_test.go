@@ -46,7 +46,6 @@ func TestRunPurge(t *testing.T) {
 	t.Run("should not purge because CanPurgeReactions is false", func(t *testing.T) {
 		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 			Channel:   "my-channel",
-			ChannelID: "channel-123",
 			Messages: []welcome.Message{
 				{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1",
 					CanPurgeReactions: false, PurgeThresholdMembersReacted: 1, PurgeBelowCountMembersNotInGuild: 10},
@@ -140,7 +139,6 @@ func TestRunPurge(t *testing.T) {
 	t.Run("should not purge because PurgeThresholdMembersReacted is not equal or greater than members reacted", func(t *testing.T) {
 		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 			Channel:   "my-channel",
-			ChannelID: "channel-123",
 			Messages: []welcome.Message{
 				{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1",
 					CanPurgeReactions: true, PurgeThresholdMembersReacted: 5, PurgeBelowCountMembersNotInGuild: 10},
@@ -234,7 +232,6 @@ func TestRunPurge(t *testing.T) {
 	t.Run("should not purge because count members not in discord is equal or greater than PurgeBelowCountMembersNotInGuild", func(t *testing.T) {
 		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 			Channel:   "my-channel",
-			ChannelID: "channel-123",
 			Messages: []welcome.Message{
 				{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1",
 					CanPurgeReactions: true, PurgeThresholdMembersReacted: 4, PurgeBelowCountMembersNotInGuild: 0},
@@ -328,7 +325,6 @@ func TestRunPurge(t *testing.T) {
 	t.Run("should do purge", func(t *testing.T) {
 		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
 			Channel:   "my-channel",
-			ChannelID: "channel-123",
 			Messages: []welcome.Message{
 				{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1",
 					CanPurgeReactions: true, PurgeThresholdMembersReacted: 1, PurgeBelowCountMembersNotInGuild: 10},
