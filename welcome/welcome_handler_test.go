@@ -50,7 +50,20 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 	}, guildName, session)
 	require.NotNil(t, welcomeManager)
 
-	data1, err := json.Marshal([]*discordgo.Message{})
+	data1, err := json.Marshal([]*discordgo.Message{
+		{
+			ID:      "123",
+			Content: "this message is kept because embed is same against config",
+			Author:  &discordgo.User{ID: "bot-123"},
+			Embeds: []*discordgo.MessageEmbed{
+				{
+					Title:       "my title 1",
+					Description: "",
+					Color:       0,
+				},
+			},
+		},
+	})
 	require.NoError(t, err)
 
 	recorder1 := httptest.NewRecorder()
@@ -61,7 +74,7 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 	expectedResponse1 := recorder1.Result()
 	defer expectedResponse1.Body.Close()
 
-	data2, err := json.Marshal(discordgo.Message{ID: "123", Reactions: []*discordgo.MessageReactions{{Emoji: &discordgo.Emoji{Name: "my-emoji-1"}}}})
+	data2, err := json.Marshal([]discordgo.User{})
 	require.NoError(t, err)
 
 	recorder2 := httptest.NewRecorder()
@@ -72,28 +85,28 @@ func TestHandlers_OnMessageReactionAdd(t *testing.T) {
 	expectedResponse2 := recorder2.Result()
 	defer expectedResponse2.Body.Close()
 
+	data3, err := json.Marshal([]discordgo.User{})
+	require.NoError(t, err)
+
 	recorder3 := httptest.NewRecorder()
+	recorder3.Header().Add("Content-Type", "application/json")
+	_, err = recorder3.Write(data3)
+	require.NoError(t, err)
 
 	expectedResponse3 := recorder3.Result()
 	defer expectedResponse3.Body.Close()
 
-	recorder4 := httptest.NewRecorder()
-
-	expectedResponse4 := recorder4.Result()
-	defer expectedResponse4.Body.Close()
-
 	session.Client = createClient(t,
-		[]*http.Response{expectedResponse1, expectedResponse2, expectedResponse3, expectedResponse4},
+		[]*http.Response{expectedResponse1, expectedResponse2, expectedResponse3},
 		[]requestTest{
 			{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
-			{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-				body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
-			{method: "PUT", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123/@me"},
+			{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123?limit=100"},
 			{method: "PUT", host: "discord.com", uri: "/api/v9/guilds/guild-123/members/user-id-456/roles/role-123"},
 		},
 	)
 
 	err = welcomeManager.Run()
+
 	require.NoError(t, err)
 
 	bufferLogs.Reset()
@@ -232,7 +245,20 @@ func TestHandlers_OnMessageReactionAdd_Errors(t *testing.T) {
 	}, guildName, session)
 	require.NotNil(t, welcomeManager)
 
-	data1, err := json.Marshal([]*discordgo.Message{})
+	data1, err := json.Marshal([]*discordgo.Message{
+		{
+			ID:      "123",
+			Content: "this message is kept because embed is same against config",
+			Author:  &discordgo.User{ID: "bot-123"},
+			Embeds: []*discordgo.MessageEmbed{
+				{
+					Title:       "my title 1",
+					Description: "",
+					Color:       0,
+				},
+			},
+		},
+	})
 	require.NoError(t, err)
 
 	recorder1 := httptest.NewRecorder()
@@ -243,7 +269,7 @@ func TestHandlers_OnMessageReactionAdd_Errors(t *testing.T) {
 	expectedResponse1 := recorder1.Result()
 	defer expectedResponse1.Body.Close()
 
-	data2, err := json.Marshal(discordgo.Message{ID: "123", Reactions: []*discordgo.MessageReactions{{Emoji: &discordgo.Emoji{Name: "my-emoji-1"}}}})
+	data2, err := json.Marshal([]discordgo.User{})
 	require.NoError(t, err)
 
 	recorder2 := httptest.NewRecorder()
@@ -254,27 +280,20 @@ func TestHandlers_OnMessageReactionAdd_Errors(t *testing.T) {
 	expectedResponse2 := recorder2.Result()
 	defer expectedResponse2.Body.Close()
 
+	// request failed
 	recorder3 := httptest.NewRecorder()
+	
+	recorder3.Result().Status = internalServerError
+	recorder3.Result().StatusCode = 500
 
 	expectedResponse3 := recorder3.Result()
 	defer expectedResponse3.Body.Close()
 
-	// request failed
-	recorder4 := httptest.NewRecorder()
-
-	recorder4.Result().Status = internalServerError
-	recorder4.Result().StatusCode = 500
-
-	expectedResponse4 := recorder4.Result()
-	defer expectedResponse4.Body.Close()
-
 	session.Client = createClient(t,
-		[]*http.Response{expectedResponse1, expectedResponse2, expectedResponse3, expectedResponse4},
+		[]*http.Response{expectedResponse1, expectedResponse2, expectedResponse3},
 		[]requestTest{
 			{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
-			{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-				body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
-			{method: "PUT", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123/@me"},
+			{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123?limit=100"},
 			{method: "PUT", host: "discord.com", uri: "/api/v9/guilds/guild-123/members/user-id-456/roles/role-123"},
 		},
 	)
@@ -334,7 +353,20 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 	}, guildName, session)
 	require.NotNil(t, welcomeManager)
 
-	data1, err := json.Marshal([]*discordgo.Message{})
+	data1, err := json.Marshal([]*discordgo.Message{
+		{
+			ID:      "123",
+			Content: "this message is kept because embed is same against config",
+			Author:  &discordgo.User{ID: "bot-123"},
+			Embeds: []*discordgo.MessageEmbed{
+				{
+					Title:       "my title 1",
+					Description: "",
+					Color:       0,
+				},
+			},
+		},
+	})
 	require.NoError(t, err)
 
 	recorder1 := httptest.NewRecorder()
@@ -345,7 +377,7 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 	expectedResponse1 := recorder1.Result()
 	defer expectedResponse1.Body.Close()
 
-	data2, err := json.Marshal(discordgo.Message{ID: "123", Reactions: []*discordgo.MessageReactions{{Emoji: &discordgo.Emoji{Name: "my-emoji-1"}}}})
+	data2, err := json.Marshal([]discordgo.User{})
 	require.NoError(t, err)
 
 	recorder2 := httptest.NewRecorder()
@@ -361,18 +393,11 @@ func TestHandlers_OnMessageReactionRemove(t *testing.T) {
 	expectedResponse3 := recorder3.Result()
 	defer expectedResponse3.Body.Close()
 
-	recorder4 := httptest.NewRecorder()
-
-	expectedResponse4 := recorder4.Result()
-	defer expectedResponse4.Body.Close()
-
 	session.Client = createClient(t,
-		[]*http.Response{expectedResponse1, expectedResponse2, expectedResponse3, expectedResponse4},
+		[]*http.Response{expectedResponse1, expectedResponse2, expectedResponse3},
 		[]requestTest{
 			{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
-			{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-				body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
-			{method: "PUT", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123/@me"},
+			{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123?limit=100"},
 			{method: "DELETE", host: "discord.com", uri: "/api/v9/guilds/guild-123/members/user-id-789/roles/role-123"},
 		},
 	)
@@ -516,7 +541,20 @@ func TestHandlers_OnMessageReactionRemove_Errors(t *testing.T) {
 	}, guildName, session)
 	require.NotNil(t, welcomeManager)
 
-	data1, err := json.Marshal([]*discordgo.Message{})
+	data1, err := json.Marshal([]*discordgo.Message{
+		{
+			ID:      "123",
+			Content: "this message is kept because embed is same against config",
+			Author:  &discordgo.User{ID: "bot-123"},
+			Embeds: []*discordgo.MessageEmbed{
+				{
+					Title:       "my title 1",
+					Description: "",
+					Color:       0,
+				},
+			},
+		},
+	})
 	require.NoError(t, err)
 
 	recorder1 := httptest.NewRecorder()
@@ -527,7 +565,7 @@ func TestHandlers_OnMessageReactionRemove_Errors(t *testing.T) {
 	expectedResponse1 := recorder1.Result()
 	defer expectedResponse1.Body.Close()
 
-	data2, err := json.Marshal(discordgo.Message{ID: "123", Reactions: []*discordgo.MessageReactions{{Emoji: &discordgo.Emoji{Name: "my-emoji-1"}}}})
+	data2, err := json.Marshal([]discordgo.User{})
 	require.NoError(t, err)
 
 	recorder2 := httptest.NewRecorder()
@@ -538,26 +576,19 @@ func TestHandlers_OnMessageReactionRemove_Errors(t *testing.T) {
 	expectedResponse2 := recorder2.Result()
 	defer expectedResponse2.Body.Close()
 
+	// request failed
 	recorder3 := httptest.NewRecorder()
+	recorder3.Result().Status = internalServerError
+	recorder3.Result().StatusCode = 500
 
 	expectedResponse3 := recorder3.Result()
 	defer expectedResponse3.Body.Close()
 
-	// request failed
-	recorder4 := httptest.NewRecorder()
-	recorder4.Result().Status = internalServerError
-	recorder4.Result().StatusCode = 500
-
-	expectedResponse4 := recorder4.Result()
-	defer expectedResponse4.Body.Close()
-
 	session.Client = createClient(t,
-		[]*http.Response{expectedResponse1, expectedResponse2, expectedResponse3, expectedResponse4},
+		[]*http.Response{expectedResponse1, expectedResponse2, expectedResponse3},
 		[]requestTest{
 			{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
-			{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-				body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
-			{method: "PUT", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123/@me"},
+			{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123?limit=100"},
 			{method: "DELETE", host: "discord.com", uri: "/api/v9/guilds/guild-123/members/user-id-789/roles/role-123"},
 		},
 	)

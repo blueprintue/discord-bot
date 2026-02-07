@@ -44,13 +44,12 @@ func TestNewWelcomeManager(t *testing.T) {
 
 	parts := strings.Split(bufferLogs.String(), "\n")
 	require.JSONEq(t, `{"level":"info","package":"welcome","message":"discord_bot.welcome.validating_configuration"}`, parts[0])
-	require.JSONEq(t, `{"level":"info","package":"welcome","message":"Completing configuration with session.State"}`, parts[1])
-	require.JSONEq(t, `{"level":"info","package":"welcome","guild_id":"guild-123","guild":"guild-name","message":"Set GuildID"}`, parts[2])
-	require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","channel":"my-channel","message":"Set ChannelID"}`, parts[3])
-	require.JSONEq(t, `{"level":"info","package":"welcome","role_id":"role-123","role":"my role 1","message":"Set RoleID"}`, parts[4])
-	require.JSONEq(t, `{"level":"info","package":"welcome","emoji_id":"emoji-123","emoji":"my-emoji-1","message":"Set EmojiID"}`, parts[5])
-	require.JSONEq(t, `{"level":"info","package":"welcome","message":"Checking configuration 2/2"}`, parts[6])
-	require.Empty(t, parts[7])
+	require.JSONEq(t, `{"level":"info","package":"welcome","guild_id":"guild-123","guild":"guild-name","message":"discord_bot.welcome.set_guild_id"}`, parts[1])
+	require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","channel":"my-channel","message":"discord_bot.welcome.set_channel_id"}`, parts[2])
+	require.JSONEq(t, `{"level":"info","package":"welcome","message index":0,"role_id":"role-123","role":"my role 1","message":"discord_bot.welcome.set_role_id"}`, parts[3])
+	require.JSONEq(t, `{"level":"info","package":"welcome","message index":0,"emoji_id":"emoji-123","emoji":"my-emoji-1","message":"discord_bot.welcome.set_emoji_id"}`, parts[4])
+	require.JSONEq(t, `{"level":"info","package":"welcome","message":"discord_bot.welcome.configuration_validated"}`, parts[5])
+	require.Empty(t, parts[6])
 }
 
 //nolint:funlen
@@ -68,7 +67,7 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","package":"welcome","message":"discord_bot.welcome.validating_configuration"}`, parts[0])
-		require.JSONEq(t, `{"level":"error","package":"welcome","message":"discord_bot.welcome.empty_channel"}`, parts[1])
+		require.JSONEq(t, `{"level":"error","package":"welcome","message":"discord_bot.welcome.configuration_empty_channel"}`, parts[1])
 		require.JSONEq(t, `{"level":"error","package":"welcome","step":1,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[2])
 		require.Empty(t, parts[3])
 	})
@@ -85,7 +84,7 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","package":"welcome","message":"discord_bot.welcome.validating_configuration"}`, parts[0])
-		require.JSONEq(t, `{"level":"error","package":"welcome","message":"discord_bot.welcome.empty_messages"}`, parts[1])
+		require.JSONEq(t, `{"level":"error","package":"welcome","message":"discord_bot.welcome.configuration_empty_messages"}`, parts[1])
 		require.JSONEq(t, `{"level":"error","package":"welcome","step":1,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[2])
 		require.Empty(t, parts[3])
 	})
@@ -103,7 +102,7 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","package":"welcome","message":"discord_bot.welcome.validating_configuration"}`, parts[0])
-		require.JSONEq(t, `{"level":"error","package":"welcome","message index":0,"title":"","description":"","message":"discord_bot.welcome.empty_title_description_message"}`, parts[1])
+		require.JSONEq(t, `{"level":"error","package":"welcome","message index":0,"title":"","description":"","message":"discord_bot.welcome.configuration_empty_title_description_message"}`, parts[1])
 		require.JSONEq(t, `{"level":"error","package":"welcome","step":1,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[2])
 		require.Empty(t, parts[3])
 	})
@@ -121,7 +120,7 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","package":"welcome","message":"discord_bot.welcome.validating_configuration"}`, parts[0])
-		require.JSONEq(t, `{"level":"error","package":"welcome","message index":0,"message":"discord_bot.welcome.empty_emoji_message"}`, parts[1])
+		require.JSONEq(t, `{"level":"error","package":"welcome","message index":0,"message":"discord_bot.welcome.configuration_empty_emoji_message"}`, parts[1])
 		require.JSONEq(t, `{"level":"error","package":"welcome","step":1,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[2])
 		require.Empty(t, parts[3])
 	})
@@ -139,7 +138,7 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","package":"welcome","message":"discord_bot.welcome.validating_configuration"}`, parts[0])
-		require.JSONEq(t, `{"level":"error","package":"welcome","message index":0,"message":"discord_bot.welcome.empty_role_message"}`, parts[1])
+		require.JSONEq(t, `{"level":"error","package":"welcome","message index":0,"message":"discord_bot.welcome.configuration_empty_role_message"}`, parts[1])
 		require.JSONEq(t, `{"level":"error","package":"welcome","step":1,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[2])
 		require.Empty(t, parts[3])
 	})
@@ -160,7 +159,7 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationInFile(t *testing.T) {
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","package":"welcome","message":"discord_bot.welcome.validating_configuration"}`, parts[0])
-		require.JSONEq(t, `{"level":"error","package":"welcome","message index":1,"message":"discord_bot.welcome.empty_role_message"}`, parts[1])
+		require.JSONEq(t, `{"level":"error","package":"welcome","message index":1,"message":"discord_bot.welcome.configuration_empty_role_message"}`, parts[1])
 		require.JSONEq(t, `{"level":"error","package":"welcome","step":1,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[2])
 		require.Empty(t, parts[3])
 	})
@@ -186,11 +185,9 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationAgainstDiscordServer(t *tes
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","package":"welcome","message":"discord_bot.welcome.validating_configuration"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Completing configuration with session.State"}`, parts[1])
-		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Checking configuration 2/2"}`, parts[2])
-		require.JSONEq(t, `{"level":"error","package":"welcome","guild in config":"guild-name","message":"Guild not found in Discord server"}`, parts[3])
-		require.JSONEq(t, `{"level":"error","package":"welcome","step":2,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[4])
-		require.Empty(t, parts[5])
+		require.JSONEq(t, `{"level":"error","package":"welcome","guild":"guild-name","message":"discord_bot.welcome.configuration_guild_missed"}`, parts[1])
+		require.JSONEq(t, `{"level":"error","package":"welcome","step":2,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[2])
+		require.Empty(t, parts[3])
 	})
 
 	t.Run("should return nil because channel not found in Discord server", func(t *testing.T) {
@@ -213,12 +210,10 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationAgainstDiscordServer(t *tes
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","package":"welcome","message":"discord_bot.welcome.validating_configuration"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Completing configuration with session.State"}`, parts[1])
-		require.JSONEq(t, `{"level":"info","package":"welcome","guild_id":"guild-123","guild":"guild-name","message":"Set GuildID"}`, parts[2])
-		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Checking configuration 2/2"}`, parts[3])
-		require.JSONEq(t, `{"level":"error","package":"welcome","channel in config":"my-channel","message":"Channel not found in Discord server"}`, parts[4])
-		require.JSONEq(t, `{"level":"error","package":"welcome","step":2,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[5])
-		require.Empty(t, parts[6])
+		require.JSONEq(t, `{"level":"info","package":"welcome","guild_id":"guild-123","guild":"guild-name","message":"discord_bot.welcome.set_guild_id"}`, parts[1])
+		require.JSONEq(t, `{"level":"error","package":"welcome","channel":"my-channel","message":"discord_bot.welcome.configuration_channel_missed"}`, parts[2])
+		require.JSONEq(t, `{"level":"error","package":"welcome","step":2,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[3])
+		require.Empty(t, parts[4])
 	})
 
 	t.Run("should return nil because emoji not found in Discord server", func(t *testing.T) {
@@ -245,13 +240,11 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationAgainstDiscordServer(t *tes
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","package":"welcome","message":"discord_bot.welcome.validating_configuration"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Completing configuration with session.State"}`, parts[1])
-		require.JSONEq(t, `{"level":"info","package":"welcome","guild_id":"guild-123","guild":"guild-name","message":"Set GuildID"}`, parts[2])
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","channel":"my-channel","message":"Set ChannelID"}`, parts[3])
-		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Checking configuration 2/2"}`, parts[4])
-		require.JSONEq(t, `{"level":"error","package":"welcome","message #":0,"emoji in config":"my-emoji-1","message":"Emoji not found in Discord server"}`, parts[5])
-		require.JSONEq(t, `{"level":"error","package":"welcome","step":2,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[6])
-		require.Empty(t, parts[7])
+		require.JSONEq(t, `{"level":"info","package":"welcome","guild_id":"guild-123","guild":"guild-name","message":"discord_bot.welcome.set_guild_id"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","channel":"my-channel","message":"discord_bot.welcome.set_channel_id"}`, parts[2])
+		require.JSONEq(t, `{"level":"error","package":"welcome","message index":0,"emoji":"my-emoji-1","message":"discord_bot.welcome.configuration_emoji_missed"}`, parts[3])
+		require.JSONEq(t, `{"level":"error","package":"welcome","step":2,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[4])
+		require.Empty(t, parts[5])
 	})
 
 	t.Run("should return nil because role not found in Discord server", func(t *testing.T) {
@@ -279,13 +272,11 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationAgainstDiscordServer(t *tes
 
 		parts := strings.Split(bufferLogs.String(), "\n")
 		require.JSONEq(t, `{"level":"info","package":"welcome","message":"discord_bot.welcome.validating_configuration"}`, parts[0])
-		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Completing configuration with session.State"}`, parts[1])
-		require.JSONEq(t, `{"level":"info","package":"welcome","guild_id":"guild-123","guild":"guild-name","message":"Set GuildID"}`, parts[2])
-		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","channel":"my-channel","message":"Set ChannelID"}`, parts[3])
-		require.JSONEq(t, `{"level":"info","package":"welcome","emoji_id":"emoji-123","emoji":"my-emoji-1","message":"Set EmojiID"}`, parts[4])
-		require.JSONEq(t, `{"level":"info","package":"welcome","message":"Checking configuration 2/2"}`, parts[5])
-		require.JSONEq(t, `{"level":"error","package":"welcome","message #":0,"role in config":"my role 1","message":"Role not found in Discord server"}`, parts[6])
-		require.JSONEq(t, `{"level":"error","package":"welcome","step":2,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[7])
-		require.Empty(t, parts[8])
+		require.JSONEq(t, `{"level":"info","package":"welcome","guild_id":"guild-123","guild":"guild-name","message":"discord_bot.welcome.set_guild_id"}`, parts[1])
+		require.JSONEq(t, `{"level":"info","package":"welcome","channel_id":"channel-123","channel":"my-channel","message":"discord_bot.welcome.set_channel_id"}`, parts[2])
+		require.JSONEq(t, `{"level":"info","package":"welcome","message index":0,"emoji_id":"emoji-123","emoji":"my-emoji-1","message":"discord_bot.welcome.set_emoji_id"}`, parts[3])
+		require.JSONEq(t, `{"level":"error","package":"welcome","message index":0,"role":"my role 1","message":"discord_bot.welcome.configuration_role_missed"}`, parts[4])
+		require.JSONEq(t, `{"level":"error","package":"welcome","step":2,"message":"discord_bot.welcome.configuration_validation_failed"}`, parts[5])
+		require.Empty(t, parts[6])
 	})
 }
