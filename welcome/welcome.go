@@ -58,12 +58,10 @@ func NewWelcomeManager(
 	}
 
 	log.Info().
-		Str("package", "welcome").
 		Msg("discord_bot.welcome.validating_configuration")
 
 	if !hasValidConfigurationInFile(config) {
 		log.Error().
-			Str("package", "welcome").
 			Int("step", stepOneConfiguration).
 			Msg("discord_bot.welcome.configuration_validation_failed")
 
@@ -74,7 +72,6 @@ func NewWelcomeManager(
 
 	if !manager.hasValidConfigurationAgainstDiscordServer(config) {
 		log.Error().
-			Str("package", "welcome").
 			Int("step", stepTwoConfiguration).
 			Msg("discord_bot.welcome.configuration_validation_failed")
 
@@ -82,7 +79,6 @@ func NewWelcomeManager(
 	}
 
 	log.Info().
-		Str("package", "welcome").
 		Msg("discord_bot.welcome.configuration_validated")
 
 	return manager
@@ -91,7 +87,6 @@ func NewWelcomeManager(
 func hasValidConfigurationInFile(config Configuration) bool {
 	if config.Channel == "" {
 		log.Error().
-			Str("package", "welcome").
 			Msg("discord_bot.welcome.configuration_empty_channel")
 
 		return false
@@ -99,7 +94,6 @@ func hasValidConfigurationInFile(config Configuration) bool {
 
 	if len(config.Messages) == 0 {
 		log.Error().
-			Str("package", "welcome").
 			Msg("discord_bot.welcome.configuration_empty_messages")
 
 		return false
@@ -108,7 +102,6 @@ func hasValidConfigurationInFile(config Configuration) bool {
 	for idx, message := range config.Messages {
 		if message.Title == "" && message.Description == "" {
 			log.Error().
-				Str("package", "welcome").
 				Int("message index", idx).
 				Str("title", message.Title).
 				Str("description", message.Description).
@@ -119,7 +112,6 @@ func hasValidConfigurationInFile(config Configuration) bool {
 
 		if message.Emoji == "" {
 			log.Error().
-				Str("package", "welcome").
 				Int("message index", idx).
 				Msg("discord_bot.welcome.configuration_empty_emoji_message")
 
@@ -128,7 +120,6 @@ func hasValidConfigurationInFile(config Configuration) bool {
 
 		if message.Role == "" {
 			log.Error().
-				Str("package", "welcome").
 				Int("message index", idx).
 				Msg("discord_bot.welcome.configuration_empty_role_message")
 
@@ -149,7 +140,6 @@ func (w *Manager) completeConfiguration(config Configuration) {
 		}
 
 		log.Info().
-			Str("package", "welcome").
 			Str("guild_id", guild.ID).
 			Str("guild", w.guildName).
 			Msg("discord_bot.welcome.set_guild_id")
@@ -162,7 +152,6 @@ func (w *Manager) completeConfiguration(config Configuration) {
 			}
 
 			log.Info().
-				Str("package", "welcome").
 				Str("channel_id", channel.ID).
 				Str("channel", config.Channel).
 				Msg("discord_bot.welcome.set_channel_id")
@@ -180,7 +169,6 @@ func (w *Manager) completeConfiguration(config Configuration) {
 				}
 
 				log.Info().
-					Str("package", "welcome").
 					Int("message index", idx).
 					Str("role_id", role.ID).
 					Str("role", w.messages[idx].Role).
@@ -203,7 +191,6 @@ func (w *Manager) completeConfiguration(config Configuration) {
 				}
 
 				log.Info().
-					Str("package", "welcome").
 					Int("message index", idx).
 					Str("emoji_id", emoji.ID).
 					Str("emoji", w.messages[idx].Emoji).
@@ -220,7 +207,6 @@ func (w *Manager) completeConfiguration(config Configuration) {
 func (w *Manager) hasValidConfigurationAgainstDiscordServer(config Configuration) bool {
 	if w.guildID == "" {
 		log.Error().
-			Str("package", "welcome").
 			Str("guild", w.guildName).
 			Msg("discord_bot.welcome.configuration_guild_missed")
 
@@ -229,7 +215,6 @@ func (w *Manager) hasValidConfigurationAgainstDiscordServer(config Configuration
 
 	if w.channelID == "" {
 		log.Error().
-			Str("package", "welcome").
 			Str("channel", config.Channel).
 			Msg("discord_bot.welcome.configuration_channel_missed")
 
@@ -239,7 +224,6 @@ func (w *Manager) hasValidConfigurationAgainstDiscordServer(config Configuration
 	for idx, message := range w.messages {
 		if message.EmojiID == "" {
 			log.Error().
-				Str("package", "welcome").
 				Int("message index", idx).
 				Str("emoji", message.Emoji).
 				Msg("discord_bot.welcome.configuration_emoji_missed")
@@ -249,7 +233,6 @@ func (w *Manager) hasValidConfigurationAgainstDiscordServer(config Configuration
 
 		if message.RoleID == "" {
 			log.Error().
-				Str("package", "welcome").
 				Int("message index", idx).
 				Str("role", message.Role).
 				Msg("discord_bot.welcome.configuration_role_missed")

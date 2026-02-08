@@ -10,7 +10,6 @@ import (
 //nolint:dupl
 func (w *Manager) OnMessageReactionAdd(_ *discordgo.Session, reaction *discordgo.MessageReactionAdd) {
 	log.Debug().
-		Str("package", "welcome").
 		Msg("discord_bot.welcome.event_message_reaction_add_received")
 
 	if reaction == nil || reaction.MessageReaction == nil {
@@ -23,7 +22,6 @@ func (w *Manager) OnMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 	}
 
 	log.Info().
-		Str("package", "welcome").
 		Str("role_id", w.messages[idxMessageFound].RoleID).
 		Str("role", w.messages[idxMessageFound].Role).
 		Str("channel_id", reaction.ChannelID).
@@ -34,7 +32,6 @@ func (w *Manager) OnMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 	err := w.discordSession.GuildMemberRoleAdd(w.guildID, reaction.UserID, w.messages[idxMessageFound].RoleID)
 	if err != nil {
 		log.Error().Err(err).
-			Str("package", "welcome").
 			Str("role_id", w.messages[idxMessageFound].RoleID).
 			Str("role", w.messages[idxMessageFound].Role).
 			Str("channel_id", reaction.ChannelID).
@@ -46,7 +43,6 @@ func (w *Manager) OnMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 	}
 
 	log.Info().
-		Str("package", "welcome").
 		Str("role_id", w.messages[idxMessageFound].RoleID).
 		Str("role", w.messages[idxMessageFound].Role).
 		Str("channel_id", reaction.ChannelID).
@@ -60,7 +56,6 @@ func (w *Manager) OnMessageReactionAdd(_ *discordgo.Session, reaction *discordgo
 //nolint:dupl
 func (w *Manager) OnMessageReactionRemove(_ *discordgo.Session, reaction *discordgo.MessageReactionRemove) {
 	log.Debug().
-		Str("package", "welcome").
 		Msg("discord_bot.welcome.event_message_reaction_remove_received")
 
 	if reaction == nil || reaction.MessageReaction == nil {
@@ -73,7 +68,6 @@ func (w *Manager) OnMessageReactionRemove(_ *discordgo.Session, reaction *discor
 	}
 
 	log.Info().
-		Str("package", "welcome").
 		Str("role_id", w.messages[idxMessageFound].RoleID).
 		Str("role", w.messages[idxMessageFound].Role).
 		Str("channel_id", reaction.ChannelID).
@@ -84,7 +78,6 @@ func (w *Manager) OnMessageReactionRemove(_ *discordgo.Session, reaction *discor
 	err := w.discordSession.GuildMemberRoleRemove(w.guildID, reaction.UserID, w.messages[idxMessageFound].RoleID)
 	if err != nil {
 		log.Error().Err(err).
-			Str("package", "welcome").
 			Str("role_id", w.messages[idxMessageFound].RoleID).
 			Str("role", w.messages[idxMessageFound].Role).
 			Str("channel_id", reaction.ChannelID).
@@ -96,7 +89,6 @@ func (w *Manager) OnMessageReactionRemove(_ *discordgo.Session, reaction *discor
 	}
 
 	log.Info().
-		Str("package", "welcome").
 		Str("role_id", w.messages[idxMessageFound].RoleID).
 		Str("role", w.messages[idxMessageFound].Role).
 		Str("channel_id", reaction.ChannelID).
