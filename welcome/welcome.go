@@ -17,8 +17,8 @@ const (
 
 // Configuration is a struct.
 type Configuration struct {
-	Channel   string    `json:"channel"`
-	Messages  []Message `json:"messages"`
+	Channel  string    `json:"channel"`
+	Messages []Message `json:"messages"`
 }
 
 // Message is a struct.
@@ -31,9 +31,9 @@ type Message struct {
 	RoleID                           string
 	Emoji                            string `json:"emoji"`
 	EmojiID                          string
-	CanPurgeReactions                bool   `json:"can_purge_reactions"`
-	PurgeThresholdMembersReacted     int    `json:"purge_threshold_members_reacted"`
-	PurgeBelowCountMembersNotInGuild int    `json:"purge_below_count_members_not_in_guild"`
+	CanPurgeReactions                bool `json:"can_purge_reactions"`
+	PurgeThresholdMembersReacted     int  `json:"purge_threshold_members_reacted"`
+	PurgeBelowCountMembersNotInGuild int  `json:"purge_below_count_members_not_in_guild"`
 }
 
 // Manager is a struct.

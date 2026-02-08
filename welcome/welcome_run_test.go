@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/blueprintue/discord-bot/welcome"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -45,7 +46,7 @@ func TestRun(t *testing.T) {
 	}
 
 	welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
-		Channel:   "my-channel",
+		Channel: "my-channel",
 		Messages: []welcome.Message{
 			{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1"},
 		},
@@ -88,8 +89,10 @@ func TestRun(t *testing.T) {
 			[]*http.Response{expectedResponse1, expectedResponse2, expectedResponse3},
 			[]requestTest{
 				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
-				{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-					body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
+				{
+					method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
+					body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`,
+				},
 				{method: "PUT", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123/@me"},
 			},
 		)
@@ -248,7 +251,7 @@ func TestRun_Errors(t *testing.T) {
 	}
 
 	welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
-		Channel:   "my-channel",
+		Channel: "my-channel",
 		Messages: []welcome.Message{
 			{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1"},
 		},
@@ -315,8 +318,10 @@ func TestRun_Errors(t *testing.T) {
 			[]*http.Response{expectedResponse1, expectedResponse2},
 			[]requestTest{
 				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
-				{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-					body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
+				{
+					method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
+					body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`,
+				},
 			},
 		)
 
@@ -375,8 +380,10 @@ func TestRun_Errors(t *testing.T) {
 			[]*http.Response{expectedResponse1, expectedResponse2, expectedResponse3},
 			[]requestTest{
 				{method: "GET", host: "discord.com", uri: "/api/v9/channels/channel-123/messages?limit=100"},
-				{method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
-					body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`},
+				{
+					method: "POST", host: "discord.com", uri: "/api/v9/channels/channel-123/messages",
+					body: `{"embeds":[{"type":"rich","title":"my title 1"}],"tts":false,"components":null,"sticker_ids":null}`,
+				},
 				{method: "PUT", host: "discord.com", uri: "/api/v9/channels/channel-123/messages/123/reactions/my-emoji-1:emoji-123/@me"},
 			},
 		)

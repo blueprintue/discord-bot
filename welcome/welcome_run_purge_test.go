@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/blueprintue/discord-bot/welcome"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -45,10 +46,12 @@ func TestRunPurge(t *testing.T) {
 
 	t.Run("should not purge because CanPurgeReactions is false", func(t *testing.T) {
 		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
-			Channel:   "my-channel",
+			Channel: "my-channel",
 			Messages: []welcome.Message{
-				{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1",
-					CanPurgeReactions: false, PurgeThresholdMembersReacted: 1, PurgeBelowCountMembersNotInGuild: 10},
+				{
+					Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1",
+					CanPurgeReactions: false, PurgeThresholdMembersReacted: 1, PurgeBelowCountMembersNotInGuild: 10,
+				},
 			},
 		}, guildName, session)
 		require.NotNil(t, welcomeManager)
@@ -138,10 +141,12 @@ func TestRunPurge(t *testing.T) {
 
 	t.Run("should not purge because PurgeThresholdMembersReacted is not equal or greater than members reacted", func(t *testing.T) {
 		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
-			Channel:   "my-channel",
+			Channel: "my-channel",
 			Messages: []welcome.Message{
-				{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1",
-					CanPurgeReactions: true, PurgeThresholdMembersReacted: 5, PurgeBelowCountMembersNotInGuild: 10},
+				{
+					Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1",
+					CanPurgeReactions: true, PurgeThresholdMembersReacted: 5, PurgeBelowCountMembersNotInGuild: 10,
+				},
 			},
 		}, guildName, session)
 		require.NotNil(t, welcomeManager)
@@ -231,10 +236,12 @@ func TestRunPurge(t *testing.T) {
 
 	t.Run("should not purge because count members not in discord is equal or greater than PurgeBelowCountMembersNotInGuild", func(t *testing.T) {
 		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
-			Channel:   "my-channel",
+			Channel: "my-channel",
 			Messages: []welcome.Message{
-				{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1",
-					CanPurgeReactions: true, PurgeThresholdMembersReacted: 4, PurgeBelowCountMembersNotInGuild: 0},
+				{
+					Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1",
+					CanPurgeReactions: true, PurgeThresholdMembersReacted: 4, PurgeBelowCountMembersNotInGuild: 0,
+				},
 			},
 		}, guildName, session)
 		require.NotNil(t, welcomeManager)
@@ -324,10 +331,12 @@ func TestRunPurge(t *testing.T) {
 
 	t.Run("should do purge", func(t *testing.T) {
 		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
-			Channel:   "my-channel",
+			Channel: "my-channel",
 			Messages: []welcome.Message{
-				{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1",
-					CanPurgeReactions: true, PurgeThresholdMembersReacted: 1, PurgeBelowCountMembersNotInGuild: 10},
+				{
+					Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1",
+					CanPurgeReactions: true, PurgeThresholdMembersReacted: 1, PurgeBelowCountMembersNotInGuild: 10,
+				},
 			},
 		}, guildName, session)
 		require.NotNil(t, welcomeManager)

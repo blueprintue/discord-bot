@@ -18,14 +18,14 @@ import (
 
 var (
 	// ErrDiscordName is when discord.name value is empty.
-	ErrDiscordName  = errors.New("invalid json value: discord.name is empty")
-	
+	ErrDiscordName = errors.New("invalid json value: discord.name is empty")
+
 	// ErrDiscordToken is when discord.token value is empty.
 	ErrDiscordToken = errors.New("invalid json value: discord.token is empty")
-	
+
 	// ErrLogFilename is when log.filename value is empty.
 	ErrLogFilename = errors.New("invalid json value: log.filename is empty")
-	
+
 	// ErrLogLevel is when log.level value is invalid.
 	ErrLogLevel = errors.New("invalid json value: log.level is invalid")
 )

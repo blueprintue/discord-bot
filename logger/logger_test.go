@@ -6,6 +6,7 @@ import (
 
 	"github.com/blueprintue/discord-bot/configuration"
 	"github.com/blueprintue/discord-bot/logger"
+
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 )

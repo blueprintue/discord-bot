@@ -6,6 +6,7 @@ import (
 	"testing/fstest"
 
 	"github.com/blueprintue/discord-bot/configuration"
+
 	"github.com/stretchr/testify/require"
 )
 

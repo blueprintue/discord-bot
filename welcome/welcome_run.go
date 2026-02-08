@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/blueprintue/discord-bot/helpers"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
 )
@@ -31,7 +32,7 @@ func (w *Manager) Run() error {
 
 		return err
 	}
-	
+
 	log.Info().
 		Msg("discord_bot.welcome.messages_added")
 

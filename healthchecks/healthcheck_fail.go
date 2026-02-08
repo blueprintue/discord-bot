@@ -19,7 +19,7 @@ func (m *Manager) Fail() {
 	if err != nil {
 		log.Error().Err(err).
 			Msg("discord_bot.healthchecks.send_failed_message_failed")
-		
+
 		return
 	}
 

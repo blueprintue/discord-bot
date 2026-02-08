@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/blueprintue/discord-bot/helpers"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/stretchr/testify/require"
 )
