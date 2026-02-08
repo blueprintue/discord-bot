@@ -3,10 +3,8 @@ package welcome
 
 import (
 	"fmt"
-	"slices"
 	"strings"
 
-	"github.com/blueprintue/discord-bot/helpers"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
 )
@@ -33,9 +31,9 @@ type Message struct {
 	RoleID                           string
 	Emoji                            string `json:"emoji"`
 	EmojiID                          string
-	CanPurgeReactions                bool `json:"can_purge_reactions"`
-	PurgeThresholdMembersReacted     int  `json:"purge_threshold_members_reacted"`
-	PurgeBelowCountMembersNotInGuild int  `json:"purge_below_count_members_not_in_guild"`
+	CanPurgeReactions                bool   `json:"can_purge_reactions"`
+	PurgeThresholdMembersReacted     int    `json:"purge_threshold_members_reacted"`
+	PurgeBelowCountMembersNotInGuild int    `json:"purge_below_count_members_not_in_guild"`
 }
 
 // Manager is a struct.
@@ -72,15 +70,7 @@ func NewWelcomeManager(
 		return nil
 	}
 
-	log.Info().
-		Str("package", "welcome").
-		Msg("Completing configuration with session.State")
-
 	manager.completeConfiguration(config)
-
-	log.Info().
-		Str("package", "welcome").
-		Msg("Checking configuration 2/2")
 
 	if !manager.hasValidConfigurationAgainstDiscordServer(config) {
 		log.Error().
@@ -91,6 +81,10 @@ func NewWelcomeManager(
 		return nil
 	}
 
+	log.Info().
+		Str("package", "welcome").
+		Msg("discord_bot.welcome.configuration_validated")
+
 	return manager
 }
 
@@ -98,7 +92,7 @@ func hasValidConfigurationInFile(config Configuration) bool {
 	if config.Channel == "" {
 		log.Error().
 			Str("package", "welcome").
-			Msg("discord_bot.welcome.empty_channel")
+			Msg("discord_bot.welcome.configuration_empty_channel")
 
 		return false
 	}
@@ -106,7 +100,7 @@ func hasValidConfigurationInFile(config Configuration) bool {
 	if len(config.Messages) == 0 {
 		log.Error().
 			Str("package", "welcome").
-			Msg("discord_bot.welcome.empty_messages")
+			Msg("discord_bot.welcome.configuration_empty_messages")
 
 		return false
 	}
@@ -118,7 +112,7 @@ func hasValidConfigurationInFile(config Configuration) bool {
 				Int("message index", idx).
 				Str("title", message.Title).
 				Str("description", message.Description).
-				Msg("discord_bot.welcome.empty_title_description_message")
+				Msg("discord_bot.welcome.configuration_empty_title_description_message")
 
 			return false
 		}
@@ -127,7 +121,7 @@ func hasValidConfigurationInFile(config Configuration) bool {
 			log.Error().
 				Str("package", "welcome").
 				Int("message index", idx).
-				Msg("discord_bot.welcome.empty_emoji_message")
+				Msg("discord_bot.welcome.configuration_empty_emoji_message")
 
 			return false
 		}
@@ -136,7 +130,7 @@ func hasValidConfigurationInFile(config Configuration) bool {
 			log.Error().
 				Str("package", "welcome").
 				Int("message index", idx).
-				Msg("discord_bot.welcome.empty_role_message")
+				Msg("discord_bot.welcome.configuration_empty_role_message")
 
 			return false
 		}
@@ -158,7 +152,7 @@ func (w *Manager) completeConfiguration(config Configuration) {
 			Str("package", "welcome").
 			Str("guild_id", guild.ID).
 			Str("guild", w.guildName).
-			Msg("Set GuildID")
+			Msg("discord_bot.welcome.set_guild_id")
 
 		w.guildID = guild.ID
 
@@ -171,7 +165,7 @@ func (w *Manager) completeConfiguration(config Configuration) {
 				Str("package", "welcome").
 				Str("channel_id", channel.ID).
 				Str("channel", config.Channel).
-				Msg("Set ChannelID")
+				Msg("discord_bot.welcome.set_channel_id")
 
 			w.channelID = channel.ID
 			w.channelName = config.Channel
@@ -187,9 +181,10 @@ func (w *Manager) completeConfiguration(config Configuration) {
 
 				log.Info().
 					Str("package", "welcome").
+					Int("message index", idx).
 					Str("role_id", role.ID).
 					Str("role", w.messages[idx].Role).
-					Msg("Set RoleID")
+					Msg("discord_bot.welcome.set_role_id")
 
 				w.messages[idx].RoleID = role.ID
 			}
@@ -209,9 +204,10 @@ func (w *Manager) completeConfiguration(config Configuration) {
 
 				log.Info().
 					Str("package", "welcome").
+					Int("message index", idx).
 					Str("emoji_id", emoji.ID).
 					Str("emoji", w.messages[idx].Emoji).
-					Msg("Set EmojiID")
+					Msg("discord_bot.welcome.set_emoji_id")
 
 				w.messages[idx].EmojiID = emoji.ID
 			}
@@ -225,8 +221,8 @@ func (w *Manager) hasValidConfigurationAgainstDiscordServer(config Configuration
 	if w.guildID == "" {
 		log.Error().
 			Str("package", "welcome").
-			Str("guild in config", w.guildName).
-			Msg("Guild not found in Discord server")
+			Str("guild", w.guildName).
+			Msg("discord_bot.welcome.configuration_guild_missed")
 
 		return false
 	}
@@ -234,8 +230,8 @@ func (w *Manager) hasValidConfigurationAgainstDiscordServer(config Configuration
 	if w.channelID == "" {
 		log.Error().
 			Str("package", "welcome").
-			Str("channel in config", config.Channel).
-			Msg("Channel not found in Discord server")
+			Str("channel", config.Channel).
+			Msg("discord_bot.welcome.configuration_channel_missed")
 
 		return false
 	}
@@ -244,9 +240,9 @@ func (w *Manager) hasValidConfigurationAgainstDiscordServer(config Configuration
 		if message.EmojiID == "" {
 			log.Error().
 				Str("package", "welcome").
-				Int("message #", idx).
-				Str("emoji in config", message.Emoji).
-				Msg("Emoji not found in Discord server")
+				Int("message index", idx).
+				Str("emoji", message.Emoji).
+				Msg("discord_bot.welcome.configuration_emoji_missed")
 
 			return false
 		}
@@ -254,443 +250,13 @@ func (w *Manager) hasValidConfigurationAgainstDiscordServer(config Configuration
 		if message.RoleID == "" {
 			log.Error().
 				Str("package", "welcome").
-				Int("message #", idx).
-				Str("role in config", message.Role).
-				Msg("Role not found in Discord server")
+				Int("message index", idx).
+				Str("role", message.Role).
+				Msg("discord_bot.welcome.configuration_role_missed")
 
 			return false
 		}
 	}
 
 	return true
-}
-
-// Run do the main task of Welcome.
-func (w *Manager) Run() error {
-	log.Info().
-		Str("package", "welcome").
-		Msg("Adding Handler on Message Reaction Add")
-
-	w.discordSession.AddHandler(w.OnMessageReactionAdd)
-
-	log.Info().
-		Str("package", "welcome").
-		Msg("Adding Handler on Message Reaction Remove")
-
-	w.discordSession.AddHandler(w.OnMessageReactionRemove)
-
-	log.Info().
-		Str("package", "welcome").
-		Msg("Adding messages to channel")
-
-	err := w.addMessagesToChannel()
-	if err != nil {
-		log.Error().Err(err).
-			Str("package", "welcome").
-			Msg("Could not add messages to channel")
-
-		return err
-	}
-
-	return nil
-}
-
-//nolint:funlen,cyclop
-func (w *Manager) addMessagesToChannel() error {
-	log.Info().
-		Str("package", "welcome").
-		Str("channel_id", w.channelID).
-		Str("channel", w.channelName).
-		Msg("Getting Messages from Channel")
-
-	messages, err := w.discordSession.ChannelMessages(w.channelID, limitChannelMessages, "", "", "")
-	if err != nil {
-		log.Error().Err(err).
-			Str("package", "welcome").
-			Str("channel_id", w.channelID).
-			Str("channel", w.channelName).
-			Msg("Could not read Messages from Channel")
-
-		return fmt.Errorf("%w", err)
-	}
-
-	var idxsMessageTreated []int
-
-	for _, message := range messages {
-		if message.Author.ID != w.discordSession.State.User.ID {
-			log.Info().
-				Str("package", "welcome").
-				Str("message_id", message.ID).
-				Str("channel_id", w.channelID).
-				Str("channel", w.channelName).
-				Msg("SKIP - Message in Channel is not from bot")
-
-			continue
-		}
-
-		if len(message.Embeds) == 0 {
-			log.Info().
-				Str("package", "welcome").
-				Str("message_id", message.ID).
-				Str("channel_id", w.channelID).
-				Str("channel", w.channelName).
-				Msg("SKIP - Message in Channel is not an embed")
-
-			continue
-		}
-
-		for idxMessages := range w.messages {
-			if w.isSameMessageAgainstConfig(message.Embeds[0], w.messages[idxMessages]) {
-				w.messages[idxMessages].ID = message.ID
-
-				log.Info().
-					Str("package", "welcome").
-					Str("message_title", w.messages[idxMessages].Title).
-					Msg("Message already sent -> update roles")
-
-				err := w.updateRoleBelongMessage(w.messages[idxMessages])
-				if err != nil {
-					log.Error().Err(err).
-						Str("package", "welcome").
-						Str("message_title", w.messages[idxMessages].Title).
-						Msg("Could not update role belong to Message")
-
-					return err
-				}
-
-				idxsMessageTreated = append(idxsMessageTreated, idxMessages)
-
-				break
-			}
-		}
-	}
-
-	for idxMessages := range w.messages {
-		messageTreated := slices.Contains(idxsMessageTreated, idxMessages)
-
-		if !messageTreated {
-			log.Info().
-				Str("package", "welcome").
-				Str("message_title", w.messages[idxMessages].Title).
-				Msg("Message missing - add Message")
-
-			err := w.addMessage(&w.messages[idxMessages])
-			if err != nil {
-				log.Error().Err(err).
-					Str("package", "welcome").
-					Str("message_title", w.messages[idxMessages].Title).
-					Msg("Could not add Message")
-
-				return err
-			}
-
-			idxsMessageTreated = append(idxsMessageTreated, idxMessages)
-		}
-	}
-
-	return nil
-}
-
-func (w *Manager) isSameMessageAgainstConfig(messageFromDiscord *discordgo.MessageEmbed, messageFromConfig Message) bool {
-	return messageFromDiscord.Title == messageFromConfig.Title &&
-		messageFromDiscord.Description == messageFromConfig.Description &&
-		messageFromDiscord.Color == messageFromConfig.Color
-}
-
-//nolint:funlen,cyclop
-func (w *Manager) updateRoleBelongMessage(message Message) error {
-	log.Info().
-		Str("package", "welcome").
-		Str("message_id", message.ID).
-		Str("message_title", message.Title).
-		Str("channel_id", w.channelID).
-		Str("channel", w.channelName).
-		Str("emoji", message.Emoji+":"+message.EmojiID).
-		Msg("Getting all Reactions from Message")
-
-	users, err := helpers.MessageReactionsAll(w.discordSession, w.channelID, message.ID, message.Emoji+":"+message.EmojiID)
-	if err != nil {
-		log.Error().Err(err).
-			Str("package", "welcome").
-			Str("message_id", message.ID).
-			Str("channel_id", w.channelID).
-			Str("channel", w.channelName).
-			Str("emoji", message.Emoji+":"+message.EmojiID).
-			Msg("Could not get all Reactions")
-
-		return fmt.Errorf("%w", err)
-	}
-
-	membersNotInGuild := []string{}
-
-	for _, user := range users {
-		if w.isUserBot(user.ID) {
-			continue
-		}
-
-		member, err := w.discordSession.State.Member(w.guildID, user.ID)
-		if err != nil {
-			log.Error().Err(err).
-				Str("package", "welcome").
-				Str("user_id", user.ID).
-				Str("guild_id", w.guildID).
-				Msg("Could not find Member in Guild")
-
-			membersNotInGuild = append(membersNotInGuild, user.ID)
-
-			continue
-		}
-
-		skipUser := slices.Contains(member.Roles, message.RoleID)
-
-		if skipUser {
-			continue
-		}
-
-		log.Info().
-			Str("package", "welcome").
-			Str("role_id", message.RoleID).
-			Str("role", message.Role).
-			Str("user_id", user.ID).
-			Str("username", user.Username).
-			Msg("Adding Role to User")
-
-		err = w.discordSession.GuildMemberRoleAdd(w.guildID, user.ID, message.RoleID)
-		if err != nil {
-			log.Error().Err(err).
-				Str("package", "welcome").
-				Str("role_id", message.RoleID).
-				Str("role", message.Role).
-				Str("user_id", user.ID).
-				Str("username", user.Username).
-				Msg("discord_bot.welcome.user_role_adding_failed")
-
-			return fmt.Errorf("%w", err)
-		}
-	}
-
-	if len(membersNotInGuild) > 0 {
-		log.Info().
-			Str("package", "welcome").
-			Int("count_members_reacted", len(users)).
-			Int("count_members_not_found", len(membersNotInGuild)).
-			Msg("Members not found in Guild")
-
-		if message.CanPurgeReactions &&
-			len(users) >= message.PurgeThresholdMembersReacted &&
-			len(membersNotInGuild) <= message.PurgeBelowCountMembersNotInGuild {
-			log.Info().
-				Str("package", "welcome").
-				Msg("Do purge")
-
-			for idx := range membersNotInGuild {
-				log.Info().
-					Str("package", "welcome").
-					Str("message_id", message.ID).
-					Str("emoji", message.Emoji+":"+message.EmojiID).
-					Str("user_id", membersNotInGuild[idx]).
-					Msg("Removing Reaction on Message for User")
-
-				err = w.discordSession.MessageReactionRemove(w.channelID, message.ID, message.Emoji+":"+message.EmojiID, membersNotInGuild[idx])
-				if err != nil {
-					log.Error().Err(err).
-						Str("package", "welcome").
-						Str("message_id", message.ID).
-						Str("emoji", message.Emoji+":"+message.EmojiID).
-						Str("user_id", membersNotInGuild[idx]).
-						Msg("Could not remove Reaction")
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
-func (w *Manager) addMessage(message *Message) error {
-	log.Info().
-		Str("package", "welcome").
-		Str("message_title", message.Title).
-		Str("channel_id", w.channelID).
-		Str("channel", w.channelName).
-		Msg("Sending Message to Channel")
-
-	messageSent, err := w.discordSession.ChannelMessageSendEmbed(w.channelID, &discordgo.MessageEmbed{
-		Title:       message.Title,
-		Description: message.Description,
-		Color:       message.Color,
-	})
-	if err != nil {
-		log.Error().Err(err).
-			Str("package", "welcome").
-			Str("message_title", message.Title).
-			Str("channel_id", w.channelID).
-			Str("channel", w.channelName).
-			Msg("Could not send Message to Channel")
-
-		return fmt.Errorf("%w", err)
-	}
-
-	log.Info().
-		Str("package", "welcome").
-		Str("message_id", messageSent.ID).
-		Str("channel_id", w.channelID).
-		Str("channel", w.channelName).
-		Msg("Message Sent")
-
-	message.ID = messageSent.ID
-
-	log.Info().
-		Str("package", "welcome").
-		Str("message_id", messageSent.ID).
-		Str("message_title", message.Title).
-		Str("emoji", message.Emoji+":"+message.EmojiID).
-		Msg("Adding Reaction to Message")
-
-	err = w.discordSession.MessageReactionAdd(w.channelID, message.ID, message.Emoji+":"+message.EmojiID)
-	if err != nil {
-		log.Error().Err(err).
-			Str("package", "welcome").
-			Str("message_id", message.ID).
-			Str("emoji", message.Emoji+":"+message.EmojiID).
-			Msg("Could not add Reaction to Message")
-
-		return fmt.Errorf("%w", err)
-	}
-
-	return nil
-}
-
-// OnMessageReactionAdd is public for tests, never call it directly
-//
-//nolint:dupl
-func (w *Manager) OnMessageReactionAdd(_ *discordgo.Session, reaction *discordgo.MessageReactionAdd) {
-	log.Debug().
-		Str("package", "welcome").
-		Msg("discord_bot.welcome.event_message_reaction_add_received")
-
-	if reaction == nil || reaction.MessageReaction == nil {
-		return
-	}
-
-	idxMessageFound, found := w.isMessageReactionMatching(reaction.MessageReaction)
-	if !found {
-		return
-	}
-
-	log.Info().
-		Str("package", "welcome").
-		Str("role_id", w.messages[idxMessageFound].RoleID).
-		Str("role", w.messages[idxMessageFound].Role).
-		Str("channel_id", reaction.ChannelID).
-		Str("message_id", reaction.MessageID).
-		Str("user_id", reaction.UserID).
-		Msg("discord_bot.welcome.user_role_adding")
-
-	err := w.discordSession.GuildMemberRoleAdd(w.guildID, reaction.UserID, w.messages[idxMessageFound].RoleID)
-	if err != nil {
-		log.Error().Err(err).
-			Str("package", "welcome").
-			Str("role_id", w.messages[idxMessageFound].RoleID).
-			Str("role", w.messages[idxMessageFound].Role).
-			Str("channel_id", reaction.ChannelID).
-			Str("message_id", reaction.MessageID).
-			Str("user_id", reaction.UserID).
-			Msg("discord_bot.welcome.user_role_adding_failed")
-
-		return
-	}
-
-	log.Info().
-		Str("package", "welcome").
-		Str("role_id", w.messages[idxMessageFound].RoleID).
-		Str("role", w.messages[idxMessageFound].Role).
-		Str("channel_id", reaction.ChannelID).
-		Str("message_id", reaction.MessageID).
-		Str("user_id", reaction.UserID).
-		Msg("discord_bot.welcome.user_role_added")
-}
-
-// OnMessageReactionRemove is public for tests, never call it directly
-//
-//nolint:dupl
-func (w *Manager) OnMessageReactionRemove(_ *discordgo.Session, reaction *discordgo.MessageReactionRemove) {
-	log.Debug().
-		Str("package", "welcome").
-		Msg("discord_bot.welcome.event_message_reaction_remove_received")
-
-	if reaction == nil || reaction.MessageReaction == nil {
-		return
-	}
-
-	idxMessageFound, found := w.isMessageReactionMatching(reaction.MessageReaction)
-	if !found {
-		return
-	}
-
-	log.Info().
-		Str("package", "welcome").
-		Str("role_id", w.messages[idxMessageFound].RoleID).
-		Str("role", w.messages[idxMessageFound].Role).
-		Str("channel_id", reaction.ChannelID).
-		Str("message_id", reaction.MessageID).
-		Str("user_id", reaction.UserID).
-		Msg("discord_bot.welcome.user_role_removing")
-
-	err := w.discordSession.GuildMemberRoleRemove(w.guildID, reaction.UserID, w.messages[idxMessageFound].RoleID)
-	if err != nil {
-		log.Error().Err(err).
-			Str("package", "welcome").
-			Str("role_id", w.messages[idxMessageFound].RoleID).
-			Str("role", w.messages[idxMessageFound].Role).
-			Str("channel_id", reaction.ChannelID).
-			Str("message_id", reaction.MessageID).
-			Str("user_id", reaction.UserID).
-			Msg("discord_bot.welcome.user_role_removing_failed")
-		
-		return
-	}
-
-	log.Info().
-		Str("package", "welcome").
-		Str("role_id", w.messages[idxMessageFound].RoleID).
-		Str("role", w.messages[idxMessageFound].Role).
-		Str("channel_id", reaction.ChannelID).
-		Str("message_id", reaction.MessageID).
-		Str("user_id", reaction.UserID).
-		Msg("discord_bot.welcome.user_role_removed")
-}
-
-func (w *Manager) isMessageReactionMatching(messageReaction *discordgo.MessageReaction) (int, bool) {
-	if messageReaction.ChannelID != w.channelID {
-		return -1, false
-	}
-
-	if w.isUserBot(messageReaction.UserID) {
-		return -1, false
-	}
-
-	idxMessageFound := -1
-
-	for idxMessage := range w.messages {
-		if messageReaction.MessageID == w.messages[idxMessage].ID {
-			idxMessageFound = idxMessage
-
-			break
-		}
-	}
-
-	if idxMessageFound == -1 {
-		return -1, false
-	}
-
-	if messageReaction.Emoji.Name != w.messages[idxMessageFound].Emoji {
-		return -1, false
-	}
-	
-	return idxMessageFound, true
-}
-
-func (w *Manager) isUserBot(userID string) bool {
-	return w.discordSession.State.User.ID == userID
 }
