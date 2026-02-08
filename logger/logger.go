@@ -29,7 +29,6 @@ func Configure(confLog configuration.Log) error {
 	logFile := path.Clean(confLog.Filename)
 
 	log.Info().
-		Str("package", "logger").
 		Str("path", path.Dir(logFile)).
 		Uint("permission", permissionDirectory).
 		Msg("discord_bot.logger.creating_log_folder")
@@ -37,7 +36,6 @@ func Configure(confLog configuration.Log) error {
 	err = os.MkdirAll(path.Dir(logFile), permissionDirectory)
 	if err != nil {
 		log.Error().Err(err).
-			Str("package", "logger").
 			Str("path", path.Dir(logFile)).
 			Uint("permission", permissionDirectory).
 			Msg("discord_bot.logger.log_folder_creation_failed")
@@ -46,13 +44,11 @@ func Configure(confLog configuration.Log) error {
 	}
 
 	log.Info().
-		Str("package", "logger").
 		Str("path", path.Dir(logFile)).
 		Uint("permission", permissionDirectory).
 		Msg("discord_bot.logger.log_folder_created")
 
 	log.Info().
-		Str("package", "logger").
 		Str("log_file", logFile).
 		Int("number_files_rotation", confLog.NumberFilesRotation).
 		Msg("discord_bot.logger.creating_log_rotate_writer")
@@ -60,7 +56,6 @@ func Configure(confLog configuration.Log) error {
 	rwriter, err := rotatewriter.NewRotateWriter(logFile, confLog.NumberFilesRotation)
 	if err != nil {
 		log.Error().Err(err).
-			Str("package", "logger").
 			Str("log_file", logFile).
 			Int("number_files_rotation", confLog.NumberFilesRotation).
 			Msg("discord_bot.logger.log_rotate_writer_creation_failed")
@@ -69,7 +64,6 @@ func Configure(confLog configuration.Log) error {
 	}
 
 	log.Info().
-		Str("package", "logger").
 		Str("log_file", logFile).
 		Int("number_files_rotation", confLog.NumberFilesRotation).
 		Msg("discord_bot.logger.log_rotate_writer_created")
@@ -88,21 +82,18 @@ func Configure(confLog configuration.Log) error {
 			errRotate := rwriter.Rotate(nil)
 			if errRotate != nil {
 				log.Error().Err(errRotate).
-					Str("package", "logger").
 					Msg("discord_bot.logger.log_rotate_failed")
 			}
 		}
 	}()
 
 	log.Info().
-		Str("package", "logger").
 		Str("log_level", confLog.Level).
 		Msg("discord_bot.logger.parsing_log_level")
 
 	logLevel, err := zerolog.ParseLevel(confLog.Level)
 	if err != nil {
 		log.Error().Err(err).
-			Str("package", "logger").
 			Str("log_level", confLog.Level).
 			Msg("discord_bot.logger.log_level_parsing_failed")
 
@@ -110,7 +101,6 @@ func Configure(confLog configuration.Log) error {
 	}
 
 	log.Info().
-		Str("package", "logger").
 		Str("log_level", confLog.Level).
 		Msg("discord_bot.logger.log_level_parsed")
 
