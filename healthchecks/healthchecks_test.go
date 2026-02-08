@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/blueprintue/discord-bot/healthchecks"
+
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"

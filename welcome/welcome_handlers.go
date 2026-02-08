@@ -84,7 +84,7 @@ func (w *Manager) OnMessageReactionRemove(_ *discordgo.Session, reaction *discor
 			Str("message_id", reaction.MessageID).
 			Str("user_id", reaction.UserID).
 			Msg("discord_bot.welcome.user_role_removing_failed")
-		
+
 		return
 	}
 
@@ -123,6 +123,6 @@ func (w *Manager) isMessageReactionMatching(messageReaction *discordgo.MessageRe
 	if messageReaction.Emoji.Name != w.messages[idxMessageFound].Emoji {
 		return -1, false
 	}
-	
+
 	return idxMessageFound, true
 }

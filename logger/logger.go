@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/blueprintue/discord-bot/configuration"
+
 	"github.com/ilya1st/rotatewriter"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -17,7 +18,7 @@ import (
 
 const (
 	formatTimestampLogger = "2006-01-02T15:04:05.000000000Z07:00"
-	permissionDirectory   = 0750
+	permissionDirectory   = 0o750
 )
 
 // Configure configures logger.

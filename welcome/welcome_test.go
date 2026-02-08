@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/blueprintue/discord-bot/welcome"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -35,7 +36,7 @@ func TestNewWelcomeManager(t *testing.T) {
 	})
 
 	welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
-		Channel:   "my-channel",
+		Channel: "my-channel",
 		Messages: []welcome.Message{
 			{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1"},
 		},
@@ -263,7 +264,7 @@ func TestNewWelcomeManager_ErrorHasValidConfigurationAgainstDiscordServer(t *tes
 		})
 
 		welcomeManager := welcome.NewWelcomeManager(welcome.Configuration{
-			Channel:   "my-channel",
+			Channel: "my-channel",
 			Messages: []welcome.Message{
 				{Title: "my title 1", Emoji: "my-emoji-1", EmojiID: "emoji-123", Role: "my role 1"},
 			},

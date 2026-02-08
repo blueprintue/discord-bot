@@ -28,6 +28,19 @@ linters:
         linters:
           - errcheck
           - lll
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    gci:
+      custom-order: true
+      sections:
+        - standard
+        - prefix(github.com/blueprintue)
+        - default
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0

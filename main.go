@@ -12,6 +12,7 @@ import (
 	"github.com/blueprintue/discord-bot/healthchecks"
 	"github.com/blueprintue/discord-bot/logger"
 	"github.com/blueprintue/discord-bot/welcome"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog/log"
 )
@@ -93,9 +94,9 @@ pending_discord_session_open_completely:
 		default:
 			log.Info().
 				Msg("discord_bot.main.pending_discord_session_open_completely")
-	
+
 			time.Sleep(waitStateFilled)
-	
+
 			if hasRequiredStateFieldsFilled(discordSession) {
 				break pending_discord_session_open_completely
 			}
@@ -166,7 +167,7 @@ func startModuleHealthchecks(configuration *healthchecks.Configuration) *healthc
 	if healthchecksManager == nil {
 		log.Error().
 			Msg("discord_bot.main.healthchecks.creation_failed")
-		
+
 		return nil
 	}
 
@@ -186,7 +187,7 @@ func startModuleHealthchecks(configuration *healthchecks.Configuration) *healthc
 
 	log.Info().
 		Msg("discord_bot.main.healthchecks.started")
-	
+
 	return healthchecksManager
 }
 
@@ -205,7 +206,7 @@ func startModuleWelcome(configuration *welcome.Configuration, guildName string, 
 	if welcomeManager == nil {
 		log.Error().
 			Msg("discord_bot.main.welcome.creation_failed")
-		
+
 		return
 	}
 
