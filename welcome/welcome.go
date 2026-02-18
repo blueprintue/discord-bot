@@ -26,12 +26,12 @@ type Message struct {
 	ID                               string
 	Title                            string `json:"title"`
 	Description                      string `json:"description"`
-	Color                            int    `json:"color"`
 	Role                             string `json:"role"`
 	RoleID                           string
 	Emoji                            string `json:"emoji"`
 	EmojiID                          string
 	CanPurgeReactions                bool `json:"can_purge_reactions"`
+	Color                            int  `json:"color"`
 	PurgeThresholdMembersReacted     int  `json:"purge_threshold_members_reacted"`
 	PurgeBelowCountMembersNotInGuild int  `json:"purge_below_count_members_not_in_guild"`
 }

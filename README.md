@@ -5,7 +5,6 @@
 [![Build Status](https://img.shields.io/github/actions/workflow/status/blueprintue/discord-bot/build.yml?label=build&logo=github)](https://github.com/blueprintue/discord-bot/actions/workflows/build.yml)
 [![Docker Stars](https://img.shields.io/docker/stars/blueprintue/discord-bot?logo=docker)](https://hub.docker.com/r/blueprintue/discord-bot/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/blueprintue/discord-bot?logo=docker)](https://hub.docker.com/r/blueprintue/discord-bot/)
-[![Go Report Card](https://goreportcard.com/badge/github.com/blueprintue/discord-bot)](https://goreportcard.com/report/github.com/blueprintue/discord-bot)
 [![Codecov](https://img.shields.io/codecov/c/github/blueprintue/discord-bot?logo=codecov)](https://codecov.io/gh/blueprintue/discord-bot)
 
 ## Usage
@@ -87,6 +86,29 @@ It uses zerolog levels (from highest to lowest):
 * trace (zerolog.TraceLevel, -1)
 
 ### Modules
+#### Exporter
+Export discord channels/messages/auhors in sqlite database file and attachements.  
+Use the configuration from Discord and Log.
+
+JSON configuration used:  
+```json
+"exporter": {
+  "mode": "once",
+  "channels_included": [],
+  "channels_excluded": [],
+  "output_path": "./",
+  "database_filename": "discord.db"
+}
+```
+
+| JSON Parameter    | Mandatory | Type     | Specific values | Default value | Description                                                         |
+| ----------------- | --------- | -------- | --------------- | ------------- | ------------------------------------------------------------------- |
+| mode              | YES       | string   | once            |               | `once`: do the export                                               |
+| channels_included | NO        | []string |                 | empty array   | list of channels to ONLY export                                     |
+| channels_excluded | NO        | []string |                 | empty array   | list of channels to NOT export                                      |
+| output_path       | NO        | string   |                 | "./exports"   | relative or absolute path (it will create directories if not exist) |
+| database_filename | NO        | string   |                 | "discord.db"  | sqlite database filename                                            |
+
 #### Healthchecks
 Uses the [Healthchecks.io](https://healthchecks.io) service to check whether `discord-bot` is online or not.  
 It can triggers alerts on several systems if it is down.  

@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
@@ -25,19 +27,32 @@ const (
 //
 //nolint:funlen
 func Configure(confLog configuration.Log) error {
-	var err error
+	var (
+		err     error
+		logFile string
+	)
 
-	logFile := path.Clean(confLog.Filename)
+	rawFilename := strings.TrimSpace(confLog.Filename)
 
 	log.Info().
-		Str("path", path.Dir(logFile)).
-		Uint("permission", permissionDirectory).
+		Str("config.filename", rawFilename).
 		Msg("discord_bot.logger.creating_log_folder")
 
-	err = os.MkdirAll(path.Dir(logFile), permissionDirectory)
+	logFile, err = filepath.Abs(rawFilename)
 	if err != nil {
 		log.Error().Err(err).
-			Str("path", path.Dir(logFile)).
+			Str("config.filename", rawFilename).
+			Msg("discord_bot.logger.log_folder_creation_failed")
+
+		return fmt.Errorf("%w", err)
+	}
+
+	logDir := path.Dir(logFile)
+
+	err = os.MkdirAll(logDir, permissionDirectory)
+	if err != nil {
+		log.Error().Err(err).
+			Str("filepath", logDir).
 			Uint("permission", permissionDirectory).
 			Msg("discord_bot.logger.log_folder_creation_failed")
 
@@ -45,7 +60,7 @@ func Configure(confLog configuration.Log) error {
 	}
 
 	log.Info().
-		Str("path", path.Dir(logFile)).
+		Str("filepath", logDir).
 		Uint("permission", permissionDirectory).
 		Msg("discord_bot.logger.log_folder_created")
 

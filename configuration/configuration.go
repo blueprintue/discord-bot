@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/blueprintue/discord-bot/exporter"
 	"github.com/blueprintue/discord-bot/healthchecks"
 	"github.com/blueprintue/discord-bot/welcome"
 )
@@ -54,6 +55,7 @@ type Log struct {
 
 // Modules contains configuration for each modules: welcome, healthchecks.
 type Modules struct {
+	ExporterConfiguration    *exporter.Configuration     `json:"exporter,omitempty"`
 	HealthcheckConfiguration *healthchecks.Configuration `json:"healthchecks,omitempty"`
 	WelcomeConfiguration     *welcome.Configuration      `json:"welcome,omitempty"`
 }
