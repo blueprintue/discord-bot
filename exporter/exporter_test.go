@@ -16,6 +16,7 @@ import (
 
 const guildName = "guild-name"
 
+//nolint:thelper
 func SkipTestNewExporterManager(t *testing.T) {
 	var bufferLogs bytes.Buffer
 
