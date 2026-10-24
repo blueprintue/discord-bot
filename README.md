@@ -5,7 +5,6 @@
 [![Build Status](https://img.shields.io/github/actions/workflow/status/blueprintue/discord-bot/build.yml?label=build&logo=github)](https://github.com/blueprintue/discord-bot/actions/workflows/build.yml)
 [![Docker Stars](https://img.shields.io/docker/stars/blueprintue/discord-bot?logo=docker)](https://hub.docker.com/r/blueprintue/discord-bot/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/blueprintue/discord-bot?logo=docker)](https://hub.docker.com/r/blueprintue/discord-bot/)
-[![Codecov](https://img.shields.io/codecov/c/github/blueprintue/discord-bot?logo=codecov)](https://codecov.io/gh/blueprintue/discord-bot)
 
 ## Usage
 
